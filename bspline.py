@@ -40,10 +40,9 @@ def cubic_bspline(s, ps):
     interval = n - 1
     u = 1.
 
-  print()
-  #print('n:',n)
-  print('t:', t, 'interval:',interval)
-  print('u:',u)
+  #print()
+  #print('t:', t, 'interval:',interval)
+  #print('u:',u)
   assert interval >= 3
   assert interval < n
 
@@ -89,9 +88,6 @@ def cubic_bspline2(sx, sy, ps):
   """
   s in [0, 1]
   """
-  #assert 2 == ps.dim
-  print(ps.shape)
-  assert ps.shape == (6+4, 4+4, 3) # REMOVE!!!!!!!!! ONE TIME SANITY CHECK!
 
   nx = ps.shape[0]
   ny = ps.shape[1]
@@ -111,10 +107,9 @@ def cubic_bspline2(sx, sy, ps):
     interval_y = ny - 1
     uy = 1.
 
-  print()
-  #print('n:',n)
-  print('tx:', tx, 'ty:', ty, 'interval_x:',interval_x, 'interval_y:', interval_y)
-  print('ux:',ux,'uy:',uy)
+  #print()
+  #print('tx:', tx, 'ty:', ty, 'interval_x:',interval_x, 'interval_y:', interval_y)
+  #print('ux:',ux,'uy:',uy)
   assert interval_x >= 3
   assert interval_y >= 3
   assert interval_x < nx
@@ -127,42 +122,27 @@ def cubic_clamped_bspline(s, ps):
   return cubic_bspline(s, n_extra*[ps[0]] + ps + n_extra*[ps[-1]])
 
 def cubic_clamped_bspline2(sx, sy, ps):
+  n_extra = 2
   nx, ny, nps = ps.shape
-  clamped_ps = np.empty((nx+4, ny+4, nps))
+  clamped_ps = np.empty((nx+2*n_extra, ny+2*n_extra, nps))
   clamped_ps.fill(np.nan)
-  clamped_ps[2:-2, 2:-2, :] = ps
+  clamped_ps[n_extra:-n_extra, n_extra:-n_extra, :] = ps
 
-  # x edges
-  clamped_ps[   0, 2:-2, :] = ps[ 0,  :, :]
-  clamped_ps[   1, 2:-2, :] = ps[ 0,  :, :]
-  clamped_ps[  -2, 2:-2, :] = ps[-1,  :, :]
-  clamped_ps[  -1, 2:-2, :] = ps[-1,  :, :]
+  for k in range(n_extra):
+    # x edges
+    clamped_ps[   k, n_extra:-n_extra, :] = ps[ 0,  :, :]
+    clamped_ps[-1-k, n_extra:-n_extra, :] = ps[-1,  :, :]
 
-  # y edges
-  clamped_ps[2:-2,    0, :] = ps[ :,  0, :]
-  clamped_ps[2:-2,    1, :] = ps[ :,  0, :]
-  clamped_ps[2:-2,   -2, :] = ps[ :, -1, :]
-  clamped_ps[2:-2,   -1, :] = ps[ :, -1, :]
-  # corners
-  clamped_ps[0, 0, :] = ps[0, 0, :]
-  clamped_ps[1, 0, :] = ps[0, 0, :]
-  clamped_ps[0, 1, :] = ps[0, 0, :]
-  clamped_ps[1, 1, :] = ps[0, 0, :]
+    # y edges
+    clamped_ps[n_extra:-n_extra,    k, :] = ps[ :,  0, :]
+    clamped_ps[n_extra:-n_extra, -1-k, :] = ps[ :, -1, :]
 
-  clamped_ps[0, -1, :] = ps[0, -1, :]
-  clamped_ps[1, -1, :] = ps[0, -1, :]
-  clamped_ps[0, -2, :] = ps[0, -1, :]
-  clamped_ps[1, -2, :] = ps[0, -1, :]
-
-  clamped_ps[-1, -1, :] = ps[-1, -1, :]
-  clamped_ps[-2, -1, :] = ps[-1, -1, :]
-  clamped_ps[-1, -2, :] = ps[-1, -1, :]
-  clamped_ps[-2, -2, :] = ps[-1, -1, :]
-
-  clamped_ps[-1, 0, :] = ps[-1, 0, :]
-  clamped_ps[-2, 0, :] = ps[-1, 0, :]
-  clamped_ps[-1, 1, :] = ps[-1, 0, :]
-  clamped_ps[-2, 1, :] = ps[-1, 0, :]
+    # corners
+    for j in range(n_extra):
+      clamped_ps[   k,    j, :] = ps[ 0,  0, :]
+      clamped_ps[   k, -1-j, :] = ps[ 0, -1, :]
+      clamped_ps[-1-k, -1-j, :] = ps[-1, -1, :]
+      clamped_ps[-1-k,    j, :] = ps[-1,  0, :]
 
   assert not np.any(np.isnan(clamped_ps))
   return cubic_bspline2(sx, sy, clamped_ps)
@@ -179,7 +159,6 @@ def main():
   ]
   ts = np.linspace(0., 1., 1000)
   xys = np.array([cubic_clamped_bspline(t, ps) for t in ts])
-  print(xys.shape)
 
   plt.figure()
   plt.plot([p[0] for p in ps], [p[1] for p in ps], 'r-.o')
@@ -193,7 +172,6 @@ def main():
     [(4.0, 0,  1.0), (4.0, 3,  4.0), (4.0, 4,  1.0), (4.0, 6,  1.0)],
     [(5.0, 0,  0.0), (5.0, 3,  0.0), (5.0, 4,  0.0), (5.0, 6,  0.0)],
   ])
-  #ps = [[np.array([x,y,z]) for x,y,z in rows] for rows in ps]
   us = np.linspace(0., 1., 50)
   vs = np.linspace(0., 1., 51)
 
