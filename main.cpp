@@ -14,20 +14,13 @@
 #include "camera.hpp"
 #include "bspline.hpp"
 #include "opengl_context.hpp"
+#include "problem/backboard.hpp"
 #include "shader/gridmesh.hpp"
 #include "shader/cat_texture.hpp"
 
 int main(int argc, char * argv[]) {
-  Eigen::Matrix<glm::dvec3, 6, 4> ps;
-  ps <<
-    glm::dvec3(1.0,0, 1.0),glm::dvec3(1.0,3, 1.0),glm::dvec3(1.0,4, 0.0),glm::dvec3(1.0,6, 1.0),
-    glm::dvec3(1.5,0, 1.0),glm::dvec3(1.5,3, 1.0),glm::dvec3(1.5,4, 1.0),glm::dvec3(1.5,6, 0.0),
-    glm::dvec3(2.0,0,-1.0),glm::dvec3(2.0,3,-2.0),glm::dvec3(2.0,4,-1.0),glm::dvec3(2.0,6,-1.0),
-    glm::dvec3(3.0,0, 0.0),glm::dvec3(3.0,3, 0.0),glm::dvec3(3.0,4, 1.0),glm::dvec3(3.0,7, 0.0),
-    glm::dvec3(4.0,0, 1.0),glm::dvec3(4.0,3, 4.0),glm::dvec3(4.0,4, 1.0),glm::dvec3(4.0,6, 1.0),
-    glm::dvec3(5.0,0, 0.0),glm::dvec3(5.0,3, 0.0),glm::dvec3(5.0,4, 0.0),glm::dvec3(5.0,6, 0.0);
-
-  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = ClampedCubicBSplineSurface<20, 30, 6, 4>(ps);
+  Backboard<6, 4> backboard;
+  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = backboard.Interpolate<20, 30>();
 
   // Parse args
   if (argc != 2) {
@@ -41,6 +34,7 @@ int main(int argc, char * argv[]) {
 
   // Gridmesh
   GridmeshShader gridmesh = CreateGridmeshFromMatrix(interpolated_ps);
+
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
 

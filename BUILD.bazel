@@ -30,6 +30,7 @@ cc_binary(
         "camera.hpp",
         "opengl_context.cpp",
         "opengl_context.hpp",
+        "problem/backboard.hpp",
         "shader/gridmesh.cpp",
         "shader/gridmesh.hpp",
         "shader/cat_texture.cpp",
