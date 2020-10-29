@@ -10,7 +10,7 @@
 
 #include <glm/glm.hpp>
 
-struct BackboardShader {
+struct GridmeshShader {
   GLint shaderProgram;
   GLuint VAO;
   GLuint VBO;
@@ -18,14 +18,14 @@ struct BackboardShader {
   int num_indices;
 };
 
-BackboardShader CreateBackboard(float *data, int rows, int cols);
-void DrawBackboard(const BackboardShader &backboard,
+GridmeshShader CreateGridmesh(float *data, int rows, int cols);
+void DrawGridmesh(const GridmeshShader &gridmesh,
                    const glm::mat4 &view,
                    const glm::mat4 &proj);
-void FreeBackboardGlResources(const BackboardShader &backboard);
+void FreeGridmeshGlResources(const GridmeshShader &gridmesh);
 
 template <int NU, int NV>
-BackboardShader CreateBackboardFromMatrix(Eigen::Matrix<glm::dvec3, NU, NV> mat) {
+GridmeshShader CreateGridmeshFromMatrix(Eigen::Matrix<glm::dvec3, NU, NV> mat) {
   std::vector<float> vec;
   for (int ku=0; ku<NU; ku++) {
     for (int kv=0; kv<NV; kv++) {
@@ -34,5 +34,5 @@ BackboardShader CreateBackboardFromMatrix(Eigen::Matrix<glm::dvec3, NU, NV> mat)
       vec.push_back(static_cast<float>(mat(ku, kv).z));
     }
   }
-  return CreateBackboard(vec.data(), (int)NU, (int)NV);
+  return CreateGridmesh(vec.data(), (int)NU, (int)NV);
 }

@@ -1,4 +1,4 @@
-#include "backboard.hpp"
+#include "gridmesh.hpp"
 
 #include <iostream>
 #include <vector>
@@ -29,7 +29,7 @@ const char *fragmentShaderSource = R"glsl(
   }
 )glsl";
 
-GLint CreateBackboardShaderProgram() {
+GLint CreateGridmeshShaderProgram() {
   // build and compile our shader program
   // ------------------------------------
   // vertex shader
@@ -75,7 +75,7 @@ GLint CreateBackboardShaderProgram() {
   return shaderProgram;
 }
 
-static void CreateBackboardBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
+static void CreateGridmeshBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
                                    float *vertices, int num_vec3s,
                                    unsigned int *indices, int num_indices) {
   // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -116,9 +116,9 @@ static void CreateBackboardBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
   glBindVertexArray(0); 
 }
 
-BackboardShader CreateBackboard(float *vertices, int rows, int cols) {
-  BackboardShader backboard;
-  backboard.shaderProgram = CreateBackboardShaderProgram();
+GridmeshShader CreateGridmesh(float *vertices, int rows, int cols) {
+  GridmeshShader gridmesh;
+  gridmesh.shaderProgram = CreateGridmeshShaderProgram();
 
   int num_vertices = rows*cols;
   std::vector<GLuint> indices;
@@ -138,35 +138,35 @@ BackboardShader CreateBackboard(float *vertices, int rows, int cols) {
       indices.push_back(down);
     }
   }
-  backboard.num_indices = static_cast<GLint>(indices.size());
-  CreateBackboardBuffers(&backboard.VBO, &backboard.VAO, &backboard.EBO, vertices, num_vertices, indices.data(), backboard.num_indices);
-  return backboard;
+  gridmesh.num_indices = static_cast<GLint>(indices.size());
+  CreateGridmeshBuffers(&gridmesh.VBO, &gridmesh.VAO, &gridmesh.EBO, vertices, num_vertices, indices.data(), gridmesh.num_indices);
+  return gridmesh;
 }
 
-void DrawBackboard(const BackboardShader &backboard,
+void DrawGridmesh(const GridmeshShader &gridmesh,
                    const glm::mat4  &view,
                    const glm::mat4  &proj) {
   // draw triangle
-  glUseProgram(backboard.shaderProgram);
-  glBindVertexArray(backboard.VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+  glUseProgram(gridmesh.shaderProgram);
+  glBindVertexArray(gridmesh.VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
   // Set up transformations
-  GLint uniView = glGetUniformLocation(backboard.shaderProgram, "view");
-  GLint uniProj = glGetUniformLocation(backboard.shaderProgram, "proj");
+  GLint uniView = glGetUniformLocation(gridmesh.shaderProgram, "view");
+  GLint uniProj = glGetUniformLocation(gridmesh.shaderProgram, "proj");
   glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
   //glDrawArrays(GL_TRIANGLES, 0, 6);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDrawElements(GL_TRIANGLES, backboard.num_indices, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, gridmesh.num_indices, GL_UNSIGNED_INT, 0);
   // glBindVertexArray(0); // no need to unbind it every time 
 }
 
-void FreeBackboardGlResources(const BackboardShader &backboard) {
+void FreeGridmeshGlResources(const GridmeshShader &gridmesh) {
   // optional: de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  glDeleteVertexArrays(1, &backboard.VAO);
-  glDeleteBuffers(1, &backboard.VBO);
-  glDeleteBuffers(1, &backboard.EBO);
-  glDeleteProgram(backboard.shaderProgram);
+  glDeleteVertexArrays(1, &gridmesh.VAO);
+  glDeleteBuffers(1, &gridmesh.VBO);
+  glDeleteBuffers(1, &gridmesh.EBO);
+  glDeleteProgram(gridmesh.shaderProgram);
 }

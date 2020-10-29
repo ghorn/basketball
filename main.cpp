@@ -14,7 +14,7 @@
 #include "camera.hpp"
 #include "bspline.hpp"
 #include "opengl_context.hpp"
-#include "shader/backboard.hpp"
+#include "shader/gridmesh.hpp"
 #include "shader/cat_texture.hpp"
 
 int main(int argc, char * argv[]) {
@@ -39,8 +39,8 @@ int main(int argc, char * argv[]) {
   // Boilerplate
   GLFWwindow * const window = OpenglSetup();
 
-  // Backboard
-  BackboardShader backboard = CreateBackboardFromMatrix(interpolated_ps);
+  // Gridmesh
+  GridmeshShader gridmesh = CreateGridmeshFromMatrix(interpolated_ps);
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
 
@@ -70,15 +70,15 @@ int main(int argc, char * argv[]) {
     // cat
     DrawCatShader(cat_shader, model, view, proj);
 
-    // backboard
-    DrawBackboard(backboard, view, proj);
+    // gridmesh
+    DrawGridmesh(gridmesh, view, proj);
 
     // Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  FreeBackboardGlResources(backboard);
+  FreeGridmeshGlResources(gridmesh);
   FreeCatGlResources(cat_shader);
 
   glfwDestroyWindow(window);
