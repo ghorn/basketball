@@ -1,0 +1,52 @@
+cc_library(
+    name = "glad",
+    srcs = [
+        "glad/src/glad.c"
+    ],
+    hdrs = [
+        "glad/include/glad/glad.h",
+        "glad/include/KHR/khrplatform.h",
+    ],
+    includes = ["glad/include"],
+    linkopts = ['-ldl'],
+)
+
+cc_binary(
+    name = "vis",
+    srcs = [
+        "vis.cpp"
+    ],
+    linkopts = [
+        '-lglfw',
+        '-lGLEW',
+        '-lGL',
+        '-lSOIL',
+    ],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wconversion",
+        "-fdiagnostics-color=always",
+    ],
+    args = [
+        "$(location :court.png)",
+        #"$(location :sample.png)",
+    ],
+    data = [
+        ":court.png",
+        ":sample.png",
+        ":sample2.png",
+    ],
+    deps = [
+        #":glad",
+    ],
+)
+
+filegroup(
+    name = "court_texture",
+    srcs = [
+        "court.jpg",
+        "sample.png",
+    ],
+)
