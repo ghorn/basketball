@@ -28,6 +28,10 @@ cc_binary(
         "bspline.hpp",
         "camera.cpp",
         "camera.hpp",
+        "shader/backboard.cpp",
+        "shader/backboard.hpp",
+        "shader/cat_texture.cpp",
+        "shader/cat_texture.hpp",
     ],
     linkopts = [
         '-lglfw',

@@ -2,22 +2,19 @@
 #include <cstdlib>
 #include <chrono>
 #include <string>
+
 #include <eigen3/Eigen/Dense>
-
-//#define GLEW_STATIC
 #include <GL/glew.h>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
-#include <SOIL/SOIL.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "camera.hpp"
 #include "bspline.hpp"
+#include "shader/backboard.hpp"
+#include "shader/cat_texture.hpp"
 
 struct GlobalState {
   Camera camera;
@@ -29,37 +26,6 @@ struct GlobalState {
   bool cursor_panning;
 };
 GlobalState global_state;
-
-// Shader sources
-const GLchar* vertexSource = R"glsl(
-    #version 150 core
-    in vec2 position;
-    in vec3 color;
-    in vec2 texcoord;
-    out vec3 Color;
-    out vec2 Texcoord;
-    uniform mat4 model;
-    uniform mat4 view;
-    uniform mat4 proj;
-    void main()
-    {
-        Color = color;
-        Texcoord = texcoord;
-        gl_Position = proj * view * model * vec4(position, 0.0, 1.0);
-    }
-)glsl";
-const GLchar* fragmentSource = R"glsl(
-    #version 150 core
-    in vec3 Color;
-    in vec2 Texcoord;
-    out vec4 outColor;
-    uniform sampler2D texKitten;
-    uniform sampler2D texPuppy;
-    void main()
-    {
-        outColor = mix(texture(texKitten, Texcoord), texture(texPuppy, Texcoord), 0.5);
-    }
-)glsl";
 
 static void KeyCallback(GLFWwindow* window,
                         int key,
@@ -160,15 +126,16 @@ static GLFWwindow* OpenglSetup() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
+  // Create window.
   GLFWwindow* const window = glfwCreateWindow(800, 600, "basketball", nullptr, nullptr);
-  // Check for Valid Context
   if (window == nullptr) {
     fprintf(stderr, "Failed to Create OpenGL Context");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
 
-
+  // Set callbacks.
   glfwSetKeyCallback(window, KeyCallback);
   glfwSetCursorPosCallback(window, CursorPositionCallback);
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
@@ -179,8 +146,8 @@ static GLFWwindow* OpenglSetup() {
 
   glewExperimental = GL_TRUE;
   glewInit();
+  glEnable(GL_DEPTH_TEST);
 
-  //gladLoadGL();
   fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
   glfwSwapInterval(1);
 
@@ -190,12 +157,12 @@ static GLFWwindow* OpenglSetup() {
 int main(int argc, char * argv[]) {
   Eigen::Matrix<glm::dvec3, 6, 4> ps;
   ps <<
-    glm::dvec3(1.0, 0,  1.0), glm::dvec3(1.0, 3,  1.0), glm::dvec3(1.0, 4,  0.0), glm::dvec3(1.0, 6,  1.0),
-    glm::dvec3(1.5, 0,  1.0), glm::dvec3(1.5, 3,  1.0), glm::dvec3(1.5, 4,  1.0), glm::dvec3(1.5, 6,  0.0),
-    glm::dvec3(2.0, 0, -1.0), glm::dvec3(2.0, 3, -2.0), glm::dvec3(2.0, 4, -1.0), glm::dvec3(2.0, 6, -1.0),
-    glm::dvec3(3.0, 0,  0.0), glm::dvec3(3.0, 3,  0.0), glm::dvec3(3.0, 4,  1.0), glm::dvec3(3.0, 7,  0.0),
-    glm::dvec3(4.0, 0,  1.0), glm::dvec3(4.0, 3,  4.0), glm::dvec3(4.0, 4,  1.0), glm::dvec3(4.0, 6,  1.0),
-    glm::dvec3(5.0, 0,  0.0), glm::dvec3(5.0, 3,  0.0), glm::dvec3(5.0, 4,  0.0), glm::dvec3(5.0, 6,  0.0);
+    glm::dvec3(1.0,0, 1.0),glm::dvec3(1.0,3, 1.0),glm::dvec3(1.0,4, 0.0),glm::dvec3(1.0,6, 1.0),
+    glm::dvec3(1.5,0, 1.0),glm::dvec3(1.5,3, 1.0),glm::dvec3(1.5,4, 1.0),glm::dvec3(1.5,6, 0.0),
+    glm::dvec3(2.0,0,-1.0),glm::dvec3(2.0,3,-2.0),glm::dvec3(2.0,4,-1.0),glm::dvec3(2.0,6,-1.0),
+    glm::dvec3(3.0,0, 0.0),glm::dvec3(3.0,3, 0.0),glm::dvec3(3.0,4, 1.0),glm::dvec3(3.0,7, 0.0),
+    glm::dvec3(4.0,0, 1.0),glm::dvec3(4.0,3, 4.0),glm::dvec3(4.0,4, 1.0),glm::dvec3(4.0,6, 1.0),
+    glm::dvec3(5.0,0, 0.0),glm::dvec3(5.0,3, 0.0),glm::dvec3(5.0,4, 0.0),glm::dvec3(5.0,6, 0.0);
 
   const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = CubicBSplineSurface<20, 30, 6, 4>(ps);
   (void)interpolated_ps;
@@ -210,107 +177,10 @@ int main(int argc, char * argv[]) {
   // Boilerplate
   GLFWwindow * const window = OpenglSetup();
 
-  // Create Vertex Array Object
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Create a Vertex Buffer Object and copy the vertex data to it
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-
-  GLfloat vertices[] = {
-  //  Position      Color             Texcoords
-    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
-     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
-    -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
-  };
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  // Create an element array
-  GLuint ebo;
-  glGenBuffers(1, &ebo);
-
-  GLuint elements[] = {
-    0, 1, 2,
-    2, 3, 0
-  };
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-
-  // Create and compile the vertex shader
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexSource, NULL);
-  glCompileShader(vertexShader);
-
-  // Create and compile the fragment shader
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-  glCompileShader(fragmentShader);
-
-  // Link the vertex and fragment shader into a shader program
-  GLuint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glBindFragDataLocation(shaderProgram, 0, "outColor");
-  glLinkProgram(shaderProgram);
-  glUseProgram(shaderProgram);
-
-  // Specify the layout of the vertex data
-  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-  glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-  GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-  glEnableVertexAttribArray(colAttrib);
-  glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-
-  GLint texAttrib = glGetAttribLocation(shaderProgram, "texcoord");
-  glEnableVertexAttribArray(texAttrib);
-  glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
-
-  // Load textures
-  GLuint textures[2];
-  glGenTextures(2, textures);
-
-  int width, height;
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, textures[0]);
-  unsigned char* image = SOIL_load_image("sample.png", &width, &height, 0, SOIL_LOAD_RGB);
-  //unsigned char* image = SOIL_load_image(image_path.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-  if (image == nullptr) {
-    fprintf(stderr, "Can't load image %s: %s\n", image_path.c_str(), SOIL_last_result());
-    exit(EXIT_FAILURE);
-  }
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-  SOIL_free_image_data(image);
-  glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, textures[1]);
-      image = SOIL_load_image("sample2.png", &width, &height, 0, SOIL_LOAD_RGB);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-      SOIL_free_image_data(image);
-  glUniform1i(glGetUniformLocation(shaderProgram, "texPuppy"), 1);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Set up transformations
-  GLint uniModel = glGetUniformLocation(shaderProgram, "model");
-  GLint uniView = glGetUniformLocation(shaderProgram, "view");
-  GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
+  // Backboard
+  BackboardShader backboard = CreateBackboardFromMatrix(interpolated_ps);
+  // Cat
+  CatShader cat_shader = CreateCatShader(image_path);
 
   std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
   while (glfwWindowShouldClose(window) == false) {
@@ -320,7 +190,7 @@ int main(int argc, char * argv[]) {
 
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate transformation
     std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
@@ -333,7 +203,6 @@ int main(int argc, char * argv[]) {
       time * glm::radians(0.1f * 180.0f),
       glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
 
     // Camera transformation
     glm::mat4 view = glm::lookAt(
@@ -341,7 +210,6 @@ int main(int argc, char * argv[]) {
       global_state.camera.Center(),
       glm::vec3(0.0f, 0.0f, -1.0f)
     );
-    glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
     // projection transformation
     const float min_clip = 1e-3f;
@@ -350,15 +218,16 @@ int main(int argc, char * argv[]) {
     glfwGetWindowSize(window, &width, &height);
     width = std::max(width, 1);
     height = std::max(height, 1);
-    glm::mat4 proj = glm::perspectiveFov(glm::radians(45.0f),
-                                         static_cast<float>(width),
-                                         static_cast<float>(height),
-                                         min_clip,
-                                         max_clip);
-    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f),
+                                      static_cast<float>(width)/static_cast<float>(height),
+                                      min_clip,
+                                      max_clip);
 
-    // Draw a rectangle from the 2 triangles using 6 indices
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // cat
+    DrawCatShader(cat_shader, model, view, proj);
+
+    // backboard
+    DrawBackboard(backboard, view, proj);
 
     // Swap buffers
     glfwSwapBuffers(window);
@@ -366,16 +235,8 @@ int main(int argc, char * argv[]) {
     glfwPollEvents();
   }
 
-  glDeleteTextures(2, textures);
-
-  glDeleteProgram(shaderProgram);
-  glDeleteShader(fragmentShader);
-  glDeleteShader(vertexShader);
-
-  glDeleteBuffers(1, &ebo);
-  glDeleteBuffers(1, &vbo);
-
-  glDeleteVertexArrays(1, &vao);
+  FreeBackboardGlResources(backboard);
+  FreeCatGlResources(cat_shader);
 
   glfwDestroyWindow(window);
   glfwTerminate();
