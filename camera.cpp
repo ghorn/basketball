@@ -9,7 +9,7 @@ glm::vec3 Camera::Eye() {
   const float cos_elev = std::cos(elevation);
   const float x = distance_ * std::cos(azimuth) * cos_elev;
   const float y = distance_ * std::sin(azimuth) * cos_elev;
-  const float z = distance_ * std::sin(elevation);
+  const float z = -distance_ * std::sin(elevation);
   return Center() + glm::vec3(x, y, z);
 }
 
@@ -26,7 +26,7 @@ void Camera::Rotate(const float delta_x, const float delta_y) {
     azimuth_deg_ += 360;
   }
 
-  elevation_deg_ -= delta_y;
+  elevation_deg_ += delta_y;
   elevation_deg_ = std::max(elevation_deg_, -89.f);
   elevation_deg_ = std::min(elevation_deg_,  89.f);
 }
