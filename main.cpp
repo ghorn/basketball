@@ -130,7 +130,7 @@ static GLFWwindow* OpenglSetup() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
   GLFWwindow* const window = glfwCreateWindow(800, 600, "basketball", nullptr, nullptr);
   // Check for Valid Context
   if (window == nullptr) {
@@ -169,6 +169,7 @@ int main(int argc, char * argv[]) {
     glm::dvec3(5.0, 0,  0.0), glm::dvec3(5.0, 3,  0.0), glm::dvec3(5.0, 4,  0.0), glm::dvec3(5.0, 6,  0.0);
 
   const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = CubicBSplineSurface<20, 30, 6, 4>(ps);
+  (void)interpolated_ps;
 
   // Parse args
   if (argc != 2) {
@@ -277,16 +278,10 @@ int main(int argc, char * argv[]) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  // Set up transformations
   GLint uniModel = glGetUniformLocation(shaderProgram, "model");
-
-  // Set up projection
   GLint uniView = glGetUniformLocation(shaderProgram, "view");
-
-  const float min_clip = 1e-3f;
-  const float max_clip = 1e4f;
-  glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, min_clip, max_clip);
   GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
-  glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
   std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
   while (glfwWindowShouldClose(window) == false) {
@@ -318,6 +313,20 @@ int main(int argc, char * argv[]) {
       glm::vec3(0.0f, 0.0f, -1.0f)
     );
     glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+    // projection transformation
+    const float min_clip = 1e-3f;
+    const float max_clip = 1e4f;
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    width = std::max(width, 1);
+    height = std::max(height, 1);
+    glm::mat4 proj = glm::perspectiveFov(glm::radians(45.0f),
+                                         static_cast<float>(width),
+                                         static_cast<float>(height),
+                                         min_clip,
+                                         max_clip);
+    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
     // Draw a rectangle from the 2 triangles using 6 indices
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
