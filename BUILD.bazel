@@ -12,23 +12,21 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "glad",
-    srcs = [
-        "glad/src/glad.c"
-    ],
-    hdrs = [
-        "glad/include/glad/glad.h",
-        "glad/include/KHR/khrplatform.h",
-    ],
-    includes = ["glad/include"],
-    linkopts = ['-ldl'],
-)
+copts = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wconversion",
+    "-fdiagnostics-color=always",
+    "-std=c++17",
+]
 
 cc_binary(
     name = "vis",
     srcs = [
-        "vis.cpp"
+        "vis.cpp",
+        "camera.cpp",
+        "camera.hpp",
     ],
     linkopts = [
         '-lglfw',
@@ -36,13 +34,7 @@ cc_binary(
         '-lGL',
         '-lSOIL',
     ],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wconversion",
-        "-fdiagnostics-color=always",
-    ],
+    copts = copts,
     args = [
         "$(location :court.png)",
         #"$(location :sample.png)",

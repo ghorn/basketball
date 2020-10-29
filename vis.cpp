@@ -9,13 +9,21 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-//#include <GL/gl.h>
-
 #include <SOIL/SOIL.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "camera.hpp"
+
+struct GlobalState {
+  Camera camera;
+  double cursor_drag_previous_xpos;
+  double cursor_drag_previous_ypos;
+  bool cursor_dragging;
+};
+GlobalState global_state;
 
 // Shader sources
 const GLchar* vertexSource = R"glsl(
@@ -62,26 +70,45 @@ static void KeyCallback(GLFWwindow* window,
 static void CursorPositionCallback(GLFWwindow* window __attribute__((unused)),
                                    double xpos,
                                    double ypos) {
-  fprintf(stderr, "Mouse moved! %.1f %.1f\n", xpos, ypos);
+  if (global_state.cursor_dragging) {
+    global_state.camera.Drag(static_cast<float>(xpos - global_state.cursor_drag_previous_xpos),
+                             static_cast<float>(ypos - global_state.cursor_drag_previous_ypos));
+    global_state.cursor_drag_previous_xpos = xpos;
+    global_state.cursor_drag_previous_ypos = ypos;
+  }
 }
 
 static void MouseButtonCallback(GLFWwindow* window,
                                 int button,
                                 int action,
                                 int mods __attribute__((unused))) {
-  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-    
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    // emable drag state
+    global_state.cursor_dragging = true;
+
+    // set previous position
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    global_state.cursor_drag_previous_xpos = xpos;
+    global_state.cursor_drag_previous_ypos = ypos;
   }
 
-  double xpos, ypos;
-  glfwGetCursorPos(window, &xpos, &ypos);
-  fprintf(stderr, "Mouse button pressed: %d %d (%.1f, %.1f)\n", button, action, xpos, ypos);
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+    // disable drag state
+    global_state.cursor_dragging = false;
+
+    // initialize previous position for determinism
+    global_state.cursor_drag_previous_xpos = 0;
+    global_state.cursor_drag_previous_ypos = 0;
+  }
+
+  //fprintf(stderr, "Mouse button pressed: %d %d (%.1f, %.1f)\n", button, action, xpos, ypos);
 }
 
 static void ScrollCallback(GLFWwindow* window __attribute__((unused)),
-                           double xoffset,
+                           double xoffset __attribute__((unused)),
                            double yoffset) {
-  fprintf(stderr, "Scroll! %.1f, %.1f\n", xoffset, yoffset);
+  global_state.camera.Scroll(static_cast<float>(yoffset));
 }
 
 static void ErrorCallback(int error, const char* description)
@@ -240,15 +267,11 @@ int main(int argc, char * argv[]) {
   GLint uniModel = glGetUniformLocation(shaderProgram, "model");
 
   // Set up projection
-  glm::mat4 view = glm::lookAt(
-      glm::vec3(1.2f, 1.2f, 1.2f),
-      glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(0.0f, 0.0f, 1.0f)
-  );
   GLint uniView = glGetUniformLocation(shaderProgram, "view");
-  glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-  glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 1.0f, 10.0f);
+  const float min_clip = 1e-3f;
+  const float max_clip = 1e4f;
+  glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, min_clip, max_clip);
   GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
   glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
@@ -266,13 +289,22 @@ int main(int argc, char * argv[]) {
     auto t_now = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
+    // Model transformation
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(
       model,
-      time * glm::radians(180.0f),
+      time * glm::radians(0.1f * 180.0f),
       glm::vec3(0.0f, 0.0f, 1.0f)
     );
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+
+    // Camera transformation
+    glm::mat4 view = glm::lookAt(
+      global_state.camera.Eye(),
+      global_state.camera.Center(),
+      glm::vec3(0.0f, 0.0f, -1.0f)
+    );
+    glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
     // Draw a rectangle from the 2 triangles using 6 indices
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
