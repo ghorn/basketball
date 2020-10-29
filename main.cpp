@@ -288,7 +288,7 @@ int main(int argc, char * argv[]) {
   GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
   glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
-  auto t_start = std::chrono::high_resolution_clock::now();
+  std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
   while (glfwWindowShouldClose(window) == false) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
@@ -299,7 +299,7 @@ int main(int argc, char * argv[]) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Calculate transformation
-    auto t_now = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
     // Model transformation
