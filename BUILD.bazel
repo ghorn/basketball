@@ -25,6 +25,7 @@ cc_binary(
     name = "vis",
     srcs = [
         "main.cpp",
+        "bspline.hpp",
         "camera.cpp",
         "camera.hpp",
     ],

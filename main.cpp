@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <string>
+#include <eigen3/Eigen/Dense>
 
 //#define GLEW_STATIC
 #include <GL/glew.h>
@@ -16,6 +17,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "camera.hpp"
+#include "bspline.hpp"
 
 struct GlobalState {
   Camera camera;
@@ -137,18 +139,18 @@ static GLFWwindow* OpenglSetup() {
     exit(EXIT_FAILURE);
   }
 
-  
+
   glfwSetKeyCallback(window, KeyCallback);
   glfwSetCursorPosCallback(window, CursorPositionCallback);
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
   glfwSetScrollCallback(window, ScrollCallback);
- 
+
   // Create Context and Load OpenGL Functions
   glfwMakeContextCurrent(window);
 
   glewExperimental = GL_TRUE;
   glewInit();
-  
+
   //gladLoadGL();
   fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
   glfwSwapInterval(1);
@@ -157,6 +159,17 @@ static GLFWwindow* OpenglSetup() {
 }
 
 int main(int argc, char * argv[]) {
+  Eigen::Matrix<glm::dvec3, 6, 4> ps;
+  ps <<
+    glm::dvec3(1.0, 0,  1.0), glm::dvec3(1.0, 3,  1.0), glm::dvec3(1.0, 4,  0.0), glm::dvec3(1.0, 6,  1.0),
+    glm::dvec3(1.5, 0,  1.0), glm::dvec3(1.5, 3,  1.0), glm::dvec3(1.5, 4,  1.0), glm::dvec3(1.5, 6,  0.0),
+    glm::dvec3(2.0, 0, -1.0), glm::dvec3(2.0, 3, -2.0), glm::dvec3(2.0, 4, -1.0), glm::dvec3(2.0, 6, -1.0),
+    glm::dvec3(3.0, 0,  0.0), glm::dvec3(3.0, 3,  0.0), glm::dvec3(3.0, 4,  1.0), glm::dvec3(3.0, 7,  0.0),
+    glm::dvec3(4.0, 0,  1.0), glm::dvec3(4.0, 3,  4.0), glm::dvec3(4.0, 4,  1.0), glm::dvec3(4.0, 6,  1.0),
+    glm::dvec3(5.0, 0,  0.0), glm::dvec3(5.0, 3,  0.0), glm::dvec3(5.0, 4,  0.0), glm::dvec3(5.0, 6,  0.0);
+
+  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = CubicBSplineSurface<20, 30, 6, 4>(ps);
+
   // Parse args
   if (argc != 2) {
     fprintf(stderr, "need one argument: court.jpg location\n");
@@ -280,7 +293,7 @@ int main(int argc, char * argv[]) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
-  
+
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
