@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
     glm::dvec3(4.0,0, 1.0),glm::dvec3(4.0,3, 4.0),glm::dvec3(4.0,4, 1.0),glm::dvec3(4.0,6, 1.0),
     glm::dvec3(5.0,0, 0.0),glm::dvec3(5.0,3, 0.0),glm::dvec3(5.0,4, 0.0),glm::dvec3(5.0,6, 0.0);
 
-  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = CubicBSplineSurface<20, 30, 6, 4>(ps);
+  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = ClampedCubicBSplineSurface<20, 30, 6, 4>(ps);
 
   // Parse args
   if (argc != 2) {

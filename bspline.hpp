@@ -89,16 +89,20 @@ PadSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
 //
 //   return ret / 36.
 
+static inline double Cubed(const double x) {
+  return x*x*x;
+}
+
 template <int NU, int NV, int NX, int NY>
 Eigen::Matrix<glm::dvec3, NU, NV>
-CubicBSplineSurfaceyo(const Eigen::Matrix<glm::dvec3, NX+2*NExtra, NY+2*NExtra> &full_ps) {
+CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
   Eigen::Matrix<glm::dvec3, NU, NV> interpolated;
   for (int ku=0; ku<NU; ku++) {
     for (int kv=0; kv<NV; kv++) {
       const double sx = static_cast<double>(ku) / (static_cast<double>(NU) - 1);
       const double sy = static_cast<double>(kv) / (static_cast<double>(NV) - 1);
-      const double tx = NExtra + 1 + sx * (NX - NExtra - 1); // t from 3 to n
-      const double ty = NExtra + 1 + sy * (NU - NExtra - 1); // t from 3 to n
+      const double tx = 3 + sx * (NX - 3); // t from 3 to n
+      const double ty = 3 + sy * (NY - 3); // t from 3 to n
 
       int interval_x = static_cast<int>(std::floor(tx));
       int interval_y = static_cast<int>(std::floor(ty));
@@ -127,14 +131,14 @@ CubicBSplineSurfaceyo(const Eigen::Matrix<glm::dvec3, NX+2*NExtra, NY+2*NExtra> 
       const double uy2 = uy*uy;
       const double uy3 = uy2*uy;
 
-      std::array<double, 4> cxs = {
-          std::pow(1. - ux, 3),
+      const std::array<double, 4> cxs = {
+          Cubed(1. - ux),
           3*ux3 - 6*ux2 + 4,
           -3.*ux3 + 3.*ux2 + 3.*ux + 1,
           ux3};
 
-      std::array<double, 4> cys = {
-          std::pow(1. - uy, 3),
+      const std::array<double, 4> cys = {
+          Cubed(1. - uy),
           3*uy3 - 6*uy2 + 4,
           -3.*uy3 + 3.*uy2 + 3.*uy + 1,
           uy3};
@@ -142,7 +146,7 @@ CubicBSplineSurfaceyo(const Eigen::Matrix<glm::dvec3, NX+2*NExtra, NY+2*NExtra> 
       glm::dvec3 ret = {0, 0, 0};
       for (int kx=0; kx<4; kx++) {
         for (int ky=0; ky<4; ky++) {
-          ret += cxs[kx]*cys[ky]*full_ps(interval_x - 3 + kx, interval_y - 3 + ky);
+          ret += cxs[kx]*cys[ky]*ps(interval_x - 3 + kx, interval_y - 3 + ky);
         }
       }
       ret.x /= 36;
@@ -216,9 +220,9 @@ CubicBSplineSurfaceyo(const Eigen::Matrix<glm::dvec3, NX+2*NExtra, NY+2*NExtra> 
 
 template <int NU, int NV, int NX, int NY>
 Eigen::Matrix<glm::dvec3, NU, NV>
-CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
+ClampedCubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
   const Eigen::Matrix<glm::dvec3, NX + 2*NExtra, NY + 2*NExtra> clamped_ps = PadSurface<NX, NY>(ps);
-  return CubicBSplineSurfaceyo<NU, NV, NX, NY>(clamped_ps);
+  return CubicBSplineSurface<NU, NV, NX + 2*NExtra, NY + 2*NExtra>(clamped_ps);
 }
 
 //
