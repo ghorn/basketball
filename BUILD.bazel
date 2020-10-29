@@ -28,6 +28,8 @@ cc_binary(
         "bspline.hpp",
         "camera.cpp",
         "camera.hpp",
+        "opengl_context.cpp",
+        "opengl_context.hpp",
         "shader/backboard.cpp",
         "shader/backboard.hpp",
         "shader/cat_texture.cpp",
