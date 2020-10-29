@@ -21,9 +21,12 @@
 
 struct GlobalState {
   Camera camera;
-  double cursor_drag_previous_xpos;
-  double cursor_drag_previous_ypos;
-  bool cursor_dragging;
+  double cursor_rotating_previous_xpos;
+  double cursor_rotating_previous_ypos;
+  bool cursor_rotating;
+  double cursor_panning_previous_xpos;
+  double cursor_panning_previous_ypos;
+  bool cursor_panning;
 };
 GlobalState global_state;
 
@@ -72,11 +75,17 @@ static void KeyCallback(GLFWwindow* window,
 static void CursorPositionCallback(GLFWwindow* window __attribute__((unused)),
                                    double xpos,
                                    double ypos) {
-  if (global_state.cursor_dragging) {
-    global_state.camera.Drag(static_cast<float>(xpos - global_state.cursor_drag_previous_xpos),
-                             static_cast<float>(ypos - global_state.cursor_drag_previous_ypos));
-    global_state.cursor_drag_previous_xpos = xpos;
-    global_state.cursor_drag_previous_ypos = ypos;
+  if (global_state.cursor_rotating) {
+    global_state.camera.Rotate(static_cast<float>(xpos - global_state.cursor_rotating_previous_xpos),
+                               static_cast<float>(ypos - global_state.cursor_rotating_previous_ypos));
+    global_state.cursor_rotating_previous_xpos = xpos;
+    global_state.cursor_rotating_previous_ypos = ypos;
+  }
+  if (global_state.cursor_panning) {
+    global_state.camera.Pan(static_cast<float>(xpos - global_state.cursor_panning_previous_xpos),
+                            static_cast<float>(ypos - global_state.cursor_panning_previous_ypos));
+    global_state.cursor_panning_previous_xpos = xpos;
+    global_state.cursor_panning_previous_ypos = ypos;
   }
 }
 
@@ -86,22 +95,42 @@ static void MouseButtonCallback(GLFWwindow* window,
                                 int mods __attribute__((unused))) {
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
     // emable drag state
-    global_state.cursor_dragging = true;
+    global_state.cursor_rotating = true;
 
     // set previous position
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
-    global_state.cursor_drag_previous_xpos = xpos;
-    global_state.cursor_drag_previous_ypos = ypos;
+    global_state.cursor_rotating_previous_xpos = xpos;
+    global_state.cursor_rotating_previous_ypos = ypos;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+    // emable drag state
+    global_state.cursor_panning = true;
+
+    // set previous position
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    global_state.cursor_panning_previous_xpos = xpos;
+    global_state.cursor_panning_previous_ypos = ypos;
   }
 
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
     // disable drag state
-    global_state.cursor_dragging = false;
+    global_state.cursor_rotating = false;
 
     // initialize previous position for determinism
-    global_state.cursor_drag_previous_xpos = 0;
-    global_state.cursor_drag_previous_ypos = 0;
+    global_state.cursor_rotating_previous_xpos = 0;
+    global_state.cursor_rotating_previous_ypos = 0;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+    // disable drag state
+    global_state.cursor_panning = false;
+
+    // initialize previous position for determinism
+    global_state.cursor_panning_previous_xpos = 0;
+    global_state.cursor_panning_previous_ypos = 0;
   }
 
   //fprintf(stderr, "Mouse button pressed: %d %d (%.1f, %.1f)\n", button, action, xpos, ypos);

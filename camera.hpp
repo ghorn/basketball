@@ -6,7 +6,8 @@ class Camera {
 public:
   glm::vec3 Eye();
   glm::vec3 Center();
-  void Drag(const float delta_x, const float delta_y);
+  void Rotate(const float delta_x, const float delta_y);
+  void Pan(const float delta_x, const float delta_y);
   void Scroll(const float scroll_amount);
 private:
 

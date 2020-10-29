@@ -10,14 +10,14 @@ glm::vec3 Camera::Eye() {
   const float x = distance_ * std::cos(azimuth) * cos_elev;
   const float y = distance_ * std::sin(azimuth) * cos_elev;
   const float z = distance_ * std::sin(elevation);
-  return glm::vec3(x, y, z);
+  return Center() + glm::vec3(x, y, z);
 }
 
 glm::vec3 Camera::Center() {
   return focus_position_;
 }
 
-void Camera::Drag(const float delta_x, const float delta_y) {
+void Camera::Rotate(const float delta_x, const float delta_y) {
   azimuth_deg_ += delta_x;
   if (azimuth_deg_ > 180) {
     azimuth_deg_ -= 360;
@@ -29,6 +29,14 @@ void Camera::Drag(const float delta_x, const float delta_y) {
   elevation_deg_ -= delta_y;
   elevation_deg_ = std::max(elevation_deg_, -89.f);
   elevation_deg_ = std::min(elevation_deg_,  89.f);
+}
+
+void Camera::Pan(const float delta_x, const float delta_y) {
+  const float sin_azi = std::sin(azimuth_deg_ * static_cast<float>(M_PI)/180.f);
+  const float cos_azi = std::cos(azimuth_deg_ * static_cast<float>(M_PI)/180.f);
+  const float scale = distance_ * 3e-3f;
+  focus_position_.y += scale*(delta_x * cos_azi - delta_y * sin_azi);
+  focus_position_.x -= scale*(delta_x * sin_azi + delta_y * cos_azi);
 }
 
 void Camera::Scroll(const float scroll_amount) {
