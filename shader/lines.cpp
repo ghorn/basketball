@@ -1,40 +1,41 @@
-#include "gridmesh.hpp"
-
-#include <iostream>
-#include <vector>
+#include "lines.hpp"
 
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <iostream>
 
-const GLchar* vertexShaderSource = R"glsl(
+// Shader sources
+const GLchar* lineVertexShaderSource = R"glsl(
   #version 400 core
-  layout (location = 0) in vec3 aPos;
+  in vec3 position;
   uniform mat4 view;
   uniform mat4 proj;
   void main()
   {
-   gl_Position = proj * view * vec4(aPos, 1.0);
+    gl_Position = proj * view * vec4(position, 1.0);
+    gl_PointSize = 3;
   }
 )glsl";
 
-const char *fragmentShaderSource = R"glsl(
+const GLchar* lineFragmentShaderSource = R"glsl(
   #version 400 core
-  out vec4 FragColor;
+  out vec4 output_color;
+  uniform vec4 color;
   void main()
   {
-   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    output_color = color;
   }
 )glsl";
 
-GLint CreateGridmeshShaderProgram() {
+GLuint CreateLineShaderProgram() {
   // build and compile our shader program
   // ------------------------------------
   // vertex shader
   GLint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glShaderSource(vertexShader, 1, &lineVertexShaderSource, NULL);
   glCompileShader(vertexShader);
   // check for shader compile errors
   GLint success;
@@ -48,7 +49,7 @@ GLint CreateGridmeshShaderProgram() {
   }
   // fragment shader
   GLint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  glShaderSource(fragmentShader, 1, &lineFragmentShaderSource, NULL);
   glCompileShader(fragmentShader);
   // check for shader compile errors
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -78,9 +79,10 @@ GLint CreateGridmeshShaderProgram() {
   return shaderProgram;
 }
 
-static void CreateGridmeshBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
-                                   float *vertices, int num_vec3s,
-                                   unsigned int *indices, int num_indices) {
+
+static void CreateLineShaderBuffers(GLint shaderProgram,
+                                    GLuint *VBO, GLuint *VAO,
+                                    float *vertices, int num_vec3s) {
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   //float vertices[] = {
@@ -95,80 +97,52 @@ static void CreateGridmeshBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
   //};
   glGenVertexArrays(1, VAO);
   glGenBuffers(1, VBO);
-  glGenBuffers(1, EBO);
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
   glBindVertexArray(*VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, *VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0])*3*num_vec3s, vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0])*num_indices, indices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
+  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(posAttrib);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-  // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0); 
 }
 
-GridmeshShader CreateGridmesh(float *vertices, int rows, int cols) {
-  GridmeshShader gridmesh;
-  gridmesh.shaderProgram = CreateGridmeshShaderProgram();
 
-  int num_vertices = rows*cols;
-  std::vector<GLuint> indices;
-  for (int kx=0; kx<rows - 1; kx++) {
-    for (int ky=0; ky<cols - 1; ky++) {
-      int me = kx*cols + ky;
-      int right = me + 1;
-      int down = (kx + 1)*cols + ky;
-      int corner = down + 1;
-      // triangle 1
-      indices.push_back(me);
-      indices.push_back(right);
-      indices.push_back(corner);
-      // triangle 2
-      indices.push_back(me);
-      indices.push_back(corner);
-      indices.push_back(down);
-    }
-  }
-  gridmesh.num_indices = static_cast<GLint>(indices.size());
-  CreateGridmeshBuffers(&gridmesh.VBO, &gridmesh.VAO, &gridmesh.EBO, vertices, num_vertices, indices.data(), gridmesh.num_indices);
-  return gridmesh;
+LineShader CreateLineShader(float *vertices, int num_vertices) {
+  LineShader line_shader;
+  line_shader.shaderProgram = CreateLineShaderProgram();
+  line_shader.num_vertices = num_vertices;
+
+  CreateLineShaderBuffers(line_shader.shaderProgram, &line_shader.VBO, &line_shader.VAO,
+                          vertices, num_vertices);
+  return line_shader;
 }
 
-void DrawGridmesh(const GridmeshShader &gridmesh,
-                   const glm::mat4  &view,
-                   const glm::mat4  &proj) {
+void DrawLines(LineShader &line_shader,
+               const glm::mat4 &view,
+               const glm::mat4 &proj,
+               const glm::vec4 &color,
+               const GLenum mode) {
   // draw triangle
-  glUseProgram(gridmesh.shaderProgram);
-  glBindVertexArray(gridmesh.VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+  glUseProgram(line_shader.shaderProgram);
+  glBindVertexArray(line_shader.VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
   // Set up transformations
-  GLint uniView = glGetUniformLocation(gridmesh.shaderProgram, "view");
-  GLint uniProj = glGetUniformLocation(gridmesh.shaderProgram, "proj");
+  GLint uniView = glGetUniformLocation(line_shader.shaderProgram, "view");
+  GLint uniProj = glGetUniformLocation(line_shader.shaderProgram, "proj");
   glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDrawElements(GL_TRIANGLES, gridmesh.num_indices, GL_UNSIGNED_INT, 0);
-  // glBindVertexArray(0); // no need to unbind it every time 
-}
-
-void FreeGridmeshGlResources(const GridmeshShader &gridmesh) {
-  // optional: de-allocate all resources once they've outlived their purpose:
-  // ------------------------------------------------------------------------
-  glDeleteVertexArrays(1, &gridmesh.VAO);
-  glDeleteBuffers(1, &gridmesh.VBO);
-  glDeleteBuffers(1, &gridmesh.EBO);
-  glDeleteProgram(gridmesh.shaderProgram);
+  GLint uniColor = glGetUniformLocation(line_shader.shaderProgram, "color");
+  glUniform4f(uniColor, color.r, color.g, color.b, color.a);
+  
+  glDrawArrays(mode, 0, line_shader.num_vertices);
 }

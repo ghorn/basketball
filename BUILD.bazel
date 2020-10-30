@@ -31,10 +31,14 @@ cc_binary(
         "opengl_context.cpp",
         "opengl_context.hpp",
         "problem/backboard.hpp",
-        "shader/gridmesh.cpp",
-        "shader/gridmesh.hpp",
+        "problem/problem.hpp",
+        "problem/shot.hpp",
         "shader/cat_texture.cpp",
         "shader/cat_texture.hpp",
+        "shader/gridmesh.cpp",
+        "shader/gridmesh.hpp",
+        "shader/lines.cpp",
+        "shader/lines.hpp",
     ],
     linkopts = [
         '-lglfw',
@@ -55,6 +59,17 @@ cc_binary(
     deps = [
         #":glad",
     ],
+)
+
+py_binary(
+    name = "geometry",
+    srcs = [
+        "problem/geometry.py",
+    ],
+    main = "problem/geometry.py",
+    srcs_version = "PY3",
+    python_version = "PY3",
+    visibility = ["//visibility:public"],
 )
 
 filegroup(

@@ -15,13 +15,12 @@
 #include "bspline.hpp"
 #include "opengl_context.hpp"
 #include "problem/backboard.hpp"
-#include "shader/gridmesh.hpp"
+#include "problem/problem.hpp"
 #include "shader/cat_texture.hpp"
+#include "shader/gridmesh.hpp"
+#include "shader/lines.hpp"
 
 int main(int argc, char * argv[]) {
-  Backboard<6, 4> backboard;
-  const Eigen::Matrix<glm::dvec3, 20, 30> interpolated_ps = backboard.Interpolate<20, 30>();
-
   // Parse args
   if (argc != 2) {
     fprintf(stderr, "need one argument: court.jpg location\n");
@@ -32,8 +31,38 @@ int main(int argc, char * argv[]) {
   // Boilerplate
   GLFWwindow * const window = OpenglSetup();
 
+  // problem
+  Problem<6, 4> problem;
+  //Problem<6, 4, 20, 30> problem;
+  const glm::dvec3 shot_point(4, 0.5, 1);
+  const std::vector<Shot> shots = problem.ComputeShots<10, 15>(shot_point);
+
   // Gridmesh
-  GridmeshShader gridmesh = CreateGridmeshFromMatrix(interpolated_ps);
+  GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>());
+
+  // Line rendering
+  std::vector<float> line;
+  for (const Shot &shot : shots) {
+    std::array<glm::vec3, 256> shot_arc;
+    shot.DrawArc<256>(&shot_arc);
+    for (glm::vec3 v3 : shot_arc) {
+      line.push_back(v3.x);
+      line.push_back(v3.y);
+      line.push_back(v3.z);
+    }
+  }
+  LineShader line_shader = CreateLineShader(line.data(), (int)(line.size() / 3));
+
+  std::vector<float> control_points;
+  for (int kx=0; kx<problem.backboard_.control_points_.rows(); kx++) {
+    for (int ky=0; ky<problem.backboard_.control_points_.cols(); ky++) {
+      const glm::dvec3 point = problem.backboard_.control_points_(kx, ky);
+      control_points.push_back(static_cast<float>(point.x));
+      control_points.push_back(static_cast<float>(point.y));
+      control_points.push_back(static_cast<float>(point.z));
+    }
+  }
+  LineShader control_point_shader = CreateLineShader(control_points.data(), (int)(control_points.size() / 3));
 
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
@@ -66,6 +95,12 @@ int main(int argc, char * argv[]) {
 
     // gridmesh
     DrawGridmesh(gridmesh, view, proj);
+
+    // lines
+    DrawLines(line_shader, view, proj, glm::vec4(0.1, 0.6, 0.2, 0.025), GL_LINE_STRIP);
+
+    // control points
+    DrawLines(control_point_shader, view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);
 
     // Swap buffers
     glfwSwapBuffers(window);

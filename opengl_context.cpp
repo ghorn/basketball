@@ -142,6 +142,7 @@ GLFWwindow* OpenglSetup() {
   glewExperimental = GL_TRUE;
   glewInit();
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_PROGRAM_POINT_SIZE);
 
   fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
   glfwSwapInterval(1);
