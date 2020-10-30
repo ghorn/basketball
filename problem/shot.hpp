@@ -3,12 +3,7 @@
 #include <cstdio>
 #include <glm/glm.hpp>
 
-#define ASSERT(expr) {                                                  \
-  if (!(expr)) {                                                        \
-    fprintf(stderr, "Assertion '" #expr "' failed at %s, line %d.\n", __FILE__, __LINE__); \
-    exit(EXIT_FAILURE);                                                 \
-  } \
-}
+#include "assert.hpp"
 
 const double g_accel = 9.81;
 

@@ -68,7 +68,18 @@ int main(int argc, char * argv[]) {
   CatShader cat_shader = CreateCatShader(image_path);
 
   std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
+
+  int counter = 0;
   while (glfwWindowShouldClose(window) == false) {
+    counter++;
+    if (counter == 22222222) {
+      fprintf(stderr, "UPDATING LINES HOLLA\n");
+      for (int k=0; k < (int)line.size()/3; k++) {
+        line[3*k+2] -= 0.5f;
+      }
+      UpdateLines(line_shader, line.data(), (int)(line.size()/3));
+    }
+
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

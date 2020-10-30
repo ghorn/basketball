@@ -1,11 +1,14 @@
 #include "lines.hpp"
 
+#include <array>
+#include <iostream>
+
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
+#include "assert.hpp"
 
 // Shader sources
 const GLchar* lineVertexShaderSource = R"glsl(
@@ -89,7 +92,7 @@ static void CreateLineShaderBuffers(GLint shaderProgram,
   //   0.5f,  0.5f, 0.0f,  // top right
   //   0.5f, -0.5f, 0.0f,  // bottom right
   //  -0.5f, -0.5f, 0.0f,  // bottom left
-  //  -0.5f,  0.5f, 0.0f   // top left 
+  //  -0.5f,  0.5f, 0.0f   // top left
   //};
   //unsigned int indices[] = {  // note that we start from 0!
   //  0, 1, 3,  // first Triangle
@@ -108,11 +111,11 @@ static void CreateLineShaderBuffers(GLint shaderProgram,
   glEnableVertexAttribArray(posAttrib);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-  glBindBuffer(GL_ARRAY_BUFFER, 0); 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-  glBindVertexArray(0); 
+  glBindVertexArray(0);
 }
 
 
@@ -143,6 +146,20 @@ void DrawLines(LineShader &line_shader,
 
   GLint uniColor = glGetUniformLocation(line_shader.shaderProgram, "color");
   glUniform4f(uniColor, color.r, color.g, color.b, color.a);
-  
+
   glDrawArrays(mode, 0, line_shader.num_vertices);
+}
+
+
+void UpdateLines(LineShader &line_shader, float *new_verts, int num_vertices) {
+  ASSERT(num_vertices == line_shader.num_vertices);
+
+  // make sure they're packed
+  //static_assert(sizeof(std::array<glm::vec3, 10>) == sizeof(float)*3*10);
+
+  glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
+  glBufferData(GL_ARRAY_BUFFER,
+               sizeof(float)*3*line_shader.num_vertices,
+               new_verts,
+               GL_DYNAMIC_DRAW);
 }

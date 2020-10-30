@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <array>
+#include <vector>
 
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
@@ -21,3 +21,4 @@ void DrawLines(LineShader &line_shader,
                const glm::mat4 &proj,
                const glm::vec4 &color,
                const GLenum mode);
+void UpdateLines(LineShader &line_shader, float *new_verts, int num_vertices);

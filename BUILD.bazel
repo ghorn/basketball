@@ -24,6 +24,7 @@ copts = [
 cc_binary(
     name = "vis",
     srcs = [
+        "assert.hpp",
         "main.cpp",
         "bspline.hpp",
         "camera.cpp",
