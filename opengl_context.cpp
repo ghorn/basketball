@@ -24,13 +24,20 @@ GlobalState global_state;
 
 static void KeyCallback(GLFWwindow* window,
                         int key,
-                        int scancode __attribute__((unused)),
+                        int scancode,
                         int action,
                         int mods __attribute__((unused))) {
-  fprintf(stderr, "Key press! %d\n", key);
+
+  fprintf(stderr, "Key press! %s (%d)\n", glfwGetKeyName(key, scancode), key);
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
+}
+
+static void WindowSizeCallback(GLFWwindow* window __attribute__((unused)),
+                               int width,
+                               int height) {
+  glViewport(0, 0, width, height);
 }
 
 static void CursorPositionCallback(GLFWwindow* window __attribute__((unused)),
@@ -135,6 +142,7 @@ GLFWwindow* OpenglSetup() {
   glfwSetCursorPosCallback(window, CursorPositionCallback);
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
   glfwSetScrollCallback(window, ScrollCallback);
+  glfwSetWindowSizeCallback(window, WindowSizeCallback);
 
   // Create Context and Load OpenGL Functions
   glfwMakeContextCurrent(window);
