@@ -88,16 +88,6 @@ static void CreateLineShaderBuffers(GLint shaderProgram,
                                     float *vertices, int num_vec3s) {
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
-  //float vertices[] = {
-  //   0.5f,  0.5f, 0.0f,  // top right
-  //   0.5f, -0.5f, 0.0f,  // bottom right
-  //  -0.5f, -0.5f, 0.0f,  // bottom left
-  //  -0.5f,  0.5f, 0.0f   // top left
-  //};
-  //unsigned int indices[] = {  // note that we start from 0!
-  //  0, 1, 3,  // first Triangle
-  //  1, 2, 3   // second Triangle
-  //};
   glGenVertexArrays(1, VAO);
   glGenBuffers(1, VBO);
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).

@@ -7,7 +7,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-//template <int N>
 struct LineShader {
   GLint shaderProgram;
   GLuint VAO;
