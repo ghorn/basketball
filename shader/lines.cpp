@@ -14,7 +14,7 @@
 // Shader sources
 const GLchar* lineVertexShaderSource = R"glsl(
   #version 400 core
-  in vec3 position;
+  layout (location = 0) in vec3 position;
   uniform mat4 view;
   uniform mat4 proj;
   void main()
@@ -55,8 +55,8 @@ LineShader CreateLineShader() {
                nullptr,
                GL_DYNAMIC_DRAW);
 
-  GLint posAttrib = glGetAttribLocation(line_shader.shaderProgram, "position");
-  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  GLint posAttrib = 0; // layout = 0 above
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(posAttrib);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -116,4 +116,7 @@ void UpdateLines(LineShader &line_shader, const std::vector<glm::vec3> &vertices
     glBufferData(GL_ARRAY_BUFFER, buffer_size, buffer_data.data(), GL_DYNAMIC_DRAW);
     line_shader.current_num_vertices = new_num_vertices;
   }
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindVertexArray(0);
 }
