@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "camera.hpp"
+#include "gl_error.hpp"
 
 struct GlobalState {
   Camera camera;
@@ -151,6 +152,12 @@ GLFWwindow* OpenglSetup() {
   glewInit();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_PROGRAM_POINT_SIZE);
+
+  // Debugging
+  glEnable(GL_DEBUG_OUTPUT);
+  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  glDebugMessageCallback(GlDebugOutput, nullptr);
+  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
   fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
   glfwSwapInterval(1);
