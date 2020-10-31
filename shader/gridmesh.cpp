@@ -8,8 +8,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "shader/compile.hpp"
 
-const GLchar* vertexShaderSource = R"glsl(
+const GLchar* gridmeshVertexShaderSource = R"glsl(
   #version 400 core
   layout (location = 0) in vec3 aPos;
   uniform mat4 view;
@@ -20,7 +21,7 @@ const GLchar* vertexShaderSource = R"glsl(
   }
 )glsl";
 
-const char *fragmentShaderSource = R"glsl(
+const char *gridmeshFragmentShaderSource = R"glsl(
   #version 400 core
   out vec4 FragColor;
   void main()
@@ -28,55 +29,6 @@ const char *fragmentShaderSource = R"glsl(
    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
   }
 )glsl";
-
-GLint CreateGridmeshShaderProgram() {
-  // build and compile our shader program
-  // ------------------------------------
-  // vertex shader
-  GLint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  // check for shader compile errors
-  GLint success;
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    char infoLog[512];
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  // fragment shader
-  GLint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  // check for shader compile errors
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    char infoLog[512];
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  // link shaders
-  GLint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  // check for linking errors
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-
-  return shaderProgram;
-}
 
 static void CreateGridmeshBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
                                    float *vertices, int num_vec3s,
@@ -121,7 +73,8 @@ static void CreateGridmeshBuffers(GLuint *VBO, GLuint *VAO, GLuint *EBO,
 
 GridmeshShader CreateGridmesh(float *vertices, int rows, int cols) {
   GridmeshShader gridmesh;
-  gridmesh.shaderProgram = CreateGridmeshShaderProgram();
+  gridmesh.shaderProgram =
+    CompileAndLinkVertexFragmentShaderProgram(gridmeshVertexShaderSource, gridmeshFragmentShaderSource);
 
   int num_vertices = rows*cols;
   std::vector<GLuint> indices;

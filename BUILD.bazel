@@ -36,6 +36,8 @@ cc_binary(
         "problem/shot.hpp",
         "shader/cat_texture.cpp",
         "shader/cat_texture.hpp",
+        "shader/compile.cpp",
+        "shader/compile.hpp",
         "shader/gridmesh.cpp",
         "shader/gridmesh.hpp",
         "shader/lines.cpp",

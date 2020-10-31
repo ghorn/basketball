@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "assert.hpp"
+#include "shader/compile.hpp"
 
 // Shader sources
 const GLchar* lineVertexShaderSource = R"glsl(
@@ -33,55 +34,6 @@ const GLchar* lineFragmentShaderSource = R"glsl(
   }
 )glsl";
 
-GLuint CreateLineShaderProgram() {
-  // build and compile our shader program
-  // ------------------------------------
-  // vertex shader
-  GLint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &lineVertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  // check for shader compile errors
-  GLint success;
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    char infoLog[512];
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  // fragment shader
-  GLint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &lineFragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  // check for shader compile errors
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    char infoLog[512];
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  // link shaders
-  GLint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  // check for linking errors
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-
-  return shaderProgram;
-}
-
 
 LineShader CreateLineShader(const std::vector<glm::vec3> &vertices) {
   const GLint num_vertices = static_cast<GLint>(vertices.size());
@@ -94,7 +46,8 @@ LineShader CreateLineShader(const std::vector<glm::vec3> &vertices) {
   }
 
   LineShader line_shader;
-  line_shader.shaderProgram = CreateLineShaderProgram();
+  line_shader.shaderProgram =
+    CompileAndLinkVertexFragmentShaderProgram(lineVertexShaderSource, lineFragmentShaderSource);
 
   line_shader.current_num_vertices = num_vertices;
 
