@@ -14,5 +14,5 @@ private:
   glm::vec3 focus_position_;
   float azimuth_deg_ = 60;
   float elevation_deg_ = 30;
-  float distance_ = 1;
+  float distance_ = 10;
 };
