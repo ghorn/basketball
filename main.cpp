@@ -41,28 +41,24 @@ int main(int argc, char * argv[]) {
   GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>());
 
   // Line rendering
-  std::vector<float> line;
+  std::vector<glm::vec3> line;
   for (const Shot &shot : shots) {
     std::array<glm::vec3, 256> shot_arc;
     shot.DrawArc<256>(&shot_arc);
     for (glm::vec3 v3 : shot_arc) {
-      line.push_back(v3.x);
-      line.push_back(v3.y);
-      line.push_back(v3.z);
+      line.push_back(v3);
     }
   }
-  LineShader line_shader = CreateLineShader(line.data(), (int)(line.size() / 3));
+  LineShader line_shader = CreateLineShader(line);
 
-  std::vector<float> control_points;
+  std::vector<glm::vec3> control_points;
   for (int kx=0; kx<problem.backboard_.control_points_.rows(); kx++) {
     for (int ky=0; ky<problem.backboard_.control_points_.cols(); ky++) {
       const glm::dvec3 point = problem.backboard_.control_points_(kx, ky);
-      control_points.push_back(static_cast<float>(point.x));
-      control_points.push_back(static_cast<float>(point.y));
-      control_points.push_back(static_cast<float>(point.z));
+      control_points.push_back(point);
     }
   }
-  LineShader control_point_shader = CreateLineShader(control_points.data(), (int)(control_points.size() / 3));
+  LineShader control_point_shader = CreateLineShader(control_points);
 
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
@@ -74,10 +70,10 @@ int main(int argc, char * argv[]) {
     counter++;
     if (counter == 22222222) {
       fprintf(stderr, "UPDATING LINES HOLLA\n");
-      for (int k=0; k < (int)line.size()/3; k++) {
-        line[3*k+2] -= 0.5f;
+      for (int k=0; k < (int)line.size(); k++) {
+        line[k] -= glm::vec3(0.f, 0.f, -0.5f);
       }
-      UpdateLines(line_shader, line.data(), (int)(line.size()/3));
+      UpdateLines(line_shader, line);
     }
 
     // Clear the screen to black

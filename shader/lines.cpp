@@ -83,20 +83,35 @@ GLuint CreateLineShaderProgram() {
 }
 
 
-static void CreateLineShaderBuffers(GLint shaderProgram,
-                                    GLuint *VBO, GLuint *VAO,
-                                    float *vertices, int num_vec3s) {
+LineShader CreateLineShader(const std::vector<glm::vec3> &vertices) {
+  const GLint num_vertices = static_cast<GLint>(vertices.size());
+  std::vector<float> buffer_data;
+  buffer_data.reserve(num_vertices);
+  for (const glm::vec3 &vertex : vertices) {
+      buffer_data.push_back(vertex.x);
+      buffer_data.push_back(vertex.y);
+      buffer_data.push_back(vertex.z);
+  }
+
+  LineShader line_shader;
+  line_shader.shaderProgram = CreateLineShaderProgram();
+
+  line_shader.current_num_vertices = num_vertices;
+
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
-  glGenVertexArrays(1, VAO);
-  glGenBuffers(1, VBO);
+  glGenVertexArrays(1, &line_shader.VAO);
+  glGenBuffers(1, &line_shader.VBO);
+
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-  glBindVertexArray(*VAO);
+  glBindVertexArray(line_shader.VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
+  glBufferData(GL_ARRAY_BUFFER,
+               3*sizeof(float)*line_shader.current_num_vertices,
+               buffer_data.data(),
+               GL_DYNAMIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0])*3*num_vec3s, vertices, GL_STATIC_DRAW);
-
-  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  GLint posAttrib = glGetAttribLocation(line_shader.shaderProgram, "position");
   glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(posAttrib);
 
@@ -106,16 +121,7 @@ static void CreateLineShaderBuffers(GLint shaderProgram,
   // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
-}
 
-
-LineShader CreateLineShader(float *vertices, int num_vertices) {
-  LineShader line_shader;
-  line_shader.shaderProgram = CreateLineShaderProgram();
-  line_shader.num_vertices = num_vertices;
-
-  CreateLineShaderBuffers(line_shader.shaderProgram, &line_shader.VBO, &line_shader.VAO,
-                          vertices, num_vertices);
   return line_shader;
 }
 
@@ -137,19 +143,31 @@ void DrawLines(LineShader &line_shader,
   GLint uniColor = glGetUniformLocation(line_shader.shaderProgram, "color");
   glUniform4f(uniColor, color.r, color.g, color.b, color.a);
 
-  glDrawArrays(mode, 0, line_shader.num_vertices);
+  glDrawArrays(mode, 0, line_shader.current_num_vertices);
 }
 
 
-void UpdateLines(LineShader &line_shader, float *new_verts, int num_vertices) {
-  ASSERT(num_vertices == line_shader.num_vertices);
+void UpdateLines(LineShader &line_shader, const std::vector<glm::vec3> &vertices) {
+  // Massage the data.
+  // TODO(greg): static assert that std::vector<glm::vec3> is packed and just reinterpret cast
+  const GLint new_num_vertices = static_cast<GLint>(vertices.size());
+  std::vector<float> buffer_data;
+  buffer_data.reserve(vertices.size());
+  for (const glm::vec3 &vertex : vertices) {
+      buffer_data.push_back(vertex.x);
+      buffer_data.push_back(vertex.y);
+      buffer_data.push_back(vertex.z);
+  }
 
-  // make sure they're packed
-  //static_assert(sizeof(std::array<glm::vec3, 10>) == sizeof(float)*3*10);
-
+  // bind the buffer
+  //glBindVertexArray(line_shader.VAO);
   glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(float)*3*line_shader.num_vertices,
-               new_verts,
-               GL_DYNAMIC_DRAW);
+
+  const GLint buffer_size = static_cast<GLint>(3 * sizeof(float) * new_num_vertices);
+  if (new_num_vertices == line_shader.current_num_vertices) {
+    // if the size of data is the same, just update the buffer
+    glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, buffer_data.data());
+  } else {
+    fprintf(stderr, "Can't change number of vertices!\n");
+  }
 }
