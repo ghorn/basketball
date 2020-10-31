@@ -35,21 +35,12 @@ const GLchar* lineFragmentShaderSource = R"glsl(
 )glsl";
 
 
-LineShader CreateLineShader(const std::vector<glm::vec3> &vertices) {
-  const GLint num_vertices = static_cast<GLint>(vertices.size());
-  std::vector<float> buffer_data;
-  buffer_data.reserve(num_vertices);
-  for (const glm::vec3 &vertex : vertices) {
-      buffer_data.push_back(vertex.x);
-      buffer_data.push_back(vertex.y);
-      buffer_data.push_back(vertex.z);
-  }
-
+LineShader CreateLineShader() {
   LineShader line_shader;
   line_shader.shaderProgram =
     CompileAndLinkVertexFragmentShaderProgram(lineVertexShaderSource, lineFragmentShaderSource);
 
-  line_shader.current_num_vertices = num_vertices;
+  line_shader.current_num_vertices = 0;
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -61,7 +52,7 @@ LineShader CreateLineShader(const std::vector<glm::vec3> &vertices) {
   glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
   glBufferData(GL_ARRAY_BUFFER,
                3*sizeof(float)*line_shader.current_num_vertices,
-               buffer_data.data(),
+               nullptr,
                GL_DYNAMIC_DRAW);
 
   GLint posAttrib = glGetAttribLocation(line_shader.shaderProgram, "position");
@@ -121,6 +112,8 @@ void UpdateLines(LineShader &line_shader, const std::vector<glm::vec3> &vertices
     // if the size of data is the same, just update the buffer
     glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, buffer_data.data());
   } else {
-    fprintf(stderr, "Can't change number of vertices!\n");
+    // if the size of data has changed, we have to reallocate GPU memory
+    glBufferData(GL_ARRAY_BUFFER, buffer_size, buffer_data.data(), GL_DYNAMIC_DRAW);
+    line_shader.current_num_vertices = new_num_vertices;
   }
 }

@@ -49,7 +49,8 @@ int main(int argc, char * argv[]) {
       line.push_back(v3);
     }
   }
-  LineShader line_shader = CreateLineShader(line);
+  LineShader line_shader = CreateLineShader();
+  UpdateLines(line_shader, line);
 
   std::vector<glm::vec3> control_points;
   for (int kx=0; kx<problem.backboard_.control_points_.rows(); kx++) {
@@ -58,7 +59,8 @@ int main(int argc, char * argv[]) {
       control_points.push_back(point);
     }
   }
-  LineShader control_point_shader = CreateLineShader(control_points);
+  LineShader control_point_shader = CreateLineShader();
+  UpdateLines(control_point_shader, control_points);
 
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
@@ -68,11 +70,17 @@ int main(int argc, char * argv[]) {
   int counter = 0;
   while (glfwWindowShouldClose(window) == false) {
     counter++;
-    if (counter == 22222222) {
+    if (counter == 100) {
       fprintf(stderr, "UPDATING LINES HOLLA\n");
       for (int k=0; k < (int)line.size(); k++) {
         line[k] -= glm::vec3(0.f, 0.f, -0.5f);
       }
+      UpdateLines(line_shader, line);
+    }
+
+    if (counter == 200) {
+      fprintf(stderr, "UPDATING LINES HOLLA\n");
+      line.resize(line.size()/3);
       UpdateLines(line_shader, line);
     }
 

@@ -14,7 +14,7 @@ struct LineShader {
   GLint current_num_vertices;
 };
 
-LineShader CreateLineShader(const std::vector<glm::vec3> &vertices);
+LineShader CreateLineShader();
 void DrawLines(LineShader &line_shader,
                const glm::mat4 &view,
                const glm::mat4 &proj,
