@@ -57,10 +57,15 @@ static inline double Cubed(const double x) {
   return x*x*x;
 }
 
+template <int NU, int NV>
+struct Surface {
+  Eigen::Matrix<glm::dvec3, NU, NV> position;
+};
+
 template <int NU, int NV, int NX, int NY>
-Eigen::Matrix<glm::dvec3, NU, NV>
+Surface<NU, NV>
 CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
-  Eigen::Matrix<glm::dvec3, NU, NV> interpolated;
+  Surface<NU, NV> interpolated;
   for (int ku=0; ku<NU; ku++) {
     for (int kv=0; kv<NV; kv++) {
       const double sx = static_cast<double>(ku) / (static_cast<double>(NU) - 1);
@@ -115,7 +120,7 @@ CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
       ret.x /= 36;
       ret.y /= 36;
       ret.z /= 36;
-      interpolated(ku, kv) = ret;
+      interpolated.position(ku, kv) = ret;
     }
   }
 
@@ -124,7 +129,7 @@ CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
 
 
 template <int NU, int NV, int NX, int NY>
-Eigen::Matrix<glm::dvec3, NU, NV>
+Surface<NU, NV>
 ClampedCubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
   const Eigen::Matrix<glm::dvec3, NX + 2*NExtra, NY + 2*NExtra> clamped_ps = PadSurface<NX, NY>(ps);
   return CubicBSplineSurface<NU, NV, NX + 2*NExtra, NY + 2*NExtra>(clamped_ps);

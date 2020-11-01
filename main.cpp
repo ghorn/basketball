@@ -38,7 +38,7 @@ int main(int argc, char * argv[]) {
   const std::vector<Shot> shots = problem.ComputeShots<10, 15>(shot_point);
 
   // Gridmesh
-  GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>());
+  GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>().position);
 
   // Line rendering
   std::vector<std::vector<glm::vec3> > shot_lines;

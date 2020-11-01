@@ -21,7 +21,7 @@ public:
   }
 
   template <int NU, int NV>
-  Eigen::Matrix<glm::dvec3, NU, NV> Interpolate() {
+  Surface<NU, NV> Interpolate() {
     return ClampedCubicBSplineSurface<NU, NV, NX, NY>(control_points_);
   }
 
