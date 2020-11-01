@@ -1,6 +1,7 @@
 #include "opengl_context.hpp"
 
 #include <iostream>
+#include <queue>
 
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
@@ -23,6 +24,7 @@ struct GlobalState {
   bool cursor_z_translating;
   double cursor_z_translating_previous_xpos;
   double cursor_z_translating_previous_ypos;
+  std::queue<int> keypress_queue; // to hand to user
 };
 GlobalState global_state;
 
@@ -41,7 +43,8 @@ static void KeyCallback(GLFWwindow* window,
                         int mods __attribute__((unused))) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
-  } else {
+  } else if (action == GLFW_PRESS) {
+    global_state.keypress_queue.push(key);
     fprintf(stderr, "Key press! %s (%d)\n", glfwGetKeyName(key, scancode), key);
   }
 }
@@ -232,4 +235,13 @@ glm::mat4 GetOrthographicProjection(GLFWwindow *window) {
   width = std::max(width, 1);
   height = std::max(height, 1);
   return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
+}
+
+bool KeypressQueueEmpty() {
+  return global_state.keypress_queue.empty();
+}
+int PopKeypressQueue() {
+  int next = global_state.keypress_queue.front();
+  global_state.keypress_queue.pop();
+  return next;
 }

@@ -63,6 +63,11 @@ int main(int argc __attribute__((unused)),
 
   std::chrono::time_point t_last = std::chrono::high_resolution_clock::now();
   while (glfwWindowShouldClose(window) == false) {
+    // Send keypress events to visualization to update state.
+    while (!KeypressQueueEmpty()) {
+      visualization.HandleKeyPress(PopKeypressQueue());
+    }
+
     std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
     float frame_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
     t_last = t_now;

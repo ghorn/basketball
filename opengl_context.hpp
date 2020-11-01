@@ -11,3 +11,5 @@ bool IsDraggingOrRotating();
 const Camera &GetCamera();
 glm::mat4 GetViewTransformation();
 glm::mat4 GetProjectionTransformation(GLFWwindow *window);
+bool KeypressQueueEmpty();
+int PopKeypressQueue();

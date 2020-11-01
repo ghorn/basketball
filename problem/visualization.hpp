@@ -99,6 +99,7 @@ public:
     control_points_vis_.Update(SingletonVector(control_points));
   }
 
+  void HandleKeyPress(const int key);
 private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 
