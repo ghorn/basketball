@@ -1,19 +1,36 @@
 #include "lines.hpp"
 
-#include <iostream>
 #include <string>
+#include <fstream>
+#include <iostream>
+#include <streambuf>
+#include <sstream>
 
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-GLuint CompileAndLinkVertexFragmentShaderProgram(const char * const vertex_shader_source,
-                                                 const char * const fragment_shader_source) {
+static inline std::string ReadFile(const std::string &path) {
+  std::ifstream file(path, std::ifstream::in);
+  if (!file) {
+    std::cerr << "Shader unable to open '" << path << "'." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  std::stringstream shader_stream;
+  shader_stream << file.rdbuf();
+  file.close();
+  return shader_stream.str();
+}
+
+GLuint CompileAndLinkVertexFragmentShaderProgram(const std::string &vertex_shader_path,
+                                                 const std::string &fragment_shader_path) {
   // build and compile our shader program
   // ------------------------------------
   // vertex shader
   GLint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+  const std::string vshader_code = ReadFile(vertex_shader_path);
+  const char* vshader_code_ptr = vshader_code.c_str();
+  glShaderSource(vertex_shader, 1, &vshader_code_ptr, NULL);
   glCompileShader(vertex_shader);
   // check for shader compile errors
   GLint success;
@@ -25,9 +42,12 @@ GLuint CompileAndLinkVertexFragmentShaderProgram(const char * const vertex_shade
     std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     exit(EXIT_FAILURE);
   }
+
   // fragment shader
   GLint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
+  const std::string fshader_code = ReadFile(fragment_shader_path);
+  const char* fshader_code_ptr = fshader_code.c_str();
+  glShaderSource(fragment_shader, 1, &fshader_code_ptr, NULL);
   glCompileShader(fragment_shader);
   // check for shader compile errors
   glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);

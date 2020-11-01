@@ -12,37 +12,10 @@
 #include "shader/compile.hpp"
 #include "assert.hpp"
 
-const GLchar* gridmeshVertexShaderSource = R"glsl(
-  #version 400 core
-  layout (location = 0) in vec3 position;
-  layout (location = 1) in vec2 texture_coordinate;
-  out vec2 texture_coordinate_;
-  uniform mat4 view;
-  uniform mat4 proj;
-  void main()
-  {
-    texture_coordinate_ = texture_coordinate;
-    gl_Position = proj * view * vec4(position, 1.0);
-  }
-)glsl";
-
-const char *gridmeshFragmentShaderSource = R"glsl(
-  #version 400 core
-  in vec2 texture_coordinate_;
-  uniform sampler2D image_texture;
-  out vec4 FragColor;
-  void main()
-  {
-    FragColor = texture(image_texture, texture_coordinate_);
-  }
-)glsl";
-
-
 GridmeshShader CreateGridmesh(const std::string &image_path) {
   GridmeshShader gridmesh;
   gridmesh.shaderProgram =
-    CompileAndLinkVertexFragmentShaderProgram(gridmeshVertexShaderSource,
-                                              gridmeshFragmentShaderSource);
+    CompileAndLinkVertexFragmentShaderProgram("shader/gridmesh.vs", "shader/gridmesh.fs");
 
   gridmesh.num_indices = 0;
   gridmesh.vertex_buffer_size = 0;

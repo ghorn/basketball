@@ -11,40 +11,11 @@
 #include "assert.hpp"
 #include "shader/compile.hpp"
 
-// Shader sources
-const GLchar* colorline_vertex_shader_source = R"glsl(
-  #version 400 core
-  layout (location = 0) in vec3 position;
-  layout (location = 1) in vec4 vert_color;
-  out vec4 frag_color_in;
-  uniform mat4 view;
-  uniform mat4 proj;
-  uniform float point_size;
-  void main()
-  {
-    gl_Position = proj * view * vec4(position, 1.0);
-    frag_color_in = vert_color;
-    gl_PointSize = 3;
-  }
-)glsl";
-
-const GLchar* colorline_fragment_shader_source = R"glsl(
-  #version 400 core
-  in vec4 frag_color_in;
-  out vec4 frag_color_out;
-  void main()
-  {
-    frag_color_out = frag_color_in;
-  }
-)glsl";
-
-
 ColorLineShader CreateColorLineShader() {
   ColorLineShader line_shader;
   line_shader.point_size = 1;
   line_shader.shaderProgram =
-    CompileAndLinkVertexFragmentShaderProgram(colorline_vertex_shader_source,
-                                              colorline_fragment_shader_source);
+    CompileAndLinkVertexFragmentShaderProgram("shader/colorlines.vs", "shader/colorlines.fs");
 
   line_shader.current_buffer_size = 0;
 

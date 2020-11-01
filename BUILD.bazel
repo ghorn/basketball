@@ -60,12 +60,14 @@ cc_binary(
         '-lSOIL',
     ],
     copts = copts,
-    args = [
-        "$(location :court.png)",
-        #"$(location :sample.png)",
-    ],
     data = [
         "image/awesomeface.png",
+        "shader/colorlines.vs",
+        "shader/colorlines.fs",
+        "shader/gridmesh.vs",
+        "shader/gridmesh.fs",
+        "shader/lines.vs",
+        "shader/lines.fs",
         ":court.png",
         ":sample.png",
         ":sample2.png",

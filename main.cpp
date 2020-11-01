@@ -20,14 +20,8 @@
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
-int main(int argc, char * argv[]) {
-  // Parse args
-  if (argc != 2) {
-    fprintf(stderr, "need one argument: court.jpg location\n");
-    exit(EXIT_FAILURE);
-  }
-  const std::string image_path = argv[1];
-
+int main(int argc __attribute__((unused)),
+         char * argv[] __attribute__((unused))) {
   // Boilerplate
   GLFWwindow * const window = OpenglSetup();
 

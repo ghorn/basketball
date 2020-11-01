@@ -11,36 +11,11 @@
 #include "assert.hpp"
 #include "shader/compile.hpp"
 
-// Shader sources
-const GLchar* lineVertexShaderSource = R"glsl(
-  #version 400 core
-  layout (location = 0) in vec3 position;
-  uniform mat4 view;
-  uniform mat4 proj;
-  uniform float point_size;
-  void main()
-  {
-    gl_Position = proj * view * vec4(position, 1.0);
-    gl_PointSize = point_size;
-  }
-)glsl";
-
-const GLchar* lineFragmentShaderSource = R"glsl(
-  #version 400 core
-  out vec4 output_color;
-  uniform vec4 color;
-  void main()
-  {
-    output_color = color;
-  }
-)glsl";
-
-
 LineShader CreateLineShader() {
   LineShader line_shader;
   line_shader.point_size = 1;
   line_shader.shaderProgram =
-    CompileAndLinkVertexFragmentShaderProgram(lineVertexShaderSource, lineFragmentShaderSource);
+    CompileAndLinkVertexFragmentShaderProgram("shader/lines.vs", "shader/lines.fs");
 
   line_shader.current_buffer_size = 0;
 
