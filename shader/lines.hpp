@@ -13,6 +13,7 @@ struct LineShader {
   GLuint VBO;
   GLint current_buffer_size;
   std::vector<GLint> segment_sizes;
+  float point_size;
 };
 
 LineShader CreateLineShader();

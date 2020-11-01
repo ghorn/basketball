@@ -10,6 +10,7 @@ ProblemVisualization::ProblemVisualization() {
   shot_lines_vis_ = CreateLineShader();
   bounce_lines_vis_ = CreateLineShader();
   control_points_vis_ = CreateLineShader();
+  control_points_vis_.point_size = 3;
 }
 
 void ProblemVisualization::FreeResources() {

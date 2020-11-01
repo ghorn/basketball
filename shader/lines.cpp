@@ -17,10 +17,11 @@ const GLchar* lineVertexShaderSource = R"glsl(
   layout (location = 0) in vec3 position;
   uniform mat4 view;
   uniform mat4 proj;
+  uniform float point_size;
   void main()
   {
     gl_Position = proj * view * vec4(position, 1.0);
-    gl_PointSize = 3;
+    gl_PointSize = point_size;
   }
 )glsl";
 
@@ -37,6 +38,7 @@ const GLchar* lineFragmentShaderSource = R"glsl(
 
 LineShader CreateLineShader() {
   LineShader line_shader;
+  line_shader.point_size = 1;
   line_shader.shaderProgram =
     CompileAndLinkVertexFragmentShaderProgram(lineVertexShaderSource, lineFragmentShaderSource);
 
@@ -86,6 +88,9 @@ void DrawLines(LineShader &line_shader,
 
   GLint uniColor = glGetUniformLocation(line_shader.shaderProgram, "color");
   glUniform4f(uniColor, color.r, color.g, color.b, color.a);
+
+  GLint uniPointSize = glGetUniformLocation(line_shader.shaderProgram, "point_size");
+  glUniform1f(uniPointSize, line_shader.point_size);
 
   GLint offset = 0;
   for (const GLint segment_size : line_shader.segment_sizes) {

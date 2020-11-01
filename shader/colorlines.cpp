@@ -19,6 +19,7 @@ const GLchar* colorline_vertex_shader_source = R"glsl(
   out vec4 frag_color_in;
   uniform mat4 view;
   uniform mat4 proj;
+  uniform float point_size;
   void main()
   {
     gl_Position = proj * view * vec4(position, 1.0);
@@ -40,6 +41,7 @@ const GLchar* colorline_fragment_shader_source = R"glsl(
 
 ColorLineShader CreateColorLineShader() {
   ColorLineShader line_shader;
+  line_shader.point_size = 1;
   line_shader.shaderProgram =
     CompileAndLinkVertexFragmentShaderProgram(colorline_vertex_shader_source,
                                               colorline_fragment_shader_source);
@@ -87,6 +89,9 @@ void DrawColorLines(ColorLineShader &line_shader,
   GLint uniProj = glGetUniformLocation(line_shader.shaderProgram, "proj");
   glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+
+  GLint uniPointSize = glGetUniformLocation(line_shader.shaderProgram, "point_size");
+  glUniform1f(uniPointSize, line_shader.point_size);
 
   GLint offset = 0;
   for (const GLint segment_size : line_shader.segment_sizes) {
