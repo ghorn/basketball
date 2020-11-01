@@ -46,12 +46,9 @@ Gridmesh::Gridmesh(const std::string &image_path) :
   glBindTexture(GL_TEXTURE_2D, texture_);
 
   // set texture wrapping parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  float borderColor[] = {1.0f, 1.0f, 0.0f, 1.0f};
-  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   // set texture filtering parameters
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -95,8 +92,19 @@ void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   shader_.UniformMatrix4fv("view", view);
   shader_.UniformMatrix4fv("proj", proj);
 
+  // disable blending
+  const GLboolean blend_was_enabled = glIsEnabled(GL_BLEND);
+  glDisable(GL_BLEND);
+
+  // Draw triangles
   glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
 
+  // restore previous blend state
+  if (blend_was_enabled) {
+    glEnable(GL_BLEND);
+  }
+
+  // unbind vao
   glBindVertexArray(0);
 }
 
