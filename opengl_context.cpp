@@ -26,6 +26,14 @@ struct GlobalState {
 };
 GlobalState global_state;
 
+bool IsDraggingOrRotating() {
+  return global_state.cursor_rotating || global_state.cursor_xy_translating || global_state.cursor_z_translating;
+}
+
+const Camera &GetCamera() {
+  return global_state.camera;
+}
+
 static void KeyCallback(GLFWwindow* window,
                         int key,
                         int scancode,

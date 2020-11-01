@@ -4,6 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "camera.hpp"
+
 GLFWwindow* OpenglSetup();
+bool IsDraggingOrRotating();
+const Camera &GetCamera();
 glm::mat4 GetViewTransformation();
 glm::mat4 GetProjectionTransformation(GLFWwindow *window);

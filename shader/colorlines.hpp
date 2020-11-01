@@ -21,7 +21,7 @@ public:
   void Update(const std::vector<std::vector<ColoredVec3> > &vertices);
   void Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum mode);
 
-  float point_size_;
+  float point_size_ = 1;
 
 private:
   Shader shader_;

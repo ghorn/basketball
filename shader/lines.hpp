@@ -25,4 +25,3 @@ private:
   std::vector<GLint> segment_sizes_;
   GLint current_buffer_size_;
 };
-

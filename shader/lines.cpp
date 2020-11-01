@@ -52,6 +52,7 @@ void Lines::Draw(const glm::mat4 &view,
   shader_.Uniform4f("color", color.r, color.g, color.b, color.a);
   shader_.Uniform1f("point_size", point_size_);
 
+  // Draw lines one segment at a time.
   GLint offset = 0;
   for (const GLint segment_size : segment_sizes_) {
     glDrawArrays(mode, offset, segment_size);

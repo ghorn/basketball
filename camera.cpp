@@ -3,7 +3,7 @@
 #include <algorithm> // min/max
 #include <cmath>
 
-glm::vec3 Camera::Eye() {
+glm::vec3 Camera::Eye() const {
   const float elevation = elevation_deg_ * static_cast<float>(M_PI) / 180.f;
   const float azimuth = azimuth_deg_ * static_cast<float>(M_PI) / 180.f;
   const float cos_elev = std::cos(elevation);
@@ -13,8 +13,12 @@ glm::vec3 Camera::Eye() {
   return Center() + glm::vec3(x, y, z);
 }
 
-glm::vec3 Camera::Center() {
+glm::vec3 Camera::Center() const {
   return focus_position_;
+}
+
+double Camera::Distance() const {
+  return distance_;
 }
 
 void Camera::Rotate(const float delta_x, const float delta_y) {

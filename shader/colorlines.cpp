@@ -53,6 +53,7 @@ void ColorLines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum
 
   shader_.Uniform1f("point_size", point_size_);
 
+  // Draw lines one segment at a time.
   GLint offset = 0;
   for (const GLint segment_size : segment_sizes_) {
     glDrawArrays(mode, offset, segment_size);
