@@ -100,6 +100,8 @@ public:
   }
 
 private:
+  static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
+
   Gridmesh backboard_vis_;
   Gridmesh court_vis_;
   Lines backboard_tangents_vis_;

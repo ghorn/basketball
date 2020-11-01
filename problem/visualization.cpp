@@ -1,23 +1,14 @@
 #include "visualization.hpp"
 
+#include <iostream>
+
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
 ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/court.png") {
   control_points_vis_.point_size_ = 3;
-  // Let's use NBA regulations.
-  constexpr double kFt2M = 0.3048;
-  constexpr double kCourtInnerLength = 94 * kFt2M;
-  constexpr double kCourtInnerWidth = 50 * kFt2M;
-  constexpr double kWidthApron = 5*kFt2M;
-  constexpr double kLengthApron = 8*kFt2M;
-  constexpr double kCourtOuterWidth = kCourtInnerWidth + kWidthApron;
-  Eigen::Matrix<glm::vec3, 2, 2> court;
-  court(0, 0) = glm::vec3(-kCourtOuterWidth/2,                   - kLengthApron, 0);
-  court(1, 0) = glm::vec3( kCourtOuterWidth/2,                   - kLengthApron, 0);
-  court(0, 1) = glm::vec3(-kCourtOuterWidth/2, kCourtInnerLength + kLengthApron, 0);
-  court(1, 1) = glm::vec3( kCourtOuterWidth/2, kCourtInnerLength + kLengthApron, 0);
 
+  Eigen::Matrix<glm::vec3, 2, 2> court = CourtCorners();
   court_vis_.Update(court);
 }
 
@@ -37,3 +28,62 @@ void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   // control points
   control_points_vis_.Draw(view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);
 }
+
+
+Eigen::Matrix<glm::vec3, 2, 2> ProblemVisualization::CourtCorners() {
+  // Let's use NBA regulations.
+  // --------------------------
+  constexpr double kFt2M = 0.3048;
+  // expected
+  constexpr double kExpectedInnerLength = 94 * kFt2M;
+  constexpr double kExpectedInnerWidth = 50 * kFt2M;
+  // measured
+  constexpr double kLengthApronPixels = 87;
+  constexpr double kInnerLengthPixels = 1826-80;
+
+  constexpr double kWidthApronPixels = 71;
+  constexpr double kInnerWidthPixels = 1005-67;
+  // conversion ratio
+  constexpr double kLengthPixelToMeter = kExpectedInnerLength / kInnerLengthPixels;
+  constexpr double kWidthPixelToMeter = kExpectedInnerWidth / kInnerWidthPixels;
+  constexpr double kPixel2Meter = 0.5*(kLengthPixelToMeter + kWidthPixelToMeter);
+  // derive apron size
+  constexpr double kLengthApron = kLengthApronPixels * kPixel2Meter; // 3.63*kFt2M;
+  constexpr double kWidthApron = kWidthApronPixels * kPixel2Meter; // 8*kFt2M;
+  constexpr double kInnerWidth = kInnerWidthPixels * kPixel2Meter;
+  constexpr double kInnerLength = kInnerLengthPixels * kPixel2Meter;
+
+  // outer dimensions
+  constexpr double kOuterWidth = kInnerWidth + 2 * kWidthApron;
+  constexpr double kOuterLength = kInnerLength + 2 * kLengthApron;
+
+  constexpr double kAspectRatio = kOuterLength / kOuterWidth;
+
+  //std::cerr << "kLengthPixelToMeter: " << kLengthPixelToMeter << std::endl;
+  //std::cerr << "kWidthPixelToMeter:  " << kWidthPixelToMeter << std::endl;
+  //std::cerr << "kPixelToMeter:       " << kPixel2Meter << std::endl;
+  //std::cerr << "court outer length: " << kOuterLength/kFt2M << " [ft]" << std::endl;
+  //std::cerr << "court outer width:  " << kOuterWidth/kFt2M  << " [ft]" << std::endl;
+  //std::cerr << "court inner length: " << kInnerLength/kFt2M << " [ft]" << std::endl;
+  //std::cerr << "court inner width:  " << kInnerWidth/kFt2M  << " [ft]" << std::endl;
+  //std::cerr << "apron length: " << kLengthApron/kFt2M << std::endl;
+  //std::cerr << "apron width:  " << kWidthApron/kFt2M << std::endl;
+  //std::cerr << "Aspect ratio: " << kAspectRatio << std::endl;
+
+  // Sanity check.
+  if (fabs(kAspectRatio - ((double)1920)/1080) > 0.01) {
+    std::cerr << "Bad Aspect Ratio!" << std::endl;
+    std::cerr << "Expected " << ((double)1920)/1080 << std::endl;
+    std::cerr << "Got      " << kAspectRatio << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  Eigen::Matrix<glm::vec3, 2, 2> court;
+  court(0, 0) = glm::vec3(-kOuterWidth/2,              - kLengthApron, 0);
+  court(1, 0) = glm::vec3( kOuterWidth/2,              - kLengthApron, 0);
+  court(0, 1) = glm::vec3(-kOuterWidth/2, kInnerLength + kLengthApron, 0);
+  court(1, 1) = glm::vec3( kOuterWidth/2, kInnerLength + kLengthApron, 0);
+
+  return court;
+}
+
