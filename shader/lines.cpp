@@ -6,15 +6,10 @@
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "assert.hpp"
-#include "shader/compile.hpp"
 
-Lines::Lines() {
-  shader_ =
-    CompileAndLinkVertexFragmentShaderProgram("shader/lines.vs", "shader/lines.fs");
-
+Lines::Lines() : shader_("shader/lines.vs", "shader/lines.fs") {
   current_buffer_size_ = 0;
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -47,20 +42,15 @@ void Lines::Draw(const glm::mat4 &view,
                  const glm::vec4 &color,
                  const GLenum mode) {
   // draw triangle
-  glUseProgram(shader_);
+  shader_.UseProgram();
   glBindVertexArray(vao_); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
   // Set up transformations
-  GLint uniView = glGetUniformLocation(shader_, "view");
-  GLint uniProj = glGetUniformLocation(shader_, "proj");
-  glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+  shader_.UniformMatrix4fv("view", view);
+  shader_.UniformMatrix4fv("proj", proj);
 
-  GLint uniColor = glGetUniformLocation(shader_, "color");
-  glUniform4f(uniColor, color.r, color.g, color.b, color.a);
-
-  GLint uniPointSize = glGetUniformLocation(shader_, "point_size");
-  glUniform1f(uniPointSize, point_size_);
+  shader_.Uniform4f("color", color.r, color.g, color.b, color.a);
+  shader_.Uniform1f("point_size", point_size_);
 
   GLint offset = 0;
   for (const GLint segment_size : segment_sizes_) {

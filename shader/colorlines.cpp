@@ -9,12 +9,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "assert.hpp"
-#include "shader/compile.hpp"
 
-ColorLines::ColorLines() {
+ColorLines::ColorLines() : shader_("shader/colorlines.vs", "shader/colorlines.fs") {
   point_size_ = 1;
-  shader_ =
-    CompileAndLinkVertexFragmentShaderProgram("shader/colorlines.vs", "shader/colorlines.fs");
+
 
   current_buffer_size_ = 0;
 
@@ -46,17 +44,14 @@ ColorLines::ColorLines() {
 
 void ColorLines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum mode) {
   // draw triangle
-  glUseProgram(shader_);
+  shader_.UseProgram();
   glBindVertexArray(vao_); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
   // Set up transformations
-  GLint uniView = glGetUniformLocation(shader_, "view");
-  GLint uniProj = glGetUniformLocation(shader_, "proj");
-  glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+  shader_.UniformMatrix4fv("view", view);
+  shader_.UniformMatrix4fv("proj", proj);
 
-  GLint uniPointSize = glGetUniformLocation(shader_, "point_size");
-  glUniform1f(uniPointSize, point_size_);
+  shader_.Uniform1f("point_size", point_size_);
 
   GLint offset = 0;
   for (const GLint segment_size : segment_sizes_) {

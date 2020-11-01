@@ -9,13 +9,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <SOIL/SOIL.h>
 
-#include "shader/compile.hpp"
 #include "assert.hpp"
 
-Gridmesh::Gridmesh(const std::string &image_path) {
-  shader_ =
-    CompileAndLinkVertexFragmentShaderProgram("shader/gridmesh.vs", "shader/gridmesh.fs");
-
+Gridmesh::Gridmesh(const std::string &image_path) :
+  shader_("shader/gridmesh.vs", "shader/gridmesh.fs")
+{
   num_indices_ = 0;
   vertex_buffer_size_ = 0;
   index_buffer_size_ = 0;
@@ -34,12 +32,12 @@ Gridmesh::Gridmesh(const std::string &image_path) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
-  glVertexAttribPointer(glGetAttribLocation(shader_, "position"),
-                        3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(GLfloat)));
+  shader_.VertexAttribPointer("position",
+                              3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(GLfloat)));
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(glGetAttribLocation(shader_, "texture_coordinate"),
-                        2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(GLfloat)));
+  shader_.VertexAttribPointer("texture_coordinate",
+                              2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(GLfloat)));
   glEnableVertexAttribArray(1);
 
   // load and create a texture
@@ -70,8 +68,8 @@ Gridmesh::Gridmesh(const std::string &image_path) {
   SOIL_free_image_data(image);
 
   // set image texture
-  glUseProgram(shader_);
-  glUniform1i(glGetUniformLocation(shader_, "image_texture"), 0);
+  shader_.UseProgram();
+  shader_.Uniform1i("image_texture", 0);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -90,14 +88,12 @@ void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   //glBindTexture(GL_TEXTURE_2D, texture_);
 
   // render
-  glUseProgram(shader_);
+  shader_.UseProgram();
   glBindVertexArray(vao_);
 
   // Set up transformations
-  glUniformMatrix4fv(glGetUniformLocation(shader_, "view"),
-                     1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(glGetUniformLocation(shader_, "proj"),
-                     1, GL_FALSE, glm::value_ptr(proj));
+  shader_.UniformMatrix4fv("view", view);
+  shader_.UniformMatrix4fv("proj", proj);
 
   glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
 
@@ -174,5 +170,4 @@ Gridmesh::~Gridmesh() {
   glDeleteVertexArrays(1, &vao_);
   glDeleteBuffers(1, &vbo_);
   glDeleteBuffers(1, &ebo_);
-  glDeleteProgram(shader_);
 }

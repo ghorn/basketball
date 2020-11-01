@@ -10,6 +10,8 @@
 
 #include <glm/glm.hpp>
 
+#include "shader/shader.hpp"
+
 struct Gridmesh {
   Gridmesh(const std::string &image_path);
   ~Gridmesh();
@@ -28,7 +30,7 @@ struct Gridmesh {
   }
 
 private:
-  GLint shader_;
+  Shader shader_;
   GLuint vao_;
   GLuint vbo_;
   GLuint ebo_;

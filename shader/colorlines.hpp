@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "shader/shader.hpp"
+
 struct ColoredVec3 {
   glm::vec3 position;
   glm::vec4 color;
@@ -22,7 +24,7 @@ public:
   float point_size_;
 
 private:
-  GLint shader_;
+  Shader shader_;
   GLuint vao_;
   GLuint vbo_;
   GLint current_buffer_size_;

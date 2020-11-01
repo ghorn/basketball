@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "shader/shader.hpp"
+
 class Lines {
 public:
   Lines();
@@ -17,7 +19,7 @@ public:
   float point_size_ = 1;
 
 private:
-  GLint shader_;
+  Shader shader_;
   GLuint vao_;
   GLuint vbo_;
   std::vector<GLint> segment_sizes_;
