@@ -8,16 +8,16 @@ template <int NX, int NY>
 class Backboard {
 public:
   Backboard() {
-    for (int kx=0; kx<NX; kx++) {
-      const double sx = 2 * kx / (double)(NX - 1) - 1; // -1 to 1
-      for (int ky=0; ky<NY; ky++) {
-        const double sy = 2 * ky / (double)(NY - 1) - 1; // -1 to 1
+    for (int ku=0; ku<NX; ku++) {
+      const double su = 2 * ku / (double)(NX - 1) - 1; // -1 to 1
+      for (int kv=0; kv<NY; kv++) {
+        const double sv = 2 * kv / (double)(NY - 1) - 1; // -1 to 1
 
-        const double z = sx - 1; // -2 to 0
-        const double y = 2*sy; // -2 to 2
-        const double x = 0.3*sx*sx + 0.3*0.5 * sy*sy + 0.1 * sin(sx) * cos(2*sy);
+        const double x = 2 * su; // -2 to 2
+        const double z = sv - 2; // -1 to -3
+        const double y = 0.3*su*su + 0.01*sv*sv + 0.5*sin(3*su)*cos(5*sv);
 
-        control_points_(kx, ky) = glm::dvec3(x, y, z);
+        control_points_(ku, kv) = glm::dvec3(x, y, z);
       }
     }
   }

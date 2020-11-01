@@ -27,13 +27,12 @@ public:
   void FreeResources();
   void Draw(const glm::mat4 &view, const glm::mat4 &proj);
 
-  template<int NX, int NY>
+  template<int NU, int NV, int NX, int NY>
   void Update(const Problem<NX, NY> &problem) {
     // shot and bounce lines
-    const glm::dvec3 shot_point(4, 0.5, 1);
     std::vector<Shot> shots;
     std::vector<Bounce> bounces;
-    problem.template ComputeShots<10, 15>(shot_point, &shots, &bounces);
+    problem.template ComputeShots<10, 15>(&shots, &bounces);
 
     // shots
     std::vector<std::vector<glm::vec3> > shot_lines;
@@ -64,14 +63,14 @@ public:
     UpdateLines(bounce_lines_vis_, bounce_lines);
 
     // backboard
-    Surface<20, 30> surface = problem.backboard_.template Interpolate<20, 30>();
+    Surface<NU, NV> surface = problem.backboard_.template Interpolate<NU, NV>();
     UpdateGridmeshFromMatrix(backboard_vis_, surface.position);
 
     // tangents
     std::vector<glm::vec3> tangents;
     std::vector<glm::vec3> normals;
-    for (int ku=0; ku<20; ku++) {
-      for (int kv=0; kv<30; kv++) {
+    for (int ku=0; ku<NU; ku++) {
+      for (int kv=0; kv<NV; kv++) {
         const glm::dvec3 &position = surface.position(ku, kv);
         const glm::dvec3 &tangent_u = surface.tangent_u(ku, kv);
         const glm::dvec3 &tangent_v = surface.tangent_v(ku, kv);
@@ -80,7 +79,7 @@ public:
         tangents.push_back(position);
         tangents.push_back(position + 0.1*tangent_v);
 
-        if (ku > 0 && ku < 19 && kv > 0 && kv < 29) {
+        if (ku > 0 && ku < NU - 1 && kv > 0 && kv < NV - 1) {
           normals.push_back(position);
           normals.push_back(position + surface.normal(ku, kv));
         }

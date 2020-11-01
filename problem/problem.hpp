@@ -15,11 +15,12 @@ public:
   Backboard<NX, NY> backboard_;
 
   template <int NU, int NV>
-  void ComputeShots(const glm::dvec3 &shot_point,
-                    std::vector<Shot> *shots,
+  void ComputeShots(std::vector<Shot> *shots,
                     std::vector<Bounce> *bounces) const {
     Surface surface = backboard_.template Interpolate<NU, NV>();
     const Eigen::Matrix<glm::dvec3, NU, NV> &bounce_points = surface.position;
+
+    const glm::dvec3 shot_point(0.5, 4, 0);
 
     shots->clear();
     bounces->clear();

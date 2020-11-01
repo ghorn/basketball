@@ -131,7 +131,7 @@ GLFWwindow* OpenglSetup() {
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
   // Create window.
-  GLFWwindow* const window = glfwCreateWindow(800, 600, "basketball", nullptr, nullptr);
+  GLFWwindow* const window = glfwCreateWindow(0.7*1920, 0.7*1080, "basketball", nullptr, nullptr);
   if (window == nullptr) {
     fprintf(stderr, "Failed to Create OpenGL Context");
     glfwTerminate();
@@ -152,6 +152,16 @@ GLFWwindow* OpenglSetup() {
   glewInit();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_PROGRAM_POINT_SIZE);
+
+  // blending
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // pretty
+  glEnable(GL_LINE_SMOOTH);
+  glEnable(GL_POLYGON_SMOOTH);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
   // Debugging
   glEnable(GL_DEBUG_OUTPUT);

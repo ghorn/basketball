@@ -38,8 +38,6 @@ cc_binary(
         "problem/shot.hpp",
         "problem/visualization.cpp",
         "problem/visualization.hpp",
-        "shader/cat_texture.cpp",
-        "shader/cat_texture.hpp",
         "shader/compile.cpp",
         "shader/compile.hpp",
         "shader/gridmesh.cpp",
@@ -67,6 +65,7 @@ cc_binary(
         #"$(location :sample.png)",
     ],
     data = [
+        "image/awesomeface.png",
         ":court.png",
         ":sample.png",
         ":sample2.png",

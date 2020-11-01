@@ -17,7 +17,6 @@
 #include "problem/backboard.hpp"
 #include "problem/problem.hpp"
 #include "problem/visualization.hpp"
-#include "shader/cat_texture.hpp"
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
@@ -38,10 +37,7 @@ int main(int argc, char * argv[]) {
 
   ProblemVisualization visualization;
 
-  visualization.Update(problem);
-
-  // Cat
-  CatShader cat_shader = CreateCatShader(image_path);
+  visualization.Update<20, 30>(problem);
 
   std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
 
@@ -61,15 +57,13 @@ int main(int argc, char * argv[]) {
       time * glm::radians(0.1f * 180.0f),
       glm::vec3(0.0f, 0.0f, 1.0f)
     );
+    (void)model;
 
     // Camera transformation
     glm::mat4 view = GetViewTransformation();
 
     // projection transformation
     glm::mat4 proj = GetProjectionTransformation(window);
-
-    // cat
-    DrawCatShader(cat_shader, model, view, proj);
 
     visualization.Draw(view, proj);
 
@@ -79,7 +73,6 @@ int main(int argc, char * argv[]) {
   }
 
   visualization.FreeResources();
-  FreeCatGlResources(cat_shader);
 
   glfwDestroyWindow(window);
   glfwTerminate();

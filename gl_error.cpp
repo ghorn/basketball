@@ -70,4 +70,5 @@ void GlDebugOutput(GLenum source,
   std::cout << std::endl;
 
   std::cerr << boost::stacktrace::stacktrace();
+  exit(EXIT_FAILURE);
 }

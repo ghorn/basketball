@@ -4,7 +4,7 @@
 #include "shader/lines.hpp"
 
 ProblemVisualization::ProblemVisualization() {
-  backboard_vis_ = CreateGridmesh();
+  backboard_vis_ = CreateGridmesh("image/awesomeface.png");
   backboard_tangents_vis_ = CreateLineShader();
   backboard_normals_vis_ = CreateLineShader();
   shot_lines_vis_ = CreateLineShader();

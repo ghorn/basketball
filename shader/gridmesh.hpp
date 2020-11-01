@@ -15,27 +15,29 @@ struct GridmeshShader {
   GLuint VAO;
   GLuint VBO;
   GLuint EBO;
-  int current_num_indices;
+  GLuint texture;
+  int num_indices;
+  GLint vertex_buffer_size = 0;
+  GLint index_buffer_size = 0;
 };
 
-GridmeshShader CreateGridmesh();
+GridmeshShader CreateGridmesh(const std::string &image_path);
 void DrawGridmesh(const GridmeshShader &gridmesh,
                    const glm::mat4 &view,
                    const glm::mat4 &proj);
 void FreeGridmeshGlResources(const GridmeshShader &gridmesh);
 
-void UpdateGridmesh(GridmeshShader &gridmesh, float *vertices, int rows, int cols);
+void UpdateGridmesh(GridmeshShader &gridmesh,
+                    const Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dynamic> &grid);
 
 template <int NU, int NV>
 void UpdateGridmeshFromMatrix(GridmeshShader &gridmesh,
                               const Eigen::Matrix<glm::dvec3, NU, NV> &mat) {
-  std::vector<float> vec;
+  Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dynamic> dynamic_mat(NU, NV);
   for (int ku=0; ku<NU; ku++) {
     for (int kv=0; kv<NV; kv++) {
-      vec.push_back(static_cast<float>(mat(ku, kv).x));
-      vec.push_back(static_cast<float>(mat(ku, kv).y));
-      vec.push_back(static_cast<float>(mat(ku, kv).z));
+      dynamic_mat(ku, kv) = mat(ku, kv);
     }
   }
-  UpdateGridmesh(gridmesh, vec.data(), (int)NU, (int)NV);
+  UpdateGridmesh(gridmesh, dynamic_mat);
 }
