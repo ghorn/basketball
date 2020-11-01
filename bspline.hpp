@@ -62,6 +62,7 @@ struct Surface {
   Eigen::Matrix<glm::dvec3, NU, NV> position;
   Eigen::Matrix<glm::dvec3, NU, NV> tangent_u;
   Eigen::Matrix<glm::dvec3, NU, NV> tangent_v;
+  Eigen::Matrix<glm::dvec3, NU, NV> normal;
 };
 
 template <int NU, int NV, int NX, int NY>
@@ -146,6 +147,7 @@ CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
       interpolated.position(ku, kv) = position;
       interpolated.tangent_u(ku, kv) = tangent_u;
       interpolated.tangent_v(ku, kv) = tangent_v;
+      interpolated.normal(ku, kv) = glm::normalize(glm::cross(tangent_u, tangent_v));
     }
   }
 

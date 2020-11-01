@@ -9,7 +9,8 @@ const double g_accel = 9.81;
 
 class Shot {
 public:
-  Shot(glm::dvec3 shot_point, glm::dvec3 bounce_point) {
+  Shot(glm::dvec3 shot_point,
+       glm::dvec3 bounce_point) {
     shot_point_ = shot_point;
     bounce_point_ = bounce_point;
 
@@ -49,9 +50,41 @@ public:
     }
   }
 
-//private:
-//  glm::vec3d ComputeShotTime() {
-//
-//  }
-  
+  glm::dvec3 BounceVel() const {
+    return glm::dvec3(vx_, vy_, vz_bounce_);
+  }
+};
+
+
+class Bounce {
+public:
+  Bounce(const glm::dvec3 &bounce_point,
+         const glm::dvec3 &incoming_velocity,
+         const glm::dvec3 &bounce_normal) : bounce_point_(bounce_point) {
+
+    //glm::dvec3 normal = glm::cross(bounce_tangent_v, bounce_tangent_u);
+    //ASSERT(glm::length(normal) > 1e-9);
+    //normal = glm::normalize(normal);
+
+    // I - 2.0 * dot(N, I) * N
+    outgoing_velocity_ = glm::reflect(incoming_velocity, bounce_normal);
+
+    const double vz0 = outgoing_velocity_.z;
+    const double pz0 = bounce_point_.z;
+    ASSERT(pz0 < 0);
+    land_time_ = (-vz0 + sqrt(vz0*vz0 - 2 * pz0 * g_accel))/ g_accel;
+  }
+  glm::dvec3 bounce_point_;
+  glm::dvec3 outgoing_velocity_;
+  double land_time_;
+
+  template <int N>
+  void DrawArc(std::array<glm::vec3, N> *array) const {
+    for (int k=0; k<N; k++) {
+      const double t = k * land_time_ / (N - 1);
+      (*array)[k].x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
+      (*array)[k].y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
+      (*array)[k].z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);
+    }
+  }
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <vector>
 
 #include <eigen3/Eigen/Dense>
@@ -14,28 +15,24 @@ public:
   Backboard<NX, NY> backboard_;
 
   template <int NU, int NV>
-  std::vector<Shot> ComputeShots(const glm::dvec3 &shot_point) const {
+  void ComputeShots(const glm::dvec3 &shot_point,
+                    std::vector<Shot> *shots,
+                    std::vector<Bounce> *bounces) const {
     Surface surface = backboard_.template Interpolate<NU, NV>();
     const Eigen::Matrix<glm::dvec3, NU, NV> &bounce_points = surface.position;
 
-    std::vector<Shot> shots;
-    for (int ku=0; ku<NU; ku++) {
-      for (int kv=0; kv<NV; kv++) {
-        shots.push_back(Shot(shot_point, bounce_points(ku, kv)));
+    shots->clear();
+    bounces->clear();
+    for (int ku=1; ku<NU-1; ku++) {
+      for (int kv=1; kv<NV-1; kv++) {
+        Shot shot(shot_point, bounce_points(ku, kv));
+        shots->push_back(shot);
+        Bounce bounce(shot.bounce_point_,
+                      shot.BounceVel(),
+                      surface.normal(ku, kv));;
+        bounces->push_back(bounce);
       }
     }
-
-    return shots;
   }
-  //Shot shots_[NU][NV];
-
-  //SetShots() {
-  //  Eigen::Matrix<glm::dvec3, NU, NV> bounce_points = backboard_.Interpolate();
-  //}
-
-//  template <int NU, int NV>
-//  Eigen::Matrix<Shot, NU, NV> MakeShots;
 private:
-  
-  //  template <int NU, int NV>
 };

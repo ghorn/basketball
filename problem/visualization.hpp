@@ -29,10 +29,13 @@ public:
 
   template<int NX, int NY>
   void Update(const Problem<NX, NY> &problem) {
-    // shot lines
+    // shot and bounce lines
     const glm::dvec3 shot_point(4, 0.5, 1);
-    const std::vector<Shot> shots = problem.template ComputeShots<10, 15>(shot_point);
+    std::vector<Shot> shots;
+    std::vector<Bounce> bounces;
+    problem.template ComputeShots<10, 15>(shot_point, &shots, &bounces);
 
+    // shots
     std::vector<std::vector<glm::vec3> > shot_lines;
     for (const Shot &shot : shots) {
       std::array<glm::vec3, 256> shot_arc;
@@ -46,12 +49,27 @@ public:
     }
     UpdateLines(shot_lines_vis_, shot_lines);
 
+    // bounces
+    std::vector<std::vector<glm::vec3> > bounce_lines;
+    for (const Bounce &bounce : bounces) {
+      std::array<glm::vec3, 256> bounce_arc;
+      bounce.DrawArc<256>(&bounce_arc);
+
+      std::vector<glm::vec3> segment;
+      for (glm::vec3 v3 : bounce_arc) {
+        segment.push_back(v3);
+      }
+      bounce_lines.push_back(segment);
+    }
+    UpdateLines(bounce_lines_vis_, bounce_lines);
+
     // backboard
     Surface<20, 30> surface = problem.backboard_.template Interpolate<20, 30>();
     UpdateGridmeshFromMatrix(backboard_vis_, surface.position);
 
     // tangents
     std::vector<glm::vec3> tangents;
+    std::vector<glm::vec3> normals;
     for (int ku=0; ku<20; ku++) {
       for (int kv=0; kv<30; kv++) {
         const glm::dvec3 &position = surface.position(ku, kv);
@@ -60,11 +78,16 @@ public:
         tangents.push_back(position);
         tangents.push_back(position + 0.1*tangent_u);
         tangents.push_back(position);
-
         tangents.push_back(position + 0.1*tangent_v);
+
+        if (ku > 0 && ku < 19 && kv > 0 && kv < 29) {
+          normals.push_back(position);
+          normals.push_back(position + surface.normal(ku, kv));
+        }
       }
     }
     UpdateLines(backboard_tangents_vis_, SingletonVector(tangents));
+    UpdateLines(backboard_normals_vis_, SingletonVector(normals));
 
     // control points
     std::vector<glm::vec3> control_points;
@@ -80,6 +103,8 @@ public:
 private:
   GridmeshShader backboard_vis_;
   LineShader backboard_tangents_vis_;
+  LineShader backboard_normals_vis_;
   LineShader shot_lines_vis_;
+  LineShader bounce_lines_vis_;
   LineShader control_points_vis_;
 };

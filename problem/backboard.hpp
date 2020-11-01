@@ -15,7 +15,7 @@ public:
 
         const double z = sx - 1; // -2 to 0
         const double y = 2*sy; // -2 to 2
-        const double x = sx*sx + 0.5 * sy*sy + 0.1 * sin(sx) * cos(2*sy);
+        const double x = 0.3*sx*sx + 0.3*0.5 * sy*sy + 0.1 * sin(sx) * cos(2*sy);
 
         control_points_(kx, ky) = glm::dvec3(x, y, z);
       }
