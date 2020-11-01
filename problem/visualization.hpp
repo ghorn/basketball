@@ -30,36 +30,29 @@ public:
   template<int NU, int NV, int NX, int NY>
   void Update(const Problem<NX, NY> &problem) {
     // shot and bounce lines
-    std::vector<Shot> shots;
-    std::vector<Bounce> bounces;
-    problem.template ComputeShots<10, 15>(&shots, &bounces);
+    const std::vector<std::pair<Shot, Bounce> > shots_n_bounces =
+      problem.template ComputeShots<10, 15>();
 
     // shots
-    std::vector<std::vector<glm::vec3> > shot_lines;
-    for (const Shot &shot : shots) {
-      std::array<glm::vec3, 256> shot_arc;
-      shot.DrawArc<256>(&shot_arc);
+    std::vector<std::vector<ColoredVec3> > shot_lines;
+    std::vector<std::vector<ColoredVec3> > bounce_lines;
+    for (const std::pair<Shot, Bounce> &shot_n_bounce : shots_n_bounces) {
+      const Shot &shot = shot_n_bounce.first;
+      const Bounce &bounce = shot_n_bounce.second;
 
-      std::vector<glm::vec3> segment;
-      for (glm::vec3 v3 : shot_arc) {
-        segment.push_back(v3);
-      }
-      shot_lines.push_back(segment);
+      glm::vec4 good_shot_color = {0.6, 0.6, 0.6, 1.0};
+      glm::vec4 bad_shot_color = {0.6, 0.6, 0.6, 0.5};
+      glm::vec4 good_bounce_color = {0.1, 0.7, 0.2, 1.0};
+      glm::vec4 bad_bounce_color =  {0.8, 0.1, 0.2, 0.5};
+      glm::vec4 shot_color = bounce.lower_than_hoop_ ? bad_shot_color : good_shot_color;
+      glm::vec4 bounce_color = bounce.lower_than_hoop_ ? bad_bounce_color : good_bounce_color;
+
+      const std::vector<ColoredVec3> shot_arc = shot.DrawArc(shot_color);
+      const std::vector<ColoredVec3> bounce_arc = bounce.DrawArc(bounce_color);
+      shot_lines.push_back(shot_arc);
+      bounce_lines.push_back(bounce_arc);
     }
     shot_lines_vis_.Update(shot_lines);
-
-    // bounces
-    std::vector<std::vector<glm::vec3> > bounce_lines;
-    for (const Bounce &bounce : bounces) {
-      std::array<glm::vec3, 256> bounce_arc;
-      bounce.DrawArc<256>(&bounce_arc);
-
-      std::vector<glm::vec3> segment;
-      for (glm::vec3 v3 : bounce_arc) {
-        segment.push_back(v3);
-      }
-      bounce_lines.push_back(segment);
-    }
     bounce_lines_vis_.Update(bounce_lines);
 
     // Rim
@@ -118,7 +111,7 @@ private:
   Gridmesh court_vis_;
   Lines backboard_tangents_vis_;
   Lines backboard_normals_vis_;
-  Lines shot_lines_vis_;
-  Lines bounce_lines_vis_;
+  ColorLines shot_lines_vis_;
+  ColorLines bounce_lines_vis_;
   Lines control_points_vis_;
 };

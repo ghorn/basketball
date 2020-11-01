@@ -5,6 +5,7 @@
 
 #include "assert.hpp"
 #include "problem/hoop.hpp"
+#include "shader/colorlines.hpp"
 
 const double g_accel = 9.81;
 
@@ -41,14 +42,20 @@ public:
   double vy_;
   double bounce_time_;
 
-  template <int N>
-  void DrawArc(std::array<glm::vec3, N> *array) const {
+  std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+    constexpr int N = 128;
+    std::vector<ColoredVec3> ret;
+    ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * bounce_time_ / (N - 1);
-      (*array)[k].x = static_cast<float>(shot_point_.x + vx_ * t);
-      (*array)[k].y = static_cast<float>(shot_point_.y + vy_ * t);
-      (*array)[k].z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5*g_accel*t*t);
+      ColoredVec3 v;
+      v.position.x = static_cast<float>(shot_point_.x + vx_ * t);
+      v.position.y = static_cast<float>(shot_point_.y + vy_ * t);
+      v.position.z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5*g_accel*t*t);
+      v.color = color;
+      ret.push_back(v);
     }
+    return ret;
   }
 
   glm::dvec3 BounceVel() const {
@@ -71,21 +78,33 @@ public:
     outgoing_velocity_ = glm::reflect(incoming_velocity, bounce_normal);
 
     const double vz0 = outgoing_velocity_.z;
-    const double pz0 = bounce_point_.z;
+    double pz0 = Hoop::kRimHeight + bounce_point_.z;
+    lower_than_hoop_ = false;
+    if (pz0 >= 0) {
+      lower_than_hoop_ = true;
+      pz0 = bounce_point_.z;
+    }
     ASSERT(pz0 < 0);
     land_time_ = (-vz0 + sqrt(vz0*vz0 - 2 * pz0 * g_accel))/ g_accel;
   }
+  bool lower_than_hoop_;
   glm::dvec3 bounce_point_;
   glm::dvec3 outgoing_velocity_;
   double land_time_;
 
-  template <int N>
-  void DrawArc(std::array<glm::vec3, N> *array) const {
+  std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+    constexpr int N = 128;
+    std::vector<ColoredVec3> ret;
+    ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * land_time_ / (N - 1);
-      (*array)[k].x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
-      (*array)[k].y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
-      (*array)[k].z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);
+      ColoredVec3 v;
+      v.position.x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
+      v.position.y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
+      v.position.z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);
+      v.color = color;
+      ret.push_back(v);
     }
+    return ret;
   }
 };
