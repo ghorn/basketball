@@ -36,6 +36,8 @@ cc_binary(
         "problem/backboard.hpp",
         "problem/problem.hpp",
         "problem/shot.hpp",
+        "problem/visualization.cpp",
+        "problem/visualization.hpp",
         "shader/cat_texture.cpp",
         "shader/cat_texture.hpp",
         "shader/compile.cpp",

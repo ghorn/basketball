@@ -2,6 +2,8 @@
 
 #include <eigen3/Eigen/Dense>
 
+#include "bspline.hpp"
+
 template <int NX, int NY>
 class Backboard {
 public:
@@ -21,7 +23,7 @@ public:
   }
 
   template <int NU, int NV>
-  Surface<NU, NV> Interpolate() {
+  Surface<NU, NV> Interpolate() const {
     return ClampedCubicBSplineSurface<NU, NV, NX, NY>(control_points_);
   }
 
