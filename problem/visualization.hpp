@@ -46,7 +46,7 @@ public:
       }
       shot_lines.push_back(segment);
     }
-    UpdateLines(shot_lines_vis_, shot_lines);
+    shot_lines_vis_.Update(shot_lines);
 
     // bounces
     std::vector<std::vector<glm::vec3> > bounce_lines;
@@ -60,7 +60,7 @@ public:
       }
       bounce_lines.push_back(segment);
     }
-    UpdateLines(bounce_lines_vis_, bounce_lines);
+    bounce_lines_vis_.Update(bounce_lines);
 
     // backboard
     Surface<NU, NV> surface = problem.backboard_.template Interpolate<NU, NV>();
@@ -85,8 +85,8 @@ public:
         }
       }
     }
-    UpdateLines(backboard_tangents_vis_, SingletonVector(tangents));
-    UpdateLines(backboard_normals_vis_, SingletonVector(normals));
+    backboard_tangents_vis_.Update(SingletonVector(tangents));
+    backboard_normals_vis_.Update(SingletonVector(normals));
 
     // control points
     std::vector<glm::vec3> control_points;
@@ -96,14 +96,14 @@ public:
         control_points.push_back(point);
       }
     }
-    UpdateLines(control_points_vis_, SingletonVector(control_points));
+    control_points_vis_.Update(SingletonVector(control_points));
   }
 
 private:
   Gridmesh backboard_vis_;
-  LineShader backboard_tangents_vis_;
-  LineShader backboard_normals_vis_;
-  LineShader shot_lines_vis_;
-  LineShader bounce_lines_vis_;
-  LineShader control_points_vis_;
+  Lines backboard_tangents_vis_;
+  Lines backboard_normals_vis_;
+  Lines shot_lines_vis_;
+  Lines bounce_lines_vis_;
+  Lines control_points_vis_;
 };

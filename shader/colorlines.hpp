@@ -7,24 +7,25 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-struct ColorLineShader {
-  GLint shaderProgram;
-  GLuint VAO;
-  GLuint VBO;
-  GLint current_buffer_size;
-  std::vector<GLint> segment_sizes;
-  float point_size;
-};
-
 struct ColoredVec3 {
   glm::vec3 position;
   glm::vec4 color;
 };
 
-ColorLineShader CreateColorLineShader();
-void DrawColorLines(ColorLineShader &line_shader,
-                    const glm::mat4 &view,
-                    const glm::mat4 &proj,
-                    const GLenum mode);
-void UpdateColorLines(ColorLineShader &line_shader,
-                      const std::vector<std::vector<ColoredVec3> > &vertices);
+struct ColorLines {
+public:
+  ColorLines();
+  ~ColorLines() = default;
+  void Update(const std::vector<std::vector<ColoredVec3> > &vertices);
+  void Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum mode);
+
+  float point_size_;
+
+private:
+  GLint shader_;
+  GLuint vao_;
+  GLuint vbo_;
+  GLint current_buffer_size_;
+  std::vector<GLint> segment_sizes_;
+};
+
