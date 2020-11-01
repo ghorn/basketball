@@ -101,8 +101,8 @@ private:
 
   bool shots_on_ = true;
   bool bounces_on_ = true;
-  bool normals_on_ = true;
-  bool tangents_on_ = true;
+  bool normals_on_ = false;
+  bool tangents_on_ = false;
   bool court_on_ = true;
   bool control_points_on_ = true;
 
