@@ -14,12 +14,15 @@
 
 struct GlobalState {
   Camera camera;
+  bool cursor_rotating;
   double cursor_rotating_previous_xpos;
   double cursor_rotating_previous_ypos;
-  bool cursor_rotating;
-  double cursor_panning_previous_xpos;
-  double cursor_panning_previous_ypos;
-  bool cursor_panning;
+  bool cursor_xy_translating;
+  double cursor_xy_translating_previous_xpos;
+  double cursor_xy_translating_previous_ypos;
+  bool cursor_z_translating;
+  double cursor_z_translating_previous_xpos;
+  double cursor_z_translating_previous_ypos;
 };
 GlobalState global_state;
 
@@ -50,11 +53,17 @@ static void CursorPositionCallback(GLFWwindow* window __attribute__((unused)),
     global_state.cursor_rotating_previous_xpos = xpos;
     global_state.cursor_rotating_previous_ypos = ypos;
   }
-  if (global_state.cursor_panning) {
-    global_state.camera.Pan(static_cast<float>(xpos - global_state.cursor_panning_previous_xpos),
-                            static_cast<float>(ypos - global_state.cursor_panning_previous_ypos));
-    global_state.cursor_panning_previous_xpos = xpos;
-    global_state.cursor_panning_previous_ypos = ypos;
+  if (global_state.cursor_xy_translating) {
+    global_state.camera.TranslateXy(static_cast<float>(xpos - global_state.cursor_xy_translating_previous_xpos),
+                                    static_cast<float>(ypos - global_state.cursor_xy_translating_previous_ypos));
+    global_state.cursor_xy_translating_previous_xpos = xpos;
+    global_state.cursor_xy_translating_previous_ypos = ypos;
+  }
+  if (global_state.cursor_z_translating) {
+    global_state.camera.TranslateZ(static_cast<float>(xpos - global_state.cursor_z_translating_previous_xpos),
+                                    static_cast<float>(ypos - global_state.cursor_z_translating_previous_ypos));
+    global_state.cursor_z_translating_previous_xpos = xpos;
+    global_state.cursor_z_translating_previous_ypos = ypos;
   }
 }
 
@@ -62,6 +71,8 @@ static void MouseButtonCallback(GLFWwindow* window,
                                 int button,
                                 int action,
                                 int mods __attribute__((unused))) {
+  //fprintf(stderr, "Mouse button pressed: %d %d\n", button, action);
+
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
     // emable drag state
     global_state.cursor_rotating = true;
@@ -75,13 +86,24 @@ static void MouseButtonCallback(GLFWwindow* window,
 
   if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
     // emable drag state
-    global_state.cursor_panning = true;
+    global_state.cursor_xy_translating = true;
 
     // set previous position
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
-    global_state.cursor_panning_previous_xpos = xpos;
-    global_state.cursor_panning_previous_ypos = ypos;
+    global_state.cursor_xy_translating_previous_xpos = xpos;
+    global_state.cursor_xy_translating_previous_ypos = ypos;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+    // emable drag state
+    global_state.cursor_z_translating = true;
+
+    // set previous position
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    global_state.cursor_z_translating_previous_xpos = xpos;
+    global_state.cursor_z_translating_previous_ypos = ypos;
   }
 
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
@@ -95,14 +117,21 @@ static void MouseButtonCallback(GLFWwindow* window,
 
   if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
     // disable drag state
-    global_state.cursor_panning = false;
+    global_state.cursor_xy_translating = false;
 
     // initialize previous position for determinism
-    global_state.cursor_panning_previous_xpos = 0;
-    global_state.cursor_panning_previous_ypos = 0;
+    global_state.cursor_xy_translating_previous_xpos = 0;
+    global_state.cursor_xy_translating_previous_ypos = 0;
   }
 
-  //fprintf(stderr, "Mouse button pressed: %d %d (%.1f, %.1f)\n", button, action, xpos, ypos);
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
+    // disable drag state
+    global_state.cursor_z_translating = false;
+
+    // initialize previous position for determinism
+    global_state.cursor_z_translating_previous_xpos = 0;
+    global_state.cursor_z_translating_previous_ypos = 0;
+  }
 }
 
 static void ScrollCallback(GLFWwindow* window __attribute__((unused)),

@@ -31,12 +31,17 @@ void Camera::Rotate(const float delta_x, const float delta_y) {
   elevation_deg_ = std::min(elevation_deg_,  89.f);
 }
 
-void Camera::Pan(const float delta_x, const float delta_y) {
+void Camera::TranslateXy(const float delta_x, const float delta_y) {
   const float sin_azi = std::sin(azimuth_deg_ * static_cast<float>(M_PI)/180.f);
   const float cos_azi = std::cos(azimuth_deg_ * static_cast<float>(M_PI)/180.f);
   const float scale = distance_ * 3e-3f;
   focus_position_.y += scale*(delta_x * cos_azi - delta_y * sin_azi);
   focus_position_.x -= scale*(delta_x * sin_azi + delta_y * cos_azi);
+}
+
+void Camera::TranslateZ(const float delta_x __attribute__((unused)), const float delta_y) {
+  const float scale = distance_ * 3e-3f;
+  focus_position_.z -= scale*delta_y;
 }
 
 void Camera::Scroll(const float scroll_amount) {
