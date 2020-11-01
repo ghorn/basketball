@@ -169,6 +169,7 @@ GLFWwindow* OpenglSetup() {
 
   // Create window.
   GLFWwindow* const window = glfwCreateWindow(0.7*1920, 0.7*1080, "basketball", nullptr, nullptr);
+
   if (window == nullptr) {
     fprintf(stderr, "Failed to Create OpenGL Context");
     glfwTerminate();
@@ -189,17 +190,6 @@ GLFWwindow* OpenglSetup() {
   glewInit();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_PROGRAM_POINT_SIZE);
-
-  // blending
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA_SATURATE);
-
-  // pretty
-  glEnable(GL_LINE_SMOOTH);
-  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-  glEnable(GL_POLYGON_SMOOTH);
-  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
   // Debugging
   glEnable(GL_DEBUG_OUTPUT);
@@ -233,4 +223,13 @@ glm::mat4 GetProjectionTransformation(GLFWwindow *window) {
                                     min_clip,
                                     max_clip);
   return proj;
+}
+
+glm::mat4 GetOrthographicProjection(GLFWwindow *window) {
+  // projection transformation
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+  width = std::max(width, 1);
+  height = std::max(height, 1);
+  return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
 }

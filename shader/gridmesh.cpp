@@ -92,17 +92,12 @@ void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   shader_.UniformMatrix4fv("view", view);
   shader_.UniformMatrix4fv("proj", proj);
 
-  // disable blending
-  const GLboolean blend_was_enabled = glIsEnabled(GL_BLEND);
+  // disable blending and polygon antialiasing
   glDisable(GL_BLEND);
+  glDisable(GL_POLYGON_SMOOTH);
 
   // Draw triangles
   glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
-
-  // restore previous blend state
-  if (blend_was_enabled) {
-    glEnable(GL_BLEND);
-  }
 
   // unbind vao
   glBindVertexArray(0);

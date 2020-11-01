@@ -18,6 +18,7 @@
 #include "problem/problem.hpp"
 #include "problem/visualization.hpp"
 #include "shader/gridmesh.hpp"
+#include "shader/freetype.hpp"
 #include "shader/lines.hpp"
 #include "shader/colorlines.hpp"
 
@@ -58,14 +59,19 @@ int main(int argc __attribute__((unused)),
 
   ColorLines axes;
 
+  Freetype textbox(18);
+
+  std::chrono::time_point t_last = std::chrono::high_resolution_clock::now();
   while (glfwWindowShouldClose(window) == false) {
+    std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
+    float frame_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
+    t_last = t_now;
 
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate transformation
-    std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
     // Model transformation
@@ -89,6 +95,13 @@ int main(int argc __attribute__((unused)),
       axes.Update(AxesLines(GetCamera()));
       axes.Draw(view, proj, GL_LINE_STRIP);
     }
+
+    // Draw some dummy text.
+    char fps_string[80];
+    sprintf(fps_string, "%.1f fps", 1 / frame_time);
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    textbox.RenderText(window, std::string(fps_string), 25.0f, (float)height-25.0f, glm::vec3(1, 1, 1));
 
     // Swap buffers
     glfwSwapBuffers(window);

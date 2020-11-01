@@ -52,6 +52,12 @@ void Lines::Draw(const glm::mat4 &view,
   shader_.Uniform4f("color", color.r, color.g, color.b, color.a);
   shader_.Uniform1f("point_size", point_size_);
 
+  // blend and antialias
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_LINE_SMOOTH);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
   // Draw lines one segment at a time.
   GLint offset = 0;
   for (const GLint segment_size : segment_sizes_) {
