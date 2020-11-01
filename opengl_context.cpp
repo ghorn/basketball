@@ -201,6 +201,7 @@ GLFWwindow* OpenglSetup() {
 
   glewExperimental = GL_TRUE;
   glewInit();
+  glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_PROGRAM_POINT_SIZE);
 
