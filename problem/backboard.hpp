@@ -3,14 +3,14 @@
 #include <eigen3/Eigen/Dense>
 
 #include "bspline.hpp"
+#include "problem/hoop.hpp" // kRimHeight
 
 template <int NX, int NY>
 class Backboard {
 public:
   static constexpr double kWidth = 1.83; // 6 feet
   static constexpr double kTall = 1.07; // 3.5 feet
-  static constexpr double kRimHeight = 3.05; // 10 feet
-  static constexpr double kBottomOfBackboard = kRimHeight - 0.305; // 12 inches below rim
+  static constexpr double kBottomOfBackboard = Hoop::kRimHeight - 0.305; // 12 inches below rim
 
   Backboard() {
     for (int ku=0; ku<NX; ku++) {

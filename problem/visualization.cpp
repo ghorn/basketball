@@ -24,6 +24,9 @@ void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   // lines
   shot_lines_vis_.Draw(view, proj, glm::vec4(0.1, 0.6, 0.2, 1.0), GL_LINE_STRIP);
   bounce_lines_vis_.Draw(view, proj, glm::vec4(0.1, 0.2, 0.7, 1.0), GL_LINE_STRIP);
+  // rim
+  rim_vis_.Draw(view, proj, glm::vec4(0.9, 0.1, 0.1, 1.0), GL_LINE_STRIP);
+
 
   // control points
   control_points_vis_.Draw(view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);

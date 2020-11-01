@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "assert.hpp"
+#include "problem/hoop.hpp"
 
 const double g_accel = 9.81;
 

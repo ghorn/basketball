@@ -62,6 +62,9 @@ public:
     }
     bounce_lines_vis_.Update(bounce_lines);
 
+    // Rim
+    rim_vis_.Update(SingletonVector(Hoop::DrawArc()));
+
     // backboard
     Surface<NU, NV> surface = problem.backboard_.template Interpolate<NU, NV>();
     backboard_vis_.Update(surface.position);
@@ -104,6 +107,7 @@ private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 
   Gridmesh backboard_vis_;
+  Lines rim_vis_;
   Gridmesh court_vis_;
   Lines backboard_tangents_vis_;
   Lines backboard_normals_vis_;
