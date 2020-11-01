@@ -12,41 +12,40 @@
 #include "shader/compile.hpp"
 #include "assert.hpp"
 
-GridmeshShader CreateGridmesh(const std::string &image_path) {
-  GridmeshShader gridmesh;
-  gridmesh.shaderProgram =
+Gridmesh::Gridmesh(const std::string &image_path) {
+  shader_ =
     CompileAndLinkVertexFragmentShaderProgram("shader/gridmesh.vs", "shader/gridmesh.fs");
 
-  gridmesh.num_indices = 0;
-  gridmesh.vertex_buffer_size = 0;
-  gridmesh.index_buffer_size = 0;
+  num_indices_ = 0;
+  vertex_buffer_size_ = 0;
+  index_buffer_size_ = 0;
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
-  glGenVertexArrays(1, &gridmesh.VAO);
-  glGenBuffers(1, &gridmesh.VBO);
-  glGenBuffers(1, &gridmesh.EBO);
+  glGenVertexArrays(1, &vao_);
+  glGenBuffers(1, &vbo_);
+  glGenBuffers(1, &ebo_);
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-  glBindVertexArray(gridmesh.VAO);
+  glBindVertexArray(vao_);
 
-  glBindBuffer(GL_ARRAY_BUFFER, gridmesh.VBO);
-  glBufferData(GL_ARRAY_BUFFER, gridmesh.vertex_buffer_size, nullptr, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridmesh.EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, gridmesh.index_buffer_size, nullptr, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
-  glVertexAttribPointer(glGetAttribLocation(gridmesh.shaderProgram, "position"),
+  glVertexAttribPointer(glGetAttribLocation(shader_, "position"),
                         3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(GLfloat)));
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(glGetAttribLocation(gridmesh.shaderProgram, "texture_coordinate"),
+  glVertexAttribPointer(glGetAttribLocation(shader_, "texture_coordinate"),
                         2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(GLfloat)));
   glEnableVertexAttribArray(1);
 
   // load and create a texture
   // -------------------------
-  glGenTextures(1, &gridmesh.texture);
-  glBindTexture(GL_TEXTURE_2D, gridmesh.texture);
+  glGenTextures(1, &texture_);
+  glBindTexture(GL_TEXTURE_2D, texture_);
 
   // set texture wrapping parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -71,8 +70,8 @@ GridmeshShader CreateGridmesh(const std::string &image_path) {
   SOIL_free_image_data(image);
 
   // set image texture
-  glUseProgram(gridmesh.shaderProgram);
-  glUniform1i(glGetUniformLocation(gridmesh.shaderProgram, "image_texture"), 0);
+  glUseProgram(shader_);
+  glUniform1i(glGetUniformLocation(shader_, "image_texture"), 0);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -83,34 +82,29 @@ GridmeshShader CreateGridmesh(const std::string &image_path) {
   // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
   // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
-
-  return gridmesh;
 }
 
-void DrawGridmesh(const GridmeshShader &gridmesh,
-                   const glm::mat4 &view,
-                   const glm::mat4 &proj) {
+void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   // bind textures?
   //glActiveTexture(GL_TEXTURE0);
-  //glBindTexture(GL_TEXTURE_2D, gridmesh.texture);
+  //glBindTexture(GL_TEXTURE_2D, texture_);
 
   // render
-  glUseProgram(gridmesh.shaderProgram);
-  glBindVertexArray(gridmesh.VAO);
+  glUseProgram(shader_);
+  glBindVertexArray(vao_);
 
   // Set up transformations
-  glUniformMatrix4fv(glGetUniformLocation(gridmesh.shaderProgram, "view"),
+  glUniformMatrix4fv(glGetUniformLocation(shader_, "view"),
                      1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(glGetUniformLocation(gridmesh.shaderProgram, "proj"),
+  glUniformMatrix4fv(glGetUniformLocation(shader_, "proj"),
                      1, GL_FALSE, glm::value_ptr(proj));
 
-  glDrawElements(GL_TRIANGLES, gridmesh.num_indices, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
 
   glBindVertexArray(0);
 }
 
-void UpdateGridmesh(GridmeshShader &gridmesh,
-                    const Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dynamic> &grid) {
+void Gridmesh::Update(const Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dynamic> &grid) {
   const int rows = static_cast<int>(grid.rows()); // readability below
   const int cols = static_cast<int>(grid.cols()); // readability below
 
@@ -150,36 +144,35 @@ void UpdateGridmesh(GridmeshShader &gridmesh,
   const GLint vertex_buffer_size = static_cast<GLint>(sizeof(vertices[0])*vertices.size());
   const GLint index_buffer_size = static_cast<GLint>(sizeof(indices[0])*indices.size());
 
-  glBindBuffer(GL_ARRAY_BUFFER, gridmesh.VBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridmesh.EBO);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
-  if (index_buffer_size == gridmesh.index_buffer_size) {
+  if (index_buffer_size == index_buffer_size_) {
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, index_buffer_size, indices.data());
   } else {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_size, indices.data(), GL_DYNAMIC_DRAW);
-    gridmesh.index_buffer_size = index_buffer_size;
+    index_buffer_size_ = index_buffer_size;
   }
 
-  if (vertex_buffer_size == gridmesh.vertex_buffer_size) {
+  if (vertex_buffer_size == vertex_buffer_size_) {
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size, vertices.data());
   } else {
     glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size, vertices.data(), GL_DYNAMIC_DRAW);
-    gridmesh.vertex_buffer_size = vertex_buffer_size;
+    vertex_buffer_size_ = vertex_buffer_size;
   }
 
-  if (num_indices != gridmesh.num_indices) {
-    gridmesh.num_indices = num_indices;
+  if (num_indices != num_indices_) {
+    num_indices_ = num_indices;
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-
-void FreeGridmeshGlResources(const GridmeshShader &gridmesh) {
-  // optional: de-allocate all resources once they've outlived their purpose:
+Gridmesh::~Gridmesh() {
+  // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  glDeleteVertexArrays(1, &gridmesh.VAO);
-  glDeleteBuffers(1, &gridmesh.VBO);
-  glDeleteBuffers(1, &gridmesh.EBO);
-  glDeleteProgram(gridmesh.shaderProgram);
+  glDeleteVertexArrays(1, &vao_);
+  glDeleteBuffers(1, &vbo_);
+  glDeleteBuffers(1, &ebo_);
+  glDeleteProgram(shader_);
 }

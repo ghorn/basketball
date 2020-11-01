@@ -24,7 +24,7 @@ std::vector<std::vector<T> > SingletonVector(const std::vector<T> xs) {
 class ProblemVisualization {
 public:
   ProblemVisualization();
-  void FreeResources();
+  ~ProblemVisualization() = default;
   void Draw(const glm::mat4 &view, const glm::mat4 &proj);
 
   template<int NU, int NV, int NX, int NY>
@@ -64,7 +64,7 @@ public:
 
     // backboard
     Surface<NU, NV> surface = problem.backboard_.template Interpolate<NU, NV>();
-    UpdateGridmeshFromMatrix(backboard_vis_, surface.position);
+    backboard_vis_.Update(surface.position);
 
     // tangents
     std::vector<glm::vec3> tangents;
@@ -100,7 +100,7 @@ public:
   }
 
 private:
-  GridmeshShader backboard_vis_;
+  Gridmesh backboard_vis_;
   LineShader backboard_tangents_vis_;
   LineShader backboard_normals_vis_;
   LineShader shot_lines_vis_;

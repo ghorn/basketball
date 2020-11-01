@@ -66,8 +66,6 @@ int main(int argc __attribute__((unused)),
     glfwPollEvents();
   }
 
-  visualization.FreeResources();
-
   glfwDestroyWindow(window);
   glfwTerminate();
   return EXIT_SUCCESS;
