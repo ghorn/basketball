@@ -106,6 +106,13 @@ public:
 private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 
+  bool shots_on_ = true;
+  bool bounces_on_ = true;
+  bool normals_on_ = true;
+  bool tangents_on_ = true;
+  bool court_on_ = true;
+  bool control_points_on_ = true;
+
   Gridmesh backboard_vis_;
   Lines rim_vis_;
   Gridmesh court_vis_;

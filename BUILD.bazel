@@ -22,6 +22,7 @@ cc_binary(
         "opengl_context.cpp",
         "opengl_context.hpp",
         "problem/backboard.hpp",
+        "problem/hoop.hpp",
         "problem/problem.hpp",
         "problem/shot.hpp",
         "problem/visualization.cpp",

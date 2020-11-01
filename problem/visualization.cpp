@@ -13,25 +13,85 @@ ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface
 }
 
 void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
-  // gridmesh
+  // backboard
   backboard_vis_.Draw(view, proj);
-  court_vis_.Draw(view, proj);
+
+  // court
+  if (court_on_) {
+    court_vis_.Draw(view, proj);
+  }
 
   // tangents/normals
-  backboard_tangents_vis_.Draw(view, proj, glm::vec4(0.8, 0.8, 0.8, 1.0), GL_LINES);
-  backboard_normals_vis_.Draw(view, proj, glm::vec4(0.4, 0.4, 0.6, 1.0), GL_LINES);
+  if (tangents_on_) {
+    backboard_tangents_vis_.Draw(view, proj, glm::vec4(0.8, 0.8, 0.8, 1.0), GL_LINES);
+  }
+  if (normals_on_) {
+    backboard_normals_vis_.Draw(view, proj, glm::vec4(0.4, 0.4, 0.6, 1.0), GL_LINES);
+  }
 
-  // lines
-  shot_lines_vis_.Draw(view, proj, glm::vec4(0.1, 0.6, 0.2, 1.0), GL_LINE_STRIP);
-  bounce_lines_vis_.Draw(view, proj, glm::vec4(0.1, 0.2, 0.7, 1.0), GL_LINE_STRIP);
   // rim
   rim_vis_.Draw(view, proj, glm::vec4(0.9, 0.1, 0.1, 1.0), GL_LINE_STRIP);
 
+  // shot
+  if (shots_on_) {
+    shot_lines_vis_.Draw(view, proj, GL_LINE_STRIP);
+  }
+  if (bounces_on_) {
+    bounce_lines_vis_.Draw(view, proj, GL_LINE_STRIP);
+  }
 
   // control points
-  control_points_vis_.Draw(view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);
+  if (control_points_on_) {
+    control_points_vis_.Draw(view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);
+  }
 }
 
+static void DescribeState(std::string name, bool state) {
+  std::cerr << name << " drawing ";
+  if (state) {
+    std::cerr << "enabled";
+  } else {
+    std::cerr << "disabled";
+  }
+  std::cerr << std::endl;
+}
+
+void ProblemVisualization::HandleKeyPress(const int key) {
+  switch (key) {
+  case GLFW_KEY_S: {
+    shots_on_ = !shots_on_;
+    DescribeState("shot", shots_on_);
+    break;
+  }
+  case GLFW_KEY_B: {
+    bounces_on_ = !bounces_on_;
+    DescribeState("bounce", bounces_on_);
+    break;
+  }
+  case GLFW_KEY_C: {
+    court_on_ = !court_on_;
+    DescribeState("court", court_on_);
+    break;
+  }
+  case GLFW_KEY_P: {
+    control_points_on_ = !control_points_on_;
+    DescribeState("control points", control_points_on_);
+    break;
+  }
+  case GLFW_KEY_N: {
+    normals_on_ = !normals_on_;
+    DescribeState("normal", normals_on_);
+    break;
+  }
+  case GLFW_KEY_T: {
+    tangents_on_ = !tangents_on_;
+    DescribeState("tangent", tangents_on_);
+    break;
+  }
+  default:{
+  }
+  }
+}
 
 Eigen::Matrix<glm::vec3, 2, 2> ProblemVisualization::CourtCorners() {
   // Let's use NBA regulations.
