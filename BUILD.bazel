@@ -62,18 +62,15 @@ cc_binary(
     copts = copts,
     data = [
         "image/awesomeface.png",
+        "image/court.png",
         "shader/colorlines.vs",
         "shader/colorlines.fs",
         "shader/gridmesh.vs",
         "shader/gridmesh.fs",
         "shader/lines.vs",
         "shader/lines.fs",
-        ":court.png",
         ":sample.png",
         ":sample2.png",
-    ],
-    deps = [
-        #":glad",
     ],
 )
 
@@ -86,12 +83,4 @@ py_binary(
     srcs_version = "PY3",
     python_version = "PY3",
     visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "court_texture",
-    srcs = [
-        "court.jpg",
-        "sample.png",
-    ],
 )

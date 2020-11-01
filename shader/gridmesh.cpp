@@ -83,9 +83,9 @@ Gridmesh::Gridmesh(const std::string &image_path) :
 }
 
 void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
-  // bind textures?
-  //glActiveTexture(GL_TEXTURE0);
-  //glBindTexture(GL_TEXTURE_2D, texture_);
+  // bind textures
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture_);
 
   // render
   shader_.UseProgram();
@@ -104,8 +104,8 @@ void Gridmesh::Update(const Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dyna
   const int rows = static_cast<int>(grid.rows()); // readability below
   const int cols = static_cast<int>(grid.cols()); // readability below
 
-  ASSERT(rows > 2);
-  ASSERT(cols > 2);
+  ASSERT(rows >= 2);
+  ASSERT(cols >= 2);
 
   // Massage the data.
   std::vector<float> vertices;

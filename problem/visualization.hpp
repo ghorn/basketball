@@ -101,6 +101,7 @@ public:
 
 private:
   Gridmesh backboard_vis_;
+  Gridmesh court_vis_;
   Lines backboard_tangents_vis_;
   Lines backboard_normals_vis_;
   Lines shot_lines_vis_;
