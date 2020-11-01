@@ -5,6 +5,7 @@
 
 ProblemVisualization::ProblemVisualization() {
   backboard_vis_ = CreateGridmesh();
+  backboard_tangents_vis_ = CreateLineShader();
   shot_lines_vis_ = CreateLineShader();
   control_points_vis_ = CreateLineShader();
 }
@@ -16,6 +17,9 @@ void ProblemVisualization::FreeResources() {
 void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   // gridmesh
   DrawGridmesh(backboard_vis_, view, proj);
+
+  // tangents
+  DrawLines(backboard_tangents_vis_, view, proj, glm::vec4(0.8, 0.8, 0.8, 1.0), GL_LINES);
 
   // lines
   DrawLines(shot_lines_vis_, view, proj, glm::vec4(0.1, 0.6, 0.2, 1.0), GL_LINE_STRIP);

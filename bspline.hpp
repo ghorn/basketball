@@ -60,6 +60,8 @@ static inline double Cubed(const double x) {
 template <int NU, int NV>
 struct Surface {
   Eigen::Matrix<glm::dvec3, NU, NV> position;
+  Eigen::Matrix<glm::dvec3, NU, NV> tangent_u;
+  Eigen::Matrix<glm::dvec3, NU, NV> tangent_v;
 };
 
 template <int NU, int NV, int NX, int NY>
@@ -104,23 +106,46 @@ CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
           3*ux3 - 6*ux2 + 4,
           -3.*ux3 + 3.*ux2 + 3.*ux + 1,
           ux3};
-
       const std::array<double, 4> cys = {
           Cubed(1. - uy),
           3*uy3 - 6*uy2 + 4,
           -3.*uy3 + 3.*uy2 + 3.*uy + 1,
           uy3};
 
-      glm::dvec3 ret = {0, 0, 0};
+      const std::array<double, 4> deriv_cxs = {
+          -3 * (1. - ux)*(1. - ux),
+          9*ux2 - 12*ux,
+          -9.*ux2 + 6.*ux + 3.,
+          3*ux2};
+      const std::array<double, 4> deriv_cys = {
+          -3 * (1. - uy)*(1. - uy),
+          9*uy2 - 12*uy,
+          -9.*uy2 + 6.*uy + 3.,
+          3*uy2};
+
+      glm::dvec3 position = {0, 0, 0};
+      glm::dvec3 tangent_u = {0, 0, 0};
+      glm::dvec3 tangent_v = {0, 0, 0};
       for (int kx=0; kx<4; kx++) {
         for (int ky=0; ky<4; ky++) {
-          ret += cxs[kx]*cys[ky]*ps(interval_x - 3 + kx, interval_y - 3 + ky);
+          const glm::dvec3 &p = ps(interval_x - 3 + kx, interval_y - 3 + ky);
+          position  +=       cxs[kx]*      cys[ky]*p;
+          tangent_u += deriv_cxs[kx]*      cys[ky]*p;
+          tangent_v +=       cxs[kx]*deriv_cys[ky]*p;
         }
       }
-      ret.x /= 36;
-      ret.y /= 36;
-      ret.z /= 36;
-      interpolated.position(ku, kv) = ret;
+      position.x /= 36;
+      position.y /= 36;
+      position.z /= 36;
+      tangent_u.x /= 36;
+      tangent_u.y /= 36;
+      tangent_u.z /= 36;
+      tangent_v.x /= 36;
+      tangent_v.y /= 36;
+      tangent_v.z /= 36;
+      interpolated.position(ku, kv) = position;
+      interpolated.tangent_u(ku, kv) = tangent_u;
+      interpolated.tangent_v(ku, kv) = tangent_v;
     }
   }
 

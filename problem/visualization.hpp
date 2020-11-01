@@ -14,6 +14,13 @@
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
+template <typename T>
+std::vector<std::vector<T> > SingletonVector(const std::vector<T> xs) {
+  std::vector<std::vector<T> > ret;
+  ret.push_back(xs);
+  return ret;
+}
+
 class ProblemVisualization {
 public:
   ProblemVisualization();
@@ -40,9 +47,24 @@ public:
     UpdateLines(shot_lines_vis_, shot_lines);
 
     // backboard
-    UpdateGridmeshFromMatrix(backboard_vis_,
-                             problem.backboard_.template Interpolate<20, 30>().position);
+    Surface<20, 30> surface = problem.backboard_.template Interpolate<20, 30>();
+    UpdateGridmeshFromMatrix(backboard_vis_, surface.position);
 
+    // tangents
+    std::vector<glm::vec3> tangents;
+    for (int ku=0; ku<20; ku++) {
+      for (int kv=0; kv<30; kv++) {
+        const glm::dvec3 &position = surface.position(ku, kv);
+        const glm::dvec3 &tangent_u = surface.tangent_u(ku, kv);
+        const glm::dvec3 &tangent_v = surface.tangent_v(ku, kv);
+        tangents.push_back(position);
+        tangents.push_back(position + 0.1*tangent_u);
+        tangents.push_back(position);
+
+        tangents.push_back(position + 0.1*tangent_v);
+      }
+    }
+    UpdateLines(backboard_tangents_vis_, SingletonVector(tangents));
 
     // control points
     std::vector<glm::vec3> control_points;
@@ -52,13 +74,12 @@ public:
         control_points.push_back(point);
       }
     }
-    std::vector<std::vector<glm::vec3> > all_control_points;
-    all_control_points.push_back(control_points);
-    UpdateLines(control_points_vis_, all_control_points);
+    UpdateLines(control_points_vis_, SingletonVector(control_points));
   }
 
 private:
   GridmeshShader backboard_vis_;
+  LineShader backboard_tangents_vis_;
   LineShader shot_lines_vis_;
   LineShader control_points_vis_;
 };
