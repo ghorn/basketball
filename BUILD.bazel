@@ -63,6 +63,7 @@ cc_binary(
     data = [
         "image/awesomeface.png",
         "image/court.png",
+        "image/warriors_court.png",
         "shader/colorlines.vs",
         "shader/colorlines.fs",
         "shader/gridmesh.vs",

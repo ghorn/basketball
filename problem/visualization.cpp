@@ -5,7 +5,7 @@
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
-ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/court.png") {
+ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/warriors_court.png") {
   control_points_vis_.point_size_ = 3;
 
   Eigen::Matrix<glm::vec3, 2, 2> court = CourtCorners();
@@ -38,11 +38,11 @@ Eigen::Matrix<glm::vec3, 2, 2> ProblemVisualization::CourtCorners() {
   constexpr double kExpectedInnerLength = 94 * kFt2M;
   constexpr double kExpectedInnerWidth = 50 * kFt2M;
   // measured
-  constexpr double kLengthApronPixels = 87;
-  constexpr double kInnerLengthPixels = 1826-80;
+  constexpr double kLengthApronPixels = 0.5*(186 + (1499 - 1318));
+  constexpr double kInnerLengthPixels = 1318 - 186;
 
-  constexpr double kWidthApronPixels = 71;
-  constexpr double kInnerWidthPixels = 1005-67;
+  constexpr double kWidthApronPixels = 0.5*(83 + (763 - 680));
+  constexpr double kInnerWidthPixels = 680 - 83;
   // conversion ratio
   constexpr double kLengthPixelToMeter = kExpectedInnerLength / kInnerLengthPixels;
   constexpr double kWidthPixelToMeter = kExpectedInnerWidth / kInnerWidthPixels;
@@ -57,8 +57,6 @@ Eigen::Matrix<glm::vec3, 2, 2> ProblemVisualization::CourtCorners() {
   constexpr double kOuterWidth = kInnerWidth + 2 * kWidthApron;
   constexpr double kOuterLength = kInnerLength + 2 * kLengthApron;
 
-  constexpr double kAspectRatio = kOuterLength / kOuterWidth;
-
   //std::cerr << "kLengthPixelToMeter: " << kLengthPixelToMeter << std::endl;
   //std::cerr << "kWidthPixelToMeter:  " << kWidthPixelToMeter << std::endl;
   //std::cerr << "kPixelToMeter:       " << kPixel2Meter << std::endl;
@@ -70,19 +68,11 @@ Eigen::Matrix<glm::vec3, 2, 2> ProblemVisualization::CourtCorners() {
   //std::cerr << "apron width:  " << kWidthApron/kFt2M << std::endl;
   //std::cerr << "Aspect ratio: " << kAspectRatio << std::endl;
 
-  // Sanity check.
-  if (fabs(kAspectRatio - ((double)1920)/1080) > 0.01) {
-    std::cerr << "Bad Aspect Ratio!" << std::endl;
-    std::cerr << "Expected " << ((double)1920)/1080 << std::endl;
-    std::cerr << "Got      " << kAspectRatio << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
   Eigen::Matrix<glm::vec3, 2, 2> court;
-  court(0, 0) = glm::vec3(-kOuterWidth/2,              - kLengthApron, 0);
-  court(1, 0) = glm::vec3( kOuterWidth/2,              - kLengthApron, 0);
-  court(0, 1) = glm::vec3(-kOuterWidth/2, kInnerLength + kLengthApron, 0);
-  court(1, 1) = glm::vec3( kOuterWidth/2, kInnerLength + kLengthApron, 0);
+  court(0, 0) = glm::vec3(-kOuterWidth/2, kOuterLength - kLengthApron, 0);
+  court(1, 0) = glm::vec3(-kOuterWidth/2,              - kLengthApron, 0);
+  court(0, 1) = glm::vec3( kOuterWidth/2, kOuterLength - kLengthApron, 0);
+  court(1, 1) = glm::vec3( kOuterWidth/2,              - kLengthApron, 0);
 
   return court;
 }
