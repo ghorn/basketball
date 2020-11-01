@@ -40,7 +40,7 @@ LineShader CreateLineShader() {
   line_shader.shaderProgram =
     CompileAndLinkVertexFragmentShaderProgram(lineVertexShaderSource, lineFragmentShaderSource);
 
-  line_shader.current_num_vertices = 0;
+  line_shader.current_buffer_size = 0;
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -51,7 +51,7 @@ LineShader CreateLineShader() {
   glBindVertexArray(line_shader.VAO);
   glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
   glBufferData(GL_ARRAY_BUFFER,
-               3*sizeof(float)*line_shader.current_num_vertices,
+               line_shader.current_buffer_size,
                nullptr,
                GL_DYNAMIC_DRAW);
 
@@ -87,34 +87,42 @@ void DrawLines(LineShader &line_shader,
   GLint uniColor = glGetUniformLocation(line_shader.shaderProgram, "color");
   glUniform4f(uniColor, color.r, color.g, color.b, color.a);
 
-  glDrawArrays(mode, 0, line_shader.current_num_vertices);
+  GLint offset = 0;
+  for (const GLint segment_size : line_shader.segment_sizes) {
+    glDrawArrays(mode, offset, segment_size);
+    offset += segment_size;
+  }
 }
 
 
-void UpdateLines(LineShader &line_shader, const std::vector<glm::vec3> &vertices) {
+void UpdateLines(LineShader &line_shader,
+                 const std::vector<std::vector<glm::vec3> > &segments) {
   // Massage the data.
   // TODO(greg): static assert that std::vector<glm::vec3> is packed and just reinterpret cast
-  const GLint new_num_vertices = static_cast<GLint>(vertices.size());
   std::vector<float> buffer_data;
-  buffer_data.reserve(vertices.size());
-  for (const glm::vec3 &vertex : vertices) {
+  line_shader.segment_sizes.resize(0);
+  for (const std::vector<glm::vec3> &segment : segments) {
+    const GLint segment_size = static_cast<GLint>(segment.size());
+    line_shader.segment_sizes.push_back(segment_size);
+    for (const glm::vec3 &vertex : segment) {
       buffer_data.push_back(vertex.x);
       buffer_data.push_back(vertex.y);
       buffer_data.push_back(vertex.z);
+    }
   }
 
   // bind the buffer
   //glBindVertexArray(line_shader.VAO);
   glBindBuffer(GL_ARRAY_BUFFER, line_shader.VBO);
 
-  const GLint buffer_size = static_cast<GLint>(3 * sizeof(float) * new_num_vertices);
-  if (new_num_vertices == line_shader.current_num_vertices) {
+  const GLint buffer_size = static_cast<GLint>(sizeof(float) * buffer_data.size());
+  if (buffer_size == line_shader.current_buffer_size) {
     // if the size of data is the same, just update the buffer
     glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, buffer_data.data());
   } else {
     // if the size of data has changed, we have to reallocate GPU memory
     glBufferData(GL_ARRAY_BUFFER, buffer_size, buffer_data.data(), GL_DYNAMIC_DRAW);
-    line_shader.current_num_vertices = new_num_vertices;
+    line_shader.current_buffer_size = buffer_size;
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);

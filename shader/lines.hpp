@@ -11,7 +11,8 @@ struct LineShader {
   GLint shaderProgram;
   GLuint VAO;
   GLuint VBO;
-  GLint current_num_vertices;
+  GLint current_buffer_size;
+  std::vector<GLint> segment_sizes;
 };
 
 LineShader CreateLineShader();
@@ -20,4 +21,5 @@ void DrawLines(LineShader &line_shader,
                const glm::mat4 &proj,
                const glm::vec4 &color,
                const GLenum mode);
-void UpdateLines(LineShader &line_shader, const std::vector<glm::vec3> &vertices);
+void UpdateLines(LineShader &line_shader,
+                 const std::vector<std::vector<glm::vec3> > &vertices);

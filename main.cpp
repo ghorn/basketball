@@ -41,16 +41,20 @@ int main(int argc, char * argv[]) {
   GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>());
 
   // Line rendering
-  std::vector<glm::vec3> line;
+  std::vector<std::vector<glm::vec3> > shot_lines;
   for (const Shot &shot : shots) {
     std::array<glm::vec3, 256> shot_arc;
     shot.DrawArc<256>(&shot_arc);
+
+    std::vector<glm::vec3> segment;
     for (glm::vec3 v3 : shot_arc) {
-      line.push_back(v3);
+      segment.push_back(v3);
     }
+    shot_lines.push_back(segment);
   }
+
   LineShader line_shader = CreateLineShader();
-  UpdateLines(line_shader, line);
+  UpdateLines(line_shader, shot_lines);
 
   std::vector<glm::vec3> control_points;
   for (int kx=0; kx<problem.backboard_.control_points_.rows(); kx++) {
@@ -60,7 +64,9 @@ int main(int argc, char * argv[]) {
     }
   }
   LineShader control_point_shader = CreateLineShader();
-  UpdateLines(control_point_shader, control_points);
+  std::vector<std::vector<glm::vec3> > all_control_points;
+  all_control_points.push_back(control_points);
+  UpdateLines(control_point_shader, all_control_points);
 
   // Cat
   CatShader cat_shader = CreateCatShader(image_path);
@@ -72,16 +78,26 @@ int main(int argc, char * argv[]) {
     counter++;
     if (counter == 100) {
       fprintf(stderr, "UPDATING LINES HOLLA\n");
-      for (int k=0; k < (int)line.size(); k++) {
-        line[k] -= glm::vec3(0.f, 0.f, -0.5f);
+      for (std::vector<glm::vec3> &segment : shot_lines) {
+        for (glm::vec3 &vertex : segment) {
+          vertex -= glm::vec3(0.f, 0.f, -0.5f);
+        }
       }
-      UpdateLines(line_shader, line);
+      UpdateLines(line_shader, shot_lines);
     }
 
     if (counter == 200) {
       fprintf(stderr, "UPDATING LINES HOLLA\n");
-      line.resize(line.size()/3);
-      UpdateLines(line_shader, line);
+      shot_lines.resize(shot_lines.size()/3);
+      UpdateLines(line_shader, shot_lines);
+    }
+
+    if (counter == 300) {
+      fprintf(stderr, "UPDATING LINES HOLLA\n");
+      for (std::vector<glm::vec3> &segment : shot_lines) {
+        segment.resize(segment.size()/3);
+      }
+      UpdateLines(line_shader, shot_lines);
     }
 
     // Clear the screen to black
@@ -112,7 +128,7 @@ int main(int argc, char * argv[]) {
     DrawGridmesh(gridmesh, view, proj);
 
     // lines
-    DrawLines(line_shader, view, proj, glm::vec4(0.1, 0.6, 0.2, 0.025), GL_LINE_STRIP);
+    DrawLines(line_shader, view, proj, glm::vec4(0.1, 0.6, 0.2, 1.0), GL_LINE_STRIP);
 
     // control points
     DrawLines(control_point_shader, view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);

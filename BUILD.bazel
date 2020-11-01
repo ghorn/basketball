@@ -42,6 +42,8 @@ cc_binary(
         "shader/compile.hpp",
         "shader/gridmesh.cpp",
         "shader/gridmesh.hpp",
+        "shader/colorlines.cpp",
+        "shader/colorlines.hpp",
         "shader/lines.cpp",
         "shader/lines.hpp",
     ],
