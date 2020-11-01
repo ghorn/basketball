@@ -38,7 +38,8 @@ int main(int argc, char * argv[]) {
   const std::vector<Shot> shots = problem.ComputeShots<10, 15>(shot_point);
 
   // Gridmesh
-  GridmeshShader gridmesh = CreateGridmeshFromMatrix(problem.backboard_.Interpolate<20, 30>().position);
+  GridmeshShader gridmesh = CreateGridmesh();
+  UpdateGridmeshFromMatrix(gridmesh, problem.backboard_.Interpolate<20, 30>().position);
 
   // Line rendering
   std::vector<std::vector<glm::vec3> > shot_lines;
@@ -84,12 +85,16 @@ int main(int argc, char * argv[]) {
         }
       }
       UpdateLines(line_shader, shot_lines);
+
+
+      UpdateGridmeshFromMatrix2(gridmesh, problem.backboard_.Interpolate<20, 30>().position);
     }
 
     if (counter == 200) {
       fprintf(stderr, "UPDATING LINES HOLLA\n");
       shot_lines.resize(shot_lines.size()/3);
       UpdateLines(line_shader, shot_lines);
+      UpdateGridmeshFromMatrix3(gridmesh, problem.backboard_.Interpolate<20, 30>().position);
     }
 
     if (counter == 300) {
@@ -98,6 +103,7 @@ int main(int argc, char * argv[]) {
         segment.resize(segment.size()/3);
       }
       UpdateLines(line_shader, shot_lines);
+      UpdateGridmeshFromMatrix3(gridmesh, problem.backboard_.Interpolate<15, 25>().position);
     }
 
     // Clear the screen to black
