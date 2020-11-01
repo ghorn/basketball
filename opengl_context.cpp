@@ -28,10 +28,10 @@ static void KeyCallback(GLFWwindow* window,
                         int scancode,
                         int action,
                         int mods __attribute__((unused))) {
-
-  fprintf(stderr, "Key press! %s (%d)\n", glfwGetKeyName(key, scancode), key);
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
+  } else {
+    fprintf(stderr, "Key press! %s (%d)\n", glfwGetKeyName(key, scancode), key);
   }
 }
 
