@@ -1,17 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
-py_binary(
-    name = "visualize",
-    srcs = [
-        "visualize.py",
-        "bspline.py",
-    ],
-    main = "visualize.py",
-    srcs_version = "PY3",
-    python_version = "PY3",
-    visibility = ["//visibility:public"],
-)
-
 copts = [
     "-Wall",
     "-Wextra",
