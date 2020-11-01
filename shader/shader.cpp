@@ -70,7 +70,7 @@ Shader::Shader(const std::string vshader_path,
   CheckCompileErrors(fragment, "FRAGMENT");
 
   // if geometry shader is given, compile geometry shader
-  GLuint geometry;
+  GLuint geometry = 0;
   if (!gshader_path.empty()) {
     const std::string gshader_code = ReadFile(gshader_path);
     const char * gshader_code_str = gshader_code.c_str();
