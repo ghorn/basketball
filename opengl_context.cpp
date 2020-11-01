@@ -78,6 +78,14 @@ static void CursorPositionCallback(GLFWwindow* window __attribute__((unused)),
   }
 }
 
+static void DescribeNewCameraFocus() {
+  const glm::vec3 focus_position = global_state.camera.Center();
+  fprintf(stderr, "Camera focus moved to {%.1f, %.1f, %.1f}\n",
+          focus_position.x,
+          focus_position.y,
+          focus_position.z);
+}
+
 static void MouseButtonCallback(GLFWwindow* window,
                                 int button,
                                 int action,
@@ -133,6 +141,7 @@ static void MouseButtonCallback(GLFWwindow* window,
     // initialize previous position for determinism
     global_state.cursor_xy_translating_previous_xpos = 0;
     global_state.cursor_xy_translating_previous_ypos = 0;
+    DescribeNewCameraFocus();
   }
 
   if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
@@ -142,6 +151,7 @@ static void MouseButtonCallback(GLFWwindow* window,
     // initialize previous position for determinism
     global_state.cursor_z_translating_previous_xpos = 0;
     global_state.cursor_z_translating_previous_ypos = 0;
+    DescribeNewCameraFocus();
   }
 }
 
