@@ -50,6 +50,8 @@ cc_binary(
         '-lGLEW',
         '-lGL',
         '-lSOIL',
+        '-lpthread',
+        '-lnlopt',
     ],
     copts = copts + ["-I/usr/include/freetype2"],
     data = [

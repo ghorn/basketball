@@ -27,23 +27,23 @@ public:
   ~ProblemVisualization() = default;
   void Draw(const glm::mat4 &view, const glm::mat4 &proj);
 
-  template<int NU, int NV, int NX, int NY>
-  void Update(const Problem<NX, NY> &problem) {
+  template<int NU_OBJ, int NV_OBJ, int NU_VIS, int NV_VIS, int NX, int NY>
+  void Update(const Eigen::Matrix<glm::dvec3, NX, NY> &control_points) {
     // shot and bounce lines
-    const std::vector<std::pair<Shot, Bounce> > shots_n_bounces =
-      problem.template ComputeShots<10, 15>();
+    const std::vector<Sample> samples =
+      Problem<NX, NY>::template ComputeShots<NU_OBJ, NV_OBJ>(control_points);
 
     // shots
     std::vector<std::vector<ColoredVec3> > shot_lines;
     std::vector<std::vector<ColoredVec3> > bounce_lines;
-    for (const std::pair<Shot, Bounce> &shot_n_bounce : shots_n_bounces) {
-      const Shot &shot = shot_n_bounce.first;
-      const Bounce &bounce = shot_n_bounce.second;
+    for (const Sample &sample : samples) {
+      const Shot &shot = sample.shot_;
+      const Bounce &bounce = sample.bounce_;
 
       glm::vec4 good_shot_color = {0.6, 0.6, 0.6, 1.0};
       glm::vec4 bad_shot_color = {0.6, 0.6, 0.6, 0.5};
-      glm::vec4 good_bounce_color = {0.1, 0.7, 0.2, 1.0};
-      glm::vec4 bad_bounce_color =  {0.8, 0.1, 0.2, 0.5};
+      glm::vec4 good_bounce_color = {0.1, 0.7, 0.2, 0.6};
+      glm::vec4 bad_bounce_color =  {0.8, 0.1, 0.2, 0.6};
       glm::vec4 shot_color = bounce.lower_than_hoop_ ? bad_shot_color : good_shot_color;
       glm::vec4 bounce_color = bounce.lower_than_hoop_ ? bad_bounce_color : good_bounce_color;
 
@@ -59,14 +59,14 @@ public:
     rim_vis_.Update(SingletonVector(Hoop::DrawArc()));
 
     // backboard
-    Surface<NU, NV> surface = problem.backboard_.template Interpolate<NU, NV>();
+    Surface<NU_VIS, NV_VIS> surface = Backboard<NX, NY>::template Interpolate<NU_VIS, NV_VIS>(control_points);
     backboard_vis_.Update(surface.position);
 
     // tangents
     std::vector<glm::vec3> tangents;
     std::vector<glm::vec3> normals;
-    for (int ku=0; ku<NU; ku++) {
-      for (int kv=0; kv<NV; kv++) {
+    for (int ku=0; ku<NU_VIS; ku++) {
+      for (int kv=0; kv<NV_VIS; kv++) {
         const glm::dvec3 &position = surface.position(ku, kv);
         const glm::dvec3 &tangent_u = surface.tangent_u(ku, kv);
         const glm::dvec3 &tangent_v = surface.tangent_v(ku, kv);
@@ -75,7 +75,7 @@ public:
         tangents.push_back(position);
         tangents.push_back(position + 0.1*tangent_v);
 
-        if (ku > 0 && ku < NU - 1 && kv > 0 && kv < NV - 1) {
+        if (ku > 0 && ku < NU_VIS - 1 && kv > 0 && kv < NV_VIS - 1) {
           normals.push_back(position);
           normals.push_back(position + surface.normal(ku, kv));
         }
@@ -85,21 +85,21 @@ public:
     backboard_normals_vis_.Update(SingletonVector(normals));
 
     // control points
-    std::vector<glm::vec3> control_points;
-    for (int kx=0; kx<problem.backboard_.control_points_.rows(); kx++) {
-      for (int ky=0; ky<problem.backboard_.control_points_.cols(); ky++) {
-        const glm::dvec3 point = problem.backboard_.control_points_(kx, ky);
-        control_points.push_back(point);
+    std::vector<glm::vec3> control_point_vec;
+    for (int kx=0; kx<NX; kx++) {
+      for (int ky=0; ky<NY; ky++) {
+        const glm::dvec3 point = control_points(kx, ky);
+        control_point_vec.push_back(point);
       }
     }
-    control_points_vis_.Update(SingletonVector(control_points));
+    control_points_vis_.Update(SingletonVector(control_point_vec));
   }
 
   void HandleKeyPress(const int key);
 private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 
-  bool shots_on_ = true;
+  bool shots_on_ = false;
   bool bounces_on_ = true;
   bool normals_on_ = false;
   bool tangents_on_ = false;

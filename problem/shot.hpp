@@ -92,6 +92,21 @@ public:
   glm::dvec3 outgoing_velocity_;
   double land_time_;
 
+  double XYDistanceFromHoop() const {
+    const double t = land_time_;
+    glm::dvec3 v;
+    v.x = bounce_point_.x + outgoing_velocity_.x * t;
+    v.y = bounce_point_.y + outgoing_velocity_.y * t;
+    v.z = bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t;
+
+    glm::dvec3 rim_center = Hoop::RimCenter();
+    glm::dvec3 delta = rim_center - v;
+
+    ASSERT(fabs(delta.z) < 1e-9);
+
+    return sqrt(delta.x*delta.x + delta.y*delta.y);
+  }
+
   std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
     std::vector<ColoredVec3> ret;
@@ -107,4 +122,16 @@ public:
     }
     return ret;
   }
+};
+
+class Sample {
+public:
+  Sample(glm::dvec3 shot_point, glm::dvec3 bounce_point, glm::dvec3 normal) :
+    shot_(shot_point, bounce_point),
+    bounce_(shot_.bounce_point_, shot_.BounceVel(), normal)
+  {
+  }
+  Shot shot_;
+  Bounce bounce_;
+  double objective;
 };

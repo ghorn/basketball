@@ -1,7 +1,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <chrono>
+#include <mutex>
+#include <iostream>
 #include <string>
+#include <thread>
+#include <queue>
 
 #include <eigen3/Eigen/Dense>
 #include <GL/glew.h>
@@ -10,6 +14,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <nlopt.hpp>
 
 #include "camera.hpp"
 #include "bspline.hpp"
@@ -42,18 +47,106 @@ static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
   return segments;
 }
 
+constexpr int NX = 6;
+constexpr int NY = 4;
+
+constexpr int NU_VIS = 20;
+constexpr int NV_VIS = 30;
+
+constexpr int NU_OBJ = 14;
+constexpr int NV_OBJ = 8;
+
+Eigen::Matrix<double, NX, NY> Vec2Dvs(const std::vector<double> &vec) {
+  ASSERT(NX*NY == vec.size());
+  Eigen::Matrix<double, NX, NY> mat;
+  int k = 0;
+  for (int kx=0; kx<NX; kx++) {
+    for (int ky=0; ky<NY; ky++) {
+      mat(kx, ky) = vec[k];
+      k++;
+    }
+  }
+  return mat;
+}
+std::vector<double> Dvs2Vec(const Eigen::Matrix<double, NX, NY> &mat) {
+  std::vector<double> vec;
+  vec.reserve(NX*NY);
+  for (int kx=0; kx<NX; kx++) {
+    for (int ky=0; ky<NY; ky++) {
+      vec.push_back(mat(kx, ky));
+    }
+  }
+  return vec;
+}
+
+std::queue<Eigen::Matrix<double, NX, NY> > dvs_queue;
+std::mutex g_queue_mutex;
+
+double Objective(const std::vector<double> &x,
+                 std::vector<double> &grad __attribute__((unused)),
+                 void *my_func_data __attribute__((unused))) {
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(0.01s);
+
+  Eigen::Matrix<double, NX, NY> dvs = Vec2Dvs(x);
+
+  // First and most importantly, send the design variables to the visualizer.
+  {
+    const std::lock_guard<std::mutex> lock(g_queue_mutex);
+    dvs_queue.push(dvs);
+  }
+
+  // Now I suppose we could compute the objective.
+  return Problem<NX, NY>::ObjectiveFunction<NU_OBJ, NV_OBJ>(Backboard<NX, NY>::ToControlPoints(dvs));
+}
+
+void Optimize() {
+  std::vector<double> x =
+    Dvs2Vec(Backboard<NX, NY>::FromControlPoints(Backboard<NX, NY>::Initialize()));
+
+  nlopt::opt optimizer(nlopt::LN_NELDERMEAD, static_cast<uint>(x.size()));
+  //nlopt::opt optimizer(nlopt::LN_SBPLX, static_cast<uint>(x.size()));
+  optimizer.set_lower_bounds(-10);
+  optimizer.set_upper_bounds(2);
+
+  std::vector<double> dx0(x.size(), 0.1);
+  optimizer.set_initial_step(dx0);
+
+
+  //nlopt_set_xtol_rel(optimizer, 1e-4);
+  optimizer.set_xtol_rel(1e-4);
+
+  //FunctionData data = {problem, visualization};
+  optimizer.set_min_objective(Objective, nullptr);
+
+//  opt.add_inequality_constraint(myvconstraint, &data[0], 1e-8);
+//  opt.add_inequality_constraint(myvconstraint, &data[1], 1e-8);
+//  std::vector<double> x(2);
+//  x[0] = 1.234; x[1] = 5.678;
+
+  double minf;
+  try{
+    fprintf(stderr, "starting optimization\n");
+    optimizer.optimize(x, minf);
+    fprintf(stderr, "found minimum %.12f\n", minf);
+    //return EXIT_SUCCESS;
+  } catch (std::exception &e) {
+    std::cerr << "nlopt failed: " << e.what() << std::endl;
+    //return EXIT_FAILURE;
+  }
+}
+
 int main(int argc __attribute__((unused)),
          char * argv[] __attribute__((unused))) {
   // Boilerplate
   GLFWwindow * const window = OpenglSetup();
 
   // problem
-  Problem<6, 4> problem;
-  //Problem<6, 4, 20, 30> problem;
-
   ProblemVisualization visualization;
+  visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(Backboard<NX, NY>::Initialize());
 
-  visualization.Update<20, 30>(problem);
+  // it's theadn' time
+  std::thread thread_object([]() {Optimize();});
 
   std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
 
@@ -66,6 +159,22 @@ int main(int argc __attribute__((unused)),
     // Send keypress events to visualization to update state.
     while (!KeypressQueueEmpty()) {
       visualization.HandleKeyPress(PopKeypressQueue());
+    }
+
+    // drain the queue
+    std::optional<Eigen::Matrix<double, NX, NY> > dvs = std::nullopt;
+    {
+      const std::lock_guard<std::mutex> lock(g_queue_mutex);
+      while (dvs_queue.size() > 1) {
+        dvs_queue.pop();
+      }
+      if (dvs_queue.size() > 0) {
+        dvs = dvs_queue.front();
+        dvs_queue.pop();
+      }
+    }
+    if (dvs) {
+      visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(Backboard<NX, NY>::ToControlPoints(*dvs));
     }
 
     std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();

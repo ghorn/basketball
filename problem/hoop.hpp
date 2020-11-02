@@ -6,6 +6,9 @@ public:
   static constexpr double kRimDiameter = 0.4572; // 18"
   static constexpr double kRimBackboardOffset = 0.151; // 6"
   static constexpr double kRimCenterY = kRimBackboardOffset + kRimDiameter;
+  static glm::dvec3 RimCenter() {
+    return {0, kRimCenterY, -kRimHeight};
+  }
 
   static std::vector<glm::vec3> DrawArc() {
     constexpr int N = 24;

@@ -86,7 +86,6 @@ void ColorLines::Update(const std::vector<std::vector<ColoredVec3> > &segments) 
       buffer_data.push_back(vertex.color.a);
     }
   }
-
   // bind the buffer
   //glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
