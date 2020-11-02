@@ -40,13 +40,18 @@ public:
       const Shot &shot = sample.shot_;
       const Bounce &bounce = sample.bounce_;
 
-      glm::vec4 good_shot_color = {0.6, 0.6, 0.6, 1.0};
-      glm::vec4 bad_shot_color = {0.6, 0.6, 0.6, 0.5};
-      glm::vec4 good_bounce_color = {0.1, 0.7, 0.2, 0.6};
-      glm::vec4 bad_bounce_color =  {0.8, 0.1, 0.2, 0.6};
-      glm::vec4 shot_color = bounce.lower_than_hoop_ ? bad_shot_color : good_shot_color;
-      glm::vec4 bounce_color = bounce.lower_than_hoop_ ? bad_bounce_color : good_bounce_color;
-
+      // Color shot by how close it is to going in.
+      double dist = bounce.XYDistanceFromHoop();
+      float r = static_cast<float>(dist/Hoop::kRimDiameter);
+      if (r < 0) {
+        r = 0;
+      }
+      if (r > 1) {
+        r = 1;
+      }
+      float g = 1 - r;
+      glm::vec4 bounce_color = {r, g, 0, 0.6};
+      glm::vec4 shot_color = {r, g, 0, 0.4};
       const std::vector<ColoredVec3> shot_arc = shot.DrawArc(shot_color);
       const std::vector<ColoredVec3> bounce_arc = bounce.DrawArc(bounce_color);
       shot_lines.push_back(shot_arc);
