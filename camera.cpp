@@ -2,6 +2,7 @@
 
 #include <algorithm> // min/max
 #include <cmath>
+#include <cstdio>
 
 glm::vec3 Camera::Eye() const {
   const float elevation = elevation_deg_ * static_cast<float>(M_PI) / 180.f;

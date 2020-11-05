@@ -2,6 +2,8 @@
 
 #include "problem.hpp"
 
+#include <algorithm>
+
 #include <eigen3/Eigen/Dense>
 #include <GL/glew.h>
 #define GLFW_INCLUDE_NONE
@@ -11,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "problem/problem.hpp"
+#include "shader/cubemesh.hpp"
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
@@ -34,11 +37,22 @@ public:
       Problem<NX, NY>::template ComputeShots<NU_OBJ, NV_OBJ>(control_points);
 
     // shots
+    // ------------------------------------------------------
     std::vector<std::vector<ColoredVec3> > shot_lines;
     std::vector<std::vector<ColoredVec3> > bounce_lines;
+    // histogram range
+    float min_x = (float)samples[0].bounce_.landing_point_.x;
+    float max_x = (float)samples[0].bounce_.landing_point_.x;
+    float min_y = (float)samples[0].bounce_.landing_point_.y;
+    float max_y = (float)samples[0].bounce_.landing_point_.y;
     for (const Sample &sample : samples) {
       const Shot &shot = sample.shot_;
       const Bounce &bounce = sample.bounce_;
+
+      min_x = std::min(min_x, (float)bounce.landing_point_.x);
+      max_x = std::max(max_x, (float)bounce.landing_point_.x);
+      min_y = std::min(min_y, (float)bounce.landing_point_.y);
+      max_y = std::max(max_y, (float)bounce.landing_point_.y);
 
       // Color shot by how close it is to going in.
       double dist = bounce.XYDistanceFromHoop();
@@ -59,6 +73,36 @@ public:
     }
     shot_lines_vis_.Update(shot_lines);
     bounce_lines_vis_.Update(bounce_lines);
+
+    // histogram
+    constexpr int nx_hist = 24;
+    constexpr int ny_hist = 24;
+    Eigen::Matrix<int, nx_hist, ny_hist> histogram = Eigen::Matrix<int, nx_hist, ny_hist>::Zero();
+    int max_count = 0;
+    for (const Sample &sample : samples) {
+      const glm::vec3 &landing_point = sample.bounce_.landing_point_;
+      int kx = static_cast<int>(0.5 + float(nx_hist - 1) * (landing_point.x - min_x) / (max_x - min_x));
+      int ky = static_cast<int>(0.5 + float(ny_hist - 1) * (landing_point.y - min_y) / (max_y - min_y));
+      ASSERT(kx >= 0);
+      ASSERT(kx < nx_hist);
+      ASSERT(ky >= 0);
+      ASSERT(ky < ny_hist);
+      histogram(kx, ky)++;
+      max_count = std::max(max_count, histogram(kx, ky));
+    }
+    Eigen::Matrix<std::pair<float, glm::vec3>, nx_hist, ny_hist> histogram_float;
+    const float max_z = -2.f;
+    const float min_z = -1.f;
+    const glm::vec3 warm = {0.5, 0.7, 0};
+    const glm::vec3 cold = {0, 0.4, 1};
+    for (int kx=0; kx<nx_hist; kx++) {
+      for (int ky=0; ky<ny_hist; ky++) {
+        const float z = (float)histogram(kx, ky) / (float)max_count;
+        const glm::vec3 col = z * warm + (1 - z) * cold;
+        histogram_float(kx, ky) = std::make_pair(min_z + z*(max_z - min_z), col);
+      }
+    }
+    histogram_vis_.Update(histogram_float, min_x, max_x, min_y, max_y);
 
     // Rim
     rim_vis_.Update(SingletonVector(Hoop::DrawArc()));
@@ -110,6 +154,8 @@ private:
   bool tangents_on_ = false;
   bool court_on_ = true;
   bool control_points_on_ = true;
+  bool histogram_on_ = true;
+  bool wireframe_on_ = false;
 
   Gridmesh backboard_vis_;
   Lines rim_vis_;
@@ -119,4 +165,5 @@ private:
   ColorLines shot_lines_vis_;
   ColorLines bounce_lines_vis_;
   Lines control_points_vis_;
+  Cubemesh histogram_vis_;
 };

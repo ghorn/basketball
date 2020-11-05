@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "shader/cubemesh.hpp"
 #include "shader/gridmesh.hpp"
 #include "shader/lines.hpp"
 
@@ -13,6 +14,12 @@ ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface
 }
 
 void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
+  if (wireframe_on_) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  } else {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+
   // backboard
   backboard_vis_.Draw(view, proj);
 
@@ -44,6 +51,11 @@ void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   if (control_points_on_) {
     control_points_vis_.Draw(view, proj, glm::vec4(1., 0, 0, 1), GL_POINTS);
   }
+
+  // histogram
+  if (histogram_on_) {
+    histogram_vis_.Draw(view, proj);
+  }
 }
 
 static void DescribeState(std::string name, bool state) {
@@ -73,6 +85,11 @@ void ProblemVisualization::HandleKeyPress(const int key) {
     DescribeState("court", court_on_);
     break;
   }
+  case GLFW_KEY_H: {
+    histogram_on_ = !histogram_on_;
+    DescribeState("histogram", histogram_on_);
+    break;
+  }
   case GLFW_KEY_P: {
     control_points_on_ = !control_points_on_;
     DescribeState("control points", control_points_on_);
@@ -86,6 +103,11 @@ void ProblemVisualization::HandleKeyPress(const int key) {
   case GLFW_KEY_T: {
     tangents_on_ = !tangents_on_;
     DescribeState("tangent", tangents_on_);
+    break;
+  }
+  case GLFW_KEY_W: {
+    wireframe_on_ = !wireframe_on_;
+    DescribeState("wireframe", wireframe_on_);
     break;
   }
   default:{

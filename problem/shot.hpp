@@ -86,21 +86,23 @@ public:
     }
     ASSERT(pz0 < 0);
     land_time_ = (-vz0 + sqrt(vz0*vz0 - 2 * pz0 * g_accel))/ g_accel;
+
+
+    // landing point
+    const double &t = land_time_;
+    landing_point_.x = bounce_point_.x + outgoing_velocity_.x * t;
+    landing_point_.y = bounce_point_.y + outgoing_velocity_.y * t;
+    landing_point_.z = bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t;
   }
   bool lower_than_hoop_;
   glm::dvec3 bounce_point_;
   glm::dvec3 outgoing_velocity_;
   double land_time_;
+  glm::dvec3 landing_point_;
 
   double XYDistanceFromHoop() const {
-    const double t = land_time_;
-    glm::dvec3 v;
-    v.x = bounce_point_.x + outgoing_velocity_.x * t;
-    v.y = bounce_point_.y + outgoing_velocity_.y * t;
-    v.z = bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t;
-
     glm::dvec3 rim_center = Hoop::RimCenter();
-    glm::dvec3 delta = rim_center - v;
+    glm::dvec3 delta = rim_center - landing_point_;
 
     ASSERT(fabs(delta.z) < 1e-9);
 
