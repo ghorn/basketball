@@ -7,7 +7,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "shader/shader.hpp"   // for Shader
+#include "bb3d/shader/shader.hpp"   // for Shader
 
 struct Cubemesh {
   Cubemesh();

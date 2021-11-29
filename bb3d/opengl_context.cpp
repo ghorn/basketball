@@ -1,4 +1,4 @@
-#include "opengl_context.hpp"
+#include "bb3d/opengl_context.hpp"
 
 #include <GL/glew.h>                     // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
 #include <algorithm>                     // for max
@@ -10,8 +10,8 @@
 #include <glm/glm.hpp>                   // for vec3, mat4, radians, vec<>::(anonymous)
 #include <glm/gtc/matrix_transform.hpp>  // for lookAt, ortho, perspective
 
-#include "camera.hpp"                    // for Camera
-#include "gl_error.hpp"                  // for GlDebugOutput
+#include "bb3d/camera.hpp"                    // for Camera
+#include "bb3d/gl_error.hpp"                  // for GlDebugOutput
 
 struct GlobalState {
   Camera camera;

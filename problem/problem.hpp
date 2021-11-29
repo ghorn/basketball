@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>            // for dvec3
 #include <vector>                 // for vector
 
-#include "assert.hpp"             // for ASSERT
+#include "bb3d/assert.hpp"             // for ASSERT
 #include "problem/backboard.hpp"  // for Backboard
 #include "problem/shot.hpp"       // for Sample, Bounce
 

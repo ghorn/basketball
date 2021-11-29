@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>         // for mat4, vec3, dvec3
 
-#include "shader/shader.hpp"   // for Shader
+#include "bb3d/shader/shader.hpp"   // for Shader
 
 struct Gridmesh {
   Gridmesh(const std::string &image_path);

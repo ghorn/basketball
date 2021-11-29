@@ -1,13 +1,10 @@
-#include "colorlines.hpp"
+#include "lines.hpp"
 
 #include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
 #include <string>     // for string
 
 
-ColorLines::ColorLines() : shader_("shader/colorlines.vs", "shader/colorlines.fs") {
-  point_size_ = 1;
-
-
+Lines::Lines() : shader_("bb3d/shader/lines.vs", "bb3d/shader/lines.fs") {
   current_buffer_size_ = 0;
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -23,10 +20,9 @@ ColorLines::ColorLines() : shader_("shader/colorlines.vs", "shader/colorlines.fs
                nullptr,
                GL_DYNAMIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (GLvoid*)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (GLvoid*)(3*sizeof(float)));
-  glEnableVertexAttribArray(1);
+  GLint posAttrib = 0; // layout = 0 above
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(posAttrib);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -36,7 +32,10 @@ ColorLines::ColorLines() : shader_("shader/colorlines.vs", "shader/colorlines.fs
   glBindVertexArray(0);
 }
 
-void ColorLines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum mode) {
+void Lines::Draw(const glm::mat4 &view,
+                 const glm::mat4 &proj,
+                 const glm::vec4 &color,
+                 const GLenum mode) {
   // draw triangle
   shader_.UseProgram();
   glBindVertexArray(vao_); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
@@ -45,6 +44,7 @@ void ColorLines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum
   shader_.UniformMatrix4fv("view", view);
   shader_.UniformMatrix4fv("proj", proj);
 
+  shader_.Uniform4f("color", color.r, color.g, color.b, color.a);
   shader_.Uniform1f("point_size", point_size_);
 
   // blend and antialias
@@ -62,24 +62,21 @@ void ColorLines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum
 }
 
 
-void ColorLines::Update(const std::vector<std::vector<ColoredVec3> > &segments) {
+void Lines::Update(const std::vector<std::vector<glm::vec3> > &segments) {
   // Massage the data.
-  // TODO(greg): static assert that std::vector<ColoredVertex> is packed and just reinterpret cast
+  // TODO(greg): static assert that std::vector<glm::vec3> is packed and just reinterpret cast
   std::vector<float> buffer_data;
   segment_sizes_.resize(0);
-  for (const std::vector<ColoredVec3> &segment : segments) {
+  for (const std::vector<glm::vec3> &segment : segments) {
     const GLint segment_size = static_cast<GLint>(segment.size());
     segment_sizes_.push_back(segment_size);
-    for (const ColoredVec3 &vertex : segment) {
-      buffer_data.push_back(vertex.position.x);
-      buffer_data.push_back(vertex.position.y);
-      buffer_data.push_back(vertex.position.z);
-      buffer_data.push_back(vertex.color.r);
-      buffer_data.push_back(vertex.color.g);
-      buffer_data.push_back(vertex.color.b);
-      buffer_data.push_back(vertex.color.a);
+    for (const glm::vec3 &vertex : segment) {
+      buffer_data.push_back(vertex.x);
+      buffer_data.push_back(vertex.y);
+      buffer_data.push_back(vertex.z);
     }
   }
+
   // bind the buffer
   //glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);

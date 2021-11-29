@@ -4,9 +4,9 @@
 #include <iostream>             // for operator<<, cerr, ostream, char_traits, endl, basic_ostream
 #include <string>               // for allocator, operator<<, string
 
-#include "shader/cubemesh.hpp"  // for Cubemesh
-#include "shader/gridmesh.hpp"  // for Gridmesh
-#include "shader/lines.hpp"     // for Lines
+#include "bb3d/shader/cubemesh.hpp"  // for Cubemesh
+#include "bb3d/shader/gridmesh.hpp"  // for Gridmesh
+#include "bb3d/shader/lines.hpp"     // for Lines
 
 ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/warriors_court.png") {
   control_points_vis_.point_size_ = 3;

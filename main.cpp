@@ -18,14 +18,14 @@
 #include <glm/gtc/matrix_transform.hpp>  // for rotate
 #include <nlopt.hpp>                     // for opt, LN_NELDERMEAD
 
-#include "assert.hpp"                    // for ASSERT
-#include "camera.hpp"                    // for Camera
-#include "opengl_context.hpp"            // for GetCamera, GetProjectionTransformation, GetViewT...
+#include "bb3d/assert.hpp"                    // for ASSERT
+#include "bb3d/camera.hpp"                    // for Camera
+#include "bb3d/opengl_context.hpp"            // for GetCamera, GetProjectionTransformation, GetViewT...
+#include "bb3d/shader/colorlines.hpp"         // for ColoredVec3, ColorLines
+#include "bb3d/shader/freetype.hpp"           // for Freetype
 #include "problem/backboard.hpp"         // for Backboard
 #include "problem/problem.hpp"           // for Problem
 #include "problem/visualization.hpp"     // for ProblemVisualization
-#include "shader/colorlines.hpp"         // for ColoredVec3, ColorLines
-#include "shader/freetype.hpp"           // for Freetype
 
 static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
   constexpr glm::vec4 red   = {1, 0, 0, 1};

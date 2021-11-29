@@ -5,9 +5,9 @@
 #include <glm/glm.hpp>            // for dvec3, vec<>::(anonymous), vec3, vec4, operator-, reflect
 #include <vector>                 // for vector
 
-#include "assert.hpp"             // for ASSERT
+#include "bb3d/assert.hpp"             // for ASSERT
+#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3
 #include "problem/hoop.hpp"       // for Hoop, Hoop::kRimHeight
-#include "shader/colorlines.hpp"  // for ColoredVec3
 
 const double g_accel = 9.81;
 

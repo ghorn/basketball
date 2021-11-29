@@ -1,4 +1,4 @@
-#include "gl_error.hpp"
+#include "bb3d/gl_error.hpp"
 
 #include <boost/stacktrace.hpp>  // for operator<<, stacktrace
 #include <cstdlib>              // for exit, EXIT_FAILURE

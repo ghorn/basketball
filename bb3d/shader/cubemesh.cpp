@@ -5,9 +5,9 @@
 #include <string>              // for string
 #include <vector>              // for vector, allocator
 
-#include "assert.hpp"          // for ASSERT
+#include "bb3d/assert.hpp"          // for ASSERT
 
-Cubemesh::Cubemesh() : shader_("shader/cubemesh.vs", "shader/cubemesh.fs") {
+Cubemesh::Cubemesh() : shader_("bb3d/shader/cubemesh.vs", "bb3d/shader/cubemesh.fs") {
   num_indices_ = 0;
   vertex_buffer_size_ = 0;
   index_buffer_size_ = 0;

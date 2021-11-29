@@ -7,10 +7,10 @@
 #include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
 #include <vector>              // for vector
 
-#include "assert.hpp"          // for ASSERT
+#include "bb3d/assert.hpp"          // for ASSERT
 
 Gridmesh::Gridmesh(const std::string &image_path) :
-  shader_("shader/gridmesh.vs", "shader/gridmesh.fs")
+  shader_("bb3d/shader/gridmesh.vs", "bb3d/shader/gridmesh.fs")
 {
   num_indices_ = 0;
   vertex_buffer_size_ = 0;

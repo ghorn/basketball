@@ -7,16 +7,16 @@
 #include <utility>                // for pair, make_pair
 #include <vector>                 // for vector
 
-#include "assert.hpp"             // for ASSERT
+#include "bb3d/assert.hpp"             // for ASSERT
+#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
+#include "bb3d/shader/cubemesh.hpp"    // for Cubemesh
+#include "bb3d/shader/gridmesh.hpp"    // for Gridmesh
+#include "bb3d/shader/lines.hpp"       // for Lines
 #include "bspline.hpp"            // for Surface
 #include "problem/backboard.hpp"  // for Backboard
 #include "problem/hoop.hpp"       // for Hoop, Hoop::kRimDiameter
 #include "problem/problem.hpp"    // for Problem
 #include "problem/shot.hpp"       // for Bounce, Sample, Shot
-#include "shader/colorlines.hpp"  // for ColoredVec3, ColorLines
-#include "shader/cubemesh.hpp"    // for Cubemesh
-#include "shader/gridmesh.hpp"    // for Gridmesh
-#include "shader/lines.hpp"       // for Lines
 
 template <typename T>
 std::vector<std::vector<T> > SingletonVector(const std::vector<T> xs) {

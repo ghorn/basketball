@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "shader/shader.hpp"
+#include "bb3d/shader/shader.hpp"
 
 class Lines {
 public:

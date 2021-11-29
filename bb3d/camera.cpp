@@ -1,4 +1,4 @@
-#include "camera.hpp"
+#include "bb3d/camera.hpp"
 
 #include <algorithm> // min/max
 #include <cmath>

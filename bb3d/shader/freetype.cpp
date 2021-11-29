@@ -12,9 +12,9 @@
 #include <string>                        // for basic_string, string, allocator, operator<<, bas...
 #include <utility>                       // for pair
 
-#include "shader/shader.hpp"             // for Shader, glfwGetWindowSize, GLFWwindow
+#include "bb3d/shader/shader.hpp"             // for Shader, glfwGetWindowSize, GLFWwindow
 
-Freetype::Freetype(int font_size) : shader_("shader/freetype.vs", "shader/freetype.fs") {
+Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/shader/freetype.fs") {
   // FreeType
   // --------
   FT_Library ft;

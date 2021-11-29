@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "shader/shader.hpp"
+#include "bb3d/shader/shader.hpp"
 
 struct ColoredVec3 {
   glm::vec3 position;
