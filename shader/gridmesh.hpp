@@ -1,14 +1,13 @@
 #pragma once
 
-#include <eigen3/Eigen/Dense>
-
-#include <GL/glew.h>
+#include <GL/glew.h>           // for GLuint, GLint
+#include <eigen3/Eigen/Dense>  // for Matrix, Dynamic, DenseCoeffsBase
+#include <string>              // for string
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>         // for mat4, vec3, dvec3
 
-#include <glm/glm.hpp>
-
-#include "shader/shader.hpp"
+#include "shader/shader.hpp"   // for Shader
 
 struct Gridmesh {
   Gridmesh(const std::string &image_path);

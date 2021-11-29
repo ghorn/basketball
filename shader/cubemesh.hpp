@@ -1,14 +1,13 @@
 #pragma once
 
-#include <tuple>
-
-#include <eigen3/Eigen/Dense>
-#include <GL/glew.h>
+#include <GL/glew.h>           // for GLuint, GLint
+#include <eigen3/Eigen/Dense>  // for Matrix, Dynamic, DenseCoeffsBase
+#include <utility>             // for pair
+#include <glm/glm.hpp>         // for vec3, mat4
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 
-#include "shader/shader.hpp"
+#include "shader/shader.hpp"   // for Shader
 
 struct Cubemesh {
   Cubemesh();

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-#include <map>
+#include <glm/glm.hpp>              // for vec3
+#include <GL/glew.h>                // for GLchar, GLuint
+#include <string>                   // for string
+#include <map>                      // for map
 
-#include <glm/glm.hpp>
-
-#include "shader/shader.hpp"
+#include "shader/shader.hpp"        // for GLFWwindow, Shader
 
 class Freetype {
 public:

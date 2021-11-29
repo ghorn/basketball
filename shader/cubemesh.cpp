@@ -1,15 +1,11 @@
 #include "cubemesh.hpp"
 
-#include <iostream>
-#include <vector>
+#include <GL/glew.h>           // for GLuint, GL_ARRAY_BUFFER, GLint, glBindBuffer, glDisable
+#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
+#include <vector>              // for vector, allocator
+#include <string>              // for string
 
-#include <GL/glew.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <SOIL/SOIL.h>
-
-#include "assert.hpp"
+#include "assert.hpp"          // for ASSERT
 
 Cubemesh::Cubemesh() : shader_("shader/cubemesh.vs", "shader/cubemesh.fs") {
   num_indices_ = 0;

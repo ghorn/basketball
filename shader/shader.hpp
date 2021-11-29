@@ -1,12 +1,10 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <GL/glew.h>    // for GLboolean, GLenum, GLint, GLsizei, GLuint
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-
-#include <string>
+#include <glm/glm.hpp>                  // for mat4, vec3, vec4
+#include <string>                       // for string
 
 class Shader {
 public:

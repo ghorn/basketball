@@ -1,9 +1,11 @@
 #pragma once
 
-#include <eigen3/Eigen/Dense>
+#include <cmath>              // for cos, sin
+#include <glm/glm.hpp>         // for dvec3
+#include <eigen3/Eigen/Dense>  // for Matrix
 
-#include "bspline.hpp"
-#include "problem/hoop.hpp" // kRimHeight
+#include "bspline.hpp"         // for ClampedCubicBSplineSurface, Surface
+#include "problem/hoop.hpp"    // for Hoop, Hoop::kRimHeight
 
 template <int NX, int NY>
 class Backboard {

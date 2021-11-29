@@ -1,31 +1,31 @@
-#include <cstdio>
-#include <cstdlib>
-#include <chrono>
-#include <mutex>
-#include <iostream>
-#include <string>
-#include <thread>
-#include <queue>
-
-#include <eigen3/Eigen/Dense>
-#include <GL/glew.h>
+#include <GL/glew.h>                     // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
+#include <bits/exception.h>              // for exception
+#include <sys/types.h>                   // for uint
+#include <cstdio>                        // for fprintf, sprintf, stderr
+#include <cstdlib>                       // for EXIT_SUCCESS
+#include <chrono>                        // for duration, duration_cast, operator-, high_resolut...
+#include <mutex>                         // for mutex, lock_guard
+#include <iostream>                      // for operator<<, basic_ostream, endl, cerr, ostream
+#include <string>                        // for allocator, char_traits, string
+#include <thread>                        // for sleep_for, thread
+#include <queue>                         // for queue
+#include <eigen3/Eigen/Dense>            // for Matrix, DenseCoeffsBase
+#include <optional>                      // for optional, nullopt
+#include <vector>                        // for vector
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <nlopt.hpp>
+#include <GLFW/glfw3.h>                  // for glfwDestroyWindow, glfwGetWindowSize, glfwPollEv...
+#include <glm/glm.hpp>                   // for operator+, vec3, mat4, radians, vec4
+#include <glm/gtc/matrix_transform.hpp>  // for rotate
+#include <nlopt.hpp>                     // for opt, LN_NELDERMEAD
 
-#include "camera.hpp"
-#include "bspline.hpp"
-#include "opengl_context.hpp"
-#include "problem/backboard.hpp"
-#include "problem/problem.hpp"
-#include "problem/visualization.hpp"
-#include "shader/gridmesh.hpp"
-#include "shader/freetype.hpp"
-#include "shader/lines.hpp"
-#include "shader/colorlines.hpp"
+#include "camera.hpp"                    // for Camera
+#include "opengl_context.hpp"            // for GetCamera, GetProjectionTransformation, GetViewT...
+#include "problem/backboard.hpp"         // for Backboard
+#include "problem/problem.hpp"           // for Problem
+#include "problem/visualization.hpp"     // for ProblemVisualization
+#include "shader/freetype.hpp"           // for Freetype
+#include "shader/colorlines.hpp"         // for ColoredVec3, ColorLines
+#include "assert.hpp"                    // for ASSERT
 
 static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
   constexpr glm::vec4 red   = {1, 0, 0, 1};

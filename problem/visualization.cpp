@@ -1,10 +1,12 @@
 #include "visualization.hpp"
 
-#include <iostream>
+#include <GL/glew.h>            // for glPolygonMode, GL_LINE_STRIP, GL_FRONT_AND_BACK, GL_LINES
+#include <iostream>             // for operator<<, cerr, ostream, char_traits, endl, basic_ostream
+#include <string>               // for allocator, operator<<, string
 
-#include "shader/cubemesh.hpp"
-#include "shader/gridmesh.hpp"
-#include "shader/lines.hpp"
+#include "shader/cubemesh.hpp"  // for Cubemesh
+#include "shader/gridmesh.hpp"  // for Gridmesh
+#include "shader/lines.hpp"     // for Lines
 
 ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/warriors_court.png") {
   control_points_vis_.point_size_ = 3;

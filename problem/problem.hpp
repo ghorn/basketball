@@ -1,13 +1,12 @@
 #pragma once
 
-#include <tuple>
-#include <vector>
+#include <glm/glm.hpp>            // for dvec3
+#include <vector>                 // for vector
+#include <eigen3/Eigen/Dense>     // for Matrix
 
-#include <eigen3/Eigen/Dense>
-#include <glm/glm.hpp>
-
-#include "problem/backboard.hpp"
-#include "problem/shot.hpp"
+#include "problem/backboard.hpp"  // for Backboard
+#include "problem/shot.hpp"       // for Sample, Bounce
+#include "assert.hpp"             // for ASSERT
 
 template <int NX, int NY>
 class Problem {

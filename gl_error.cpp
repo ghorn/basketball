@@ -1,7 +1,9 @@
 #include "gl_error.hpp"
 
-#include <boost/stacktrace.hpp>
-#include <iostream>
+#include <boost/stacktrace.hpp>  // for operator<<, stacktrace
+#include <cstdlib>              // for exit, EXIT_FAILURE
+#include <iostream>              // for operator<<, ostream, cout, endl, basic_ostream, char_traits
+#include <string>                // for string, operator<<
 
 
 GLenum GlCheckError_(const char *file, int line) {

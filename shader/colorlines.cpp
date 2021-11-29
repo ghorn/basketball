@@ -1,14 +1,8 @@
 #include "colorlines.hpp"
 
-#include <array>
-#include <iostream>
+#include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
+#include <string>     // for string
 
-#include <GL/glew.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "assert.hpp"
 
 ColorLines::ColorLines() : shader_("shader/colorlines.vs", "shader/colorlines.fs") {
   point_size_ = 1;

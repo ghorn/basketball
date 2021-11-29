@@ -1,15 +1,13 @@
 #include "gridmesh.hpp"
 
-#include <iostream>
-#include <vector>
+#include <GL/glew.h>           // for GLuint, glTexParameteri, GL_TEXTURE_2D, GL_ARRAY_BUFFER
+#include <cstdio>              // for fprintf, stderr
+#include <SOIL/SOIL.h>         // for SOIL_free_image_data, SOIL_last_result, SOIL_load_image
+#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
+#include <cstdlib>             // for exit, EXIT_FAILURE
+#include <vector>              // for vector
 
-#include <GL/glew.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <SOIL/SOIL.h>
-
-#include "assert.hpp"
+#include "assert.hpp"          // for ASSERT
 
 Gridmesh::Gridmesh(const std::string &image_path) :
   shader_("shader/gridmesh.vs", "shader/gridmesh.fs")

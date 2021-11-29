@@ -1,5 +1,10 @@
 #pragma once
 
+#include <glm/glm.hpp>  // for vec3, dvec3
+#include <cmath>        // for cos, sin, M_PI
+#include <vector>       // for vector
+#include <algorithm>    // for max
+
 class Hoop {
 public:
   static constexpr double kRimHeight = 3.05; // 10 feet

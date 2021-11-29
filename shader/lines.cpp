@@ -1,13 +1,8 @@
 #include "lines.hpp"
 
-#include <array>
-#include <iostream>
+#include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
+#include <string>     // for string
 
-#include <GL/glew.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#include "assert.hpp"
 
 Lines::Lines() : shader_("shader/lines.vs", "shader/lines.fs") {
   current_buffer_size_ = 0;

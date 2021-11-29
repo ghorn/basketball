@@ -1,17 +1,17 @@
 #include "opengl_context.hpp"
 
-#include <iostream>
-#include <queue>
-
-#include <GL/glew.h>
+#include <GL/glew.h>                     // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
+#include <stdio.h>                       // for fprintf, stderr
+#include <cstdlib>                       // for exit, EXIT_FAILURE
+#include <queue>                         // for queue
+#include <algorithm>                     // for max
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <GLFW/glfw3.h>                  // for glfwWindowHint, GLFWwindow, glfwGetCursorPos
+#include <glm/glm.hpp>                   // for vec3, mat4, radians, vec<>::(anonymous)
+#include <glm/gtc/matrix_transform.hpp>  // for lookAt, ortho, perspective
 
-#include "camera.hpp"
-#include "gl_error.hpp"
+#include "camera.hpp"                    // for Camera
+#include "gl_error.hpp"                  // for GlDebugOutput
 
 struct GlobalState {
   Camera camera;

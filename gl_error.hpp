@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-#include <GL/glew.h>
+#include <GL/glew.h>  // for GLenum, GLsizei
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 

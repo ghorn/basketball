@@ -1,21 +1,18 @@
 #include "freetype.hpp"
 
-#include <iostream>
-#include <map>
-#include <string>
+#include <GL/glew.h>                     // for GLchar, glBindTexture, glTexParameteri, GL_TEXTU...
+#include <freetype/freetype.h>    // for FT_FREETYPE_H
+#include <freetype/ftimage.h>            // for FT_Bitmap, FT_Vector
+#include <glm/glm.hpp>                   // for ivec2, vec<>::(anonymous), vec3, mat4
+#include <glm/gtc/matrix_transform.hpp>  // for ortho
+#include <cstdlib>                       // for exit, EXIT_FAILURE, NULL
+#include <iostream>                      // for operator<<, endl, basic_ostream, cerr, ostream
+#include <map>                           // for map
+#include <string>                        // for basic_string, string, allocator, operator<<, bas...
+#include <algorithm>                     // for max
+#include <utility>                       // for pair
 
-#include <GL/glew.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include "shader/shader.hpp"
+#include "shader/shader.hpp"             // for Shader, glfwGetWindowSize, GLFWwindow
 
 Freetype::Freetype(int font_size) : shader_("shader/freetype.vs", "shader/freetype.fs") {
   // FreeType
