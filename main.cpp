@@ -143,7 +143,7 @@ void Optimize(SharedData &shared_data) {
 int main(int argc __attribute__((unused)),
          char * argv[] __attribute__((unused))) {
   // Boilerplate
-  GLFWwindow * const window = OpenglSetup();
+  bb3d::Window window(std::make_unique<bb3d::WindowState>(bb3d::WindowState()));
 
   // problem
   ProblemVisualization visualization;
@@ -159,10 +159,10 @@ int main(int argc __attribute__((unused)),
 
   const std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
   std::chrono::time_point t_last = t_start;
-  while (glfwWindowShouldClose(window) == false) {
+  while (!window.ShouldClose()) {
     // Send keypress events to visualization to update state.
-    while (!KeypressQueueEmpty()) {
-      visualization.HandleKeyPress(PopKeypressQueue());
+    while (!window.window_state_->KeypressQueueEmpty()) {
+      visualization.HandleKeyPress(window.window_state_->PopKeypressQueue());
     }
 
     // drain the queue
@@ -201,32 +201,29 @@ int main(int argc __attribute__((unused)),
     (void)model;
 
     // Camera transformation
-    glm::mat4 view = GetViewTransformation();
+    glm::mat4 view = window.window_state_->GetViewTransformation();
 
     // projection transformation
-    glm::mat4 proj = GetProjectionTransformation(window);
+    glm::mat4 proj = window.GetProjectionTransformation();
 
     visualization.Draw(view, proj);
 
     // draw axes if we're dragging or rotating
-    if (IsDraggingOrRotating()) {
-      axes.Update(AxesLines(GetCamera()));
+    if (window.window_state_->IsDraggingOrRotating()) {
+      axes.Update(AxesLines(window.window_state_->GetCamera()));
       axes.Draw(view, proj, GL_LINE_STRIP);
     }
 
     // Draw some dummy text.
     char fps_string[80];
     sprintf(fps_string, "%.1f fps", 1 / frame_time);
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-    textbox.RenderText(window, std::string(fps_string), 25.0f, (float)height-25.0f, glm::vec3(1, 1, 1));
+    const bb3d::Window::Size window_size = window.GetSize();
+    textbox.RenderText(window, std::string(fps_string), 25.0f, (float)window_size.height-25.0f, glm::vec3(1, 1, 1));
 
-    // Swap buffers
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    // Swap buffers and poll events
+    window.SwapBuffers();
+    window.PollEvents();
   }
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
   return EXIT_SUCCESS;
 }

@@ -6,12 +6,13 @@
 #include <string>                   // for string
 
 #include "bb3d/shader/shader.hpp"        // for GLFWwindow, Shader
+#include "bb3d/opengl_context.hpp" // Window
 
 class Freetype {
 public:
   Freetype(int font_size);
   ~Freetype() = default;
-  void RenderText(GLFWwindow *window, std::string text, float x, float y, glm::vec3 color);
+  void RenderText(const bb3d::Window &window, std::string text, float x, float y, glm::vec3 color);
 private:
   Shader shader_;
   GLuint vao_;
