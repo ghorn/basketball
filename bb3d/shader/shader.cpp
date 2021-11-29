@@ -9,11 +9,13 @@
 #include <sstream>
 #include <string>                // for string, operator<<, allocator, operator!=, char_traits
 
+#include "bb3d/assert.hpp"
+
 static inline std::string ReadFile(const std::string &path) {
   std::ifstream file(path, std::ifstream::in);
   if (!file) {
     std::cerr << "Shader unable to open '" << path << "'." << std::endl;
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
   std::stringstream shader_stream;
   shader_stream << file.rdbuf();
@@ -31,7 +33,7 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
       std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
-      exit(EXIT_FAILURE);
+      exit_thread_safe(EXIT_FAILURE);
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
@@ -40,7 +42,7 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
       std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
-      exit(EXIT_FAILURE);
+      exit_thread_safe(EXIT_FAILURE);
     }
   }
 }

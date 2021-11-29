@@ -5,6 +5,7 @@
 #include <iostream>              // for operator<<, ostream, cout, endl, basic_ostream, char_traits
 #include <string>                // for string, operator<<
 
+#include "bb3d/assert.hpp"
 
 GLenum GlCheckError_(const char *file, int line) {
   GLenum errorCode;
@@ -72,5 +73,5 @@ void GlDebugOutput(GLenum source,
   std::cout << std::endl;
 
   std::cerr << boost::stacktrace::stacktrace();
-  exit(EXIT_FAILURE);
+  exit_thread_safe(EXIT_FAILURE);
 }

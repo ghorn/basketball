@@ -39,6 +39,7 @@ cc_binary(
 cc_library(
     name = "bb3d",
     srcs = [
+        "bb3d/assert.cpp",
         "bb3d/assert.hpp",
         "bb3d/camera.cpp",
         "bb3d/camera.hpp",

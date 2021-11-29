@@ -3,8 +3,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <queue>                         // for queue
 #include <memory>
+#include <queue>                         // for queue
 
 #include "bb3d/camera.hpp"
 

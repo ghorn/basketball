@@ -2,15 +2,16 @@
 
 #include <GL/glew.h>                     // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
 #include <algorithm>                     // for max
-#include <cstdlib>                       // for exit, EXIT_FAILURE
-#include <queue>                         // for queue
 #include <cstdio>                        // for fprintf, stderr
+#include <cstdlib>                       // for exit, EXIT_FAILURE
 #include <iostream>
+#include <queue>                         // for queue
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>                  // for glfwWindowHint, GLFWwindow, glfwGetCursorPos
 #include <glm/glm.hpp>                   // for vec3, mat4, radians, vec<>::(anonymous)
 #include <glm/gtc/matrix_transform.hpp>  // for lookAt, ortho, perspective
 
+#include "bb3d/assert.hpp"
 #include "bb3d/camera.hpp"                    // for Camera
 #include "bb3d/gl_error.hpp"                  // for GlDebugOutput
 
@@ -191,7 +192,7 @@ static GLFWwindow* OpenglSetup(WindowState *window_state) {
   // Load GLFW and Create a Window
   if (!glfwInit()) {
     fprintf(stderr, "Failed to initialize glfw");
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -205,7 +206,7 @@ static GLFWwindow* OpenglSetup(WindowState *window_state) {
   if (window == nullptr) {
     fprintf(stderr, "Failed to Create OpenGL Context");
     glfwTerminate();
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
 
   // Set user pointer.

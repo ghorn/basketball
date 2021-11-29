@@ -5,8 +5,8 @@
 #include <map>                      // for map
 #include <string>                   // for string
 
-#include "bb3d/shader/shader.hpp"        // for GLFWwindow, Shader
 #include "bb3d/opengl_context.hpp" // Window
+#include "bb3d/shader/shader.hpp"        // for GLFWwindow, Shader
 
 class Freetype {
 public:

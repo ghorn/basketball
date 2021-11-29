@@ -56,7 +56,7 @@ Gridmesh::Gridmesh(const std::string &image_path) :
                                          &image_width, &image_height, 0, SOIL_LOAD_RGBA);
   if (image == nullptr) {
     fprintf(stderr, "Can't load image %s: %s\n", image_path.c_str(), SOIL_last_result());
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
   glGenerateMipmap(GL_TEXTURE_2D);

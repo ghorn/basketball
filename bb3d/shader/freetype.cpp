@@ -12,6 +12,7 @@
 #include <string>                        // for basic_string, string, allocator, operator<<, bas...
 #include <utility>                       // for pair
 
+#include "bb3d/assert.hpp"
 #include "bb3d/shader/shader.hpp"             // for Shader, glfwGetWindowSize, GLFWwindow
 
 Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/shader/freetype.fs") {
@@ -21,7 +22,7 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
   // All functions return a value different than 0 whenever an error occurred
   if (FT_Init_FreeType(&ft)) {
     std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
 
   // find path to font
@@ -32,7 +33,7 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
   FT_Face face;
   if (FT_New_Face(ft, font_path.c_str(), 0, &face)) {
     std::cerr << "ERROR::FREETYPE: Failed to load '" << font_path << "'." << std::endl;
-    exit(EXIT_FAILURE);
+    exit_thread_safe(EXIT_FAILURE);
   }
   // set size to load glyphs as
   FT_Set_Pixel_Sizes(face, 0, font_size);
@@ -55,8 +56,8 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
       GL_TEXTURE_2D,
       0,
       GL_RED,
-      face->glyph->bitmap.width,
-      face->glyph->bitmap.rows,
+      static_cast<GLsizei>(face->glyph->bitmap.width),
+      static_cast<GLsizei>(face->glyph->bitmap.rows),
       0,
       GL_RED,
       GL_UNSIGNED_BYTE,
