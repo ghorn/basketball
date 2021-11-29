@@ -9,7 +9,7 @@ copts = [
     "-std=c++17",
 ]
 
-cc_library(
+cc_binary(
     name = "vis",
     srcs = [
         "main.cpp",

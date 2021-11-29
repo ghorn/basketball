@@ -79,12 +79,16 @@ std::vector<double> Dvs2Vec(const Eigen::Matrix<double, NX, NY> &mat) {
   return vec;
 }
 
-std::queue<Eigen::Matrix<double, NX, NY> > dvs_queue;
-std::mutex g_queue_mutex;
+struct SharedData {
+  std::queue<Eigen::Matrix<double, NX, NY> > dvs_queue;
+  std::mutex queue_mutex;
+};
 
 double Objective(const std::vector<double> &x,
                  std::vector<double> &grad __attribute__((unused)),
-                 void *my_func_data __attribute__((unused))) {
+                 void *my_func_data) {
+  SharedData *shared_data = reinterpret_cast<SharedData*>(my_func_data);
+
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(0.01s);
 
@@ -92,15 +96,15 @@ double Objective(const std::vector<double> &x,
 
   // First and most importantly, send the design variables to the visualizer.
   {
-    const std::lock_guard<std::mutex> lock(g_queue_mutex);
-    dvs_queue.push(dvs);
+    const std::lock_guard<std::mutex> lock(shared_data->queue_mutex);
+    shared_data->dvs_queue.push(dvs);
   }
 
   // Now I suppose we could compute the objective.
   return Problem<NX, NY>::ObjectiveFunction<NU_OBJ, NV_OBJ>(Backboard<NX, NY>::ToControlPoints(dvs));
 }
 
-void Optimize() {
+void Optimize(SharedData &shared_data) {
   std::vector<double> x =
     Dvs2Vec(Backboard<NX, NY>::FromControlPoints(Backboard<NX, NY>::Initialize()));
 
@@ -117,7 +121,7 @@ void Optimize() {
   optimizer.set_xtol_rel(1e-4);
 
   //FunctionData data = {problem, visualization};
-  optimizer.set_min_objective(Objective, nullptr);
+  optimizer.set_min_objective(Objective, &shared_data);
 
 //  opt.add_inequality_constraint(myvconstraint, &data[0], 1e-8);
 //  opt.add_inequality_constraint(myvconstraint, &data[1], 1e-8);
@@ -146,7 +150,8 @@ int main(int argc __attribute__((unused)),
   visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(Backboard<NX, NY>::Initialize());
 
   // it's theadn' time
-  std::thread thread_object([]() {Optimize();});
+  SharedData shared_data;
+  std::thread thread_object([&shared_data]() {Optimize(shared_data);});
 
   ColorLines axes;
 
@@ -163,13 +168,13 @@ int main(int argc __attribute__((unused)),
     // drain the queue
     std::optional<Eigen::Matrix<double, NX, NY> > dvs = std::nullopt;
     {
-      const std::lock_guard<std::mutex> lock(g_queue_mutex);
-      while (dvs_queue.size() > 1) {
-        dvs_queue.pop();
+      const std::lock_guard<std::mutex> lock(shared_data.queue_mutex);
+      while (shared_data.dvs_queue.size() > 1) {
+        shared_data.dvs_queue.pop();
       }
-      if (dvs_queue.size() > 0) {
-        dvs = dvs_queue.front();
-        dvs_queue.pop();
+      if (shared_data.dvs_queue.size() > 0) {
+        dvs = shared_data.dvs_queue.front();
+        shared_data.dvs_queue.pop();
       }
     }
     if (dvs) {
