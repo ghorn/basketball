@@ -1,9 +1,9 @@
 #include <GL/glew.h>  // for GLint, GL_COMPILE_STATUS, glAttachShader, glCompileShader, glCreate...
 #include <cstdlib>   // for exit, NULL, EXIT_FAILURE
-#include <string>     // for string, char_traits, operator<<
 #include <fstream>    // for operator<<, basic_ostream, endl, ifstream, ostream, basic_ostream::...
 #include <iostream>   // for cerr
 #include <sstream>
+#include <string>     // for string, char_traits, operator<<
 
 static inline std::string ReadFile(const std::string &path) {
   std::ifstream file(path, std::ifstream::in);

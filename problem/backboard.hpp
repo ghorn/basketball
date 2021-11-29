@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>              // for cos, sin
-#include <glm/glm.hpp>         // for dvec3
 #include <eigen3/Eigen/Dense>  // for Matrix
+#include <glm/glm.hpp>         // for dvec3
 
 #include "bspline.hpp"         // for ClampedCubicBSplineSurface, Surface
 #include "problem/hoop.hpp"    // for Hoop, Hoop::kRimHeight

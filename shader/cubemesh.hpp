@@ -2,8 +2,8 @@
 
 #include <GL/glew.h>           // for GLuint, GLint
 #include <eigen3/Eigen/Dense>  // for Matrix, Dynamic, DenseCoeffsBase
-#include <utility>             // for pair
 #include <glm/glm.hpp>         // for vec3, mat4
+#include <utility>             // for pair
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 

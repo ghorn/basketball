@@ -1,16 +1,16 @@
 #include <GL/glew.h>                     // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
 #include <bits/exception.h>              // for exception
-#include <sys/types.h>                   // for uint
+#include <chrono>                        // for duration, duration_cast, operator-, high_resolut...
 #include <cstdio>                        // for fprintf, sprintf, stderr
 #include <cstdlib>                       // for EXIT_SUCCESS
-#include <chrono>                        // for duration, duration_cast, operator-, high_resolut...
-#include <mutex>                         // for mutex, lock_guard
-#include <iostream>                      // for operator<<, basic_ostream, endl, cerr, ostream
-#include <string>                        // for allocator, char_traits, string
-#include <thread>                        // for sleep_for, thread
-#include <queue>                         // for queue
 #include <eigen3/Eigen/Dense>            // for Matrix, DenseCoeffsBase
+#include <iostream>                      // for operator<<, basic_ostream, endl, cerr, ostream
+#include <mutex>                         // for mutex, lock_guard
 #include <optional>                      // for optional, nullopt
+#include <queue>                         // for queue
+#include <string>                        // for allocator, char_traits, string
+#include <sys/types.h>                   // for uint
+#include <thread>                        // for sleep_for, thread
 #include <vector>                        // for vector
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>                  // for glfwDestroyWindow, glfwGetWindowSize, glfwPollEv...
@@ -18,14 +18,14 @@
 #include <glm/gtc/matrix_transform.hpp>  // for rotate
 #include <nlopt.hpp>                     // for opt, LN_NELDERMEAD
 
+#include "assert.hpp"                    // for ASSERT
 #include "camera.hpp"                    // for Camera
 #include "opengl_context.hpp"            // for GetCamera, GetProjectionTransformation, GetViewT...
 #include "problem/backboard.hpp"         // for Backboard
 #include "problem/problem.hpp"           // for Problem
 #include "problem/visualization.hpp"     // for ProblemVisualization
-#include "shader/freetype.hpp"           // for Freetype
 #include "shader/colorlines.hpp"         // for ColoredVec3, ColorLines
-#include "assert.hpp"                    // for ASSERT
+#include "shader/freetype.hpp"           // for Freetype
 
 static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
   constexpr glm::vec4 red   = {1, 0, 0, 1};
@@ -148,13 +148,12 @@ int main(int argc __attribute__((unused)),
   // it's theadn' time
   std::thread thread_object([]() {Optimize();});
 
-  std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
-
   ColorLines axes;
 
   Freetype textbox(18);
 
-  std::chrono::time_point t_last = std::chrono::high_resolution_clock::now();
+  const std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
+  std::chrono::time_point t_last = t_start;
   while (glfwWindowShouldClose(window) == false) {
     // Send keypress events to visualization to update state.
     while (!KeypressQueueEmpty()) {

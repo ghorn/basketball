@@ -1,10 +1,10 @@
 #include "opengl_context.hpp"
 
 #include <GL/glew.h>                     // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
-#include <stdio.h>                       // for fprintf, stderr
+#include <algorithm>                     // for max
 #include <cstdlib>                       // for exit, EXIT_FAILURE
 #include <queue>                         // for queue
-#include <algorithm>                     // for max
+#include <stdio.h>                       // for fprintf, stderr
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>                  // for glfwWindowHint, GLFWwindow, glfwGetCursorPos
 #include <glm/glm.hpp>                   // for vec3, mat4, radians, vec<>::(anonymous)

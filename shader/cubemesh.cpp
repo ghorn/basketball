@@ -2,8 +2,8 @@
 
 #include <GL/glew.h>           // for GLuint, GL_ARRAY_BUFFER, GLint, glBindBuffer, glDisable
 #include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
-#include <vector>              // for vector, allocator
 #include <string>              // for string
+#include <vector>              // for vector, allocator
 
 #include "assert.hpp"          // for ASSERT
 

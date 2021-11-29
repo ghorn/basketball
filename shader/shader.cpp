@@ -2,12 +2,12 @@
 
 #include <GL/glew.h>             // for glGetUniformLocation, GLuint, GL_FALSE, glAttachShader
 #include <cstdlib>              // for exit, NULL, EXIT_FAILURE
+#include <fstream>               // for operator<<, endl, basic_ostream, ostream, ifstream, basi...
 #include <glm/glm.hpp>           // for mat2, mat3, mat4, vec2, vec3, vec4
 #include <glm/gtc/type_ptr.hpp>  // for value_ptr
-#include <string>                // for string, operator<<, allocator, operator!=, char_traits
-#include <fstream>               // for operator<<, endl, basic_ostream, ostream, ifstream, basi...
 #include <iostream>              // for cerr
 #include <sstream>
+#include <string>                // for string, operator<<, allocator, operator!=, char_traits
 
 static inline std::string ReadFile(const std::string &path) {
   std::ifstream file(path, std::ifstream::in);

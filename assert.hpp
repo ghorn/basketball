@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdlib>   // for exit, EXIT_FAILURE
 #include <cstdio>    // for fprintf, stderr
+#include <cstdlib>   // for exit, EXIT_FAILURE
 
 #define ASSERT(expr) {                                                  \
   if (!(expr)) {                                                        \

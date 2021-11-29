@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>              // for vec3
 #include <GL/glew.h>                // for GLchar, GLuint
-#include <string>                   // for string
+#include <glm/glm.hpp>              // for vec3
 #include <map>                      // for map
+#include <string>                   // for string
 
 #include "shader/shader.hpp"        // for GLFWwindow, Shader
 

@@ -1,10 +1,10 @@
 #include "gridmesh.hpp"
 
 #include <GL/glew.h>           // for GLuint, glTexParameteri, GL_TEXTURE_2D, GL_ARRAY_BUFFER
-#include <cstdio>              // for fprintf, stderr
 #include <SOIL/SOIL.h>         // for SOIL_free_image_data, SOIL_last_result, SOIL_load_image
-#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
+#include <cstdio>              // for fprintf, stderr
 #include <cstdlib>             // for exit, EXIT_FAILURE
+#include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
 #include <vector>              // for vector
 
 #include "assert.hpp"          // for ASSERT

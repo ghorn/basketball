@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>            // for dvec3, vec<>::(anonymous), vec3, vec4, operator-, reflect
-#include <cmath>                  // for sqrt, fabs
-#include <vector>                 // for vector
 #include <algorithm>              // for max
+#include <cmath>                  // for sqrt, fabs
+#include <glm/glm.hpp>            // for dvec3, vec<>::(anonymous), vec3, vec4, operator-, reflect
+#include <vector>                 // for vector
 
 #include "assert.hpp"             // for ASSERT
 #include "problem/hoop.hpp"       // for Hoop, Hoop::kRimHeight

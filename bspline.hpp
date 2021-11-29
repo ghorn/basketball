@@ -1,10 +1,10 @@
 #pragma once
 
-#include <glm/glm.hpp>         // for dvec3, operator*, vec<>::(anonymous), cross, normalize
+#include <array>               // for array<>::value_type, array
 #include <cassert>            // for assert
 #include <cmath>              // for floor
 #include <eigen3/Eigen/Dense>  // for Matrix
-#include <array>               // for array<>::value_type, array
+#include <glm/glm.hpp>         // for dvec3, operator*, vec<>::(anonymous), cross, normalize
 
 #define NExtra 2
 

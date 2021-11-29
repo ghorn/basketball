@@ -1,12 +1,12 @@
 #pragma once
 
+#include <eigen3/Eigen/Dense>     // for Matrix
 #include <glm/glm.hpp>            // for dvec3
 #include <vector>                 // for vector
-#include <eigen3/Eigen/Dense>     // for Matrix
 
+#include "assert.hpp"             // for ASSERT
 #include "problem/backboard.hpp"  // for Backboard
 #include "problem/shot.hpp"       // for Sample, Bounce
-#include "assert.hpp"             // for ASSERT
 
 template <int NX, int NY>
 class Problem {
