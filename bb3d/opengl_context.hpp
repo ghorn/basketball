@@ -30,7 +30,6 @@ class WindowState {
  public:
   WindowState() = default;
   ~WindowState() = default;
-  ;
   [[nodiscard]] bool KeypressQueueEmpty() const;
   int PopKeypressQueue();
   std::queue<int> keypress_queue;                 // to hand to user
