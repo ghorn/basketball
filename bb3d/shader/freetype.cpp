@@ -92,16 +92,15 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
 
 // render line of text
 // -------------------
-void Freetype::RenderText(const bb3d::Window& window, const std::string& text, float x, float y,
-                          glm::vec3 color) {
+void Freetype::RenderText(const glm::mat4& orthographic_projection, const std::string& text,
+                          float x, float y, glm::vec3 color) {
   const float scale = 1.0F;
 
   // activate corresponding render state
   shader_.UseProgram();
 
   // projection transformation
-  const glm::mat4 projection = window.GetOrthographicProjection();
-  shader_.UniformMatrix4fv("projection", projection);
+  shader_.UniformMatrix4fv("projection", orthographic_projection);
 
   shader_.Uniform3f("textColor", color.r, color.g, color.b);
   glActiveTexture(GL_TEXTURE0);

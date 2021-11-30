@@ -30,26 +30,6 @@
 #include "problem/problem.hpp"         // for Problem
 #include "problem/visualization.hpp"   // for ProblemVisualization
 
-static std::vector<std::vector<bb3d::ColoredVec3>> AxesLines(const bb3d::Camera &camera) {
-  constexpr glm::vec4 red = {1, 0, 0, 1};
-  constexpr glm::vec4 green = {0, 1, 0, 1};
-  constexpr glm::vec4 blue = {0, 0, 1, 1};
-  const glm::vec3 focus_pos = camera.Center();
-  const double distance = camera.Distance();
-  const double scale = distance * 0.1;
-
-  const glm::vec3 x = {scale, 0, 0};
-  const glm::vec3 y = {0, scale, 0};
-  const glm::vec3 z = {0, 0, scale};
-
-  std::vector<std::vector<bb3d::ColoredVec3>> segments;
-  segments.push_back({{focus_pos, red}, {focus_pos + x, red}});
-  segments.push_back({{focus_pos, green}, {focus_pos + y, green}});
-  segments.push_back({{focus_pos, blue}, {focus_pos + z, blue}});
-
-  return segments;
-}
-
 constexpr int NX = 6;
 constexpr int NY = 4;
 
@@ -154,18 +134,11 @@ int run_it() {
   SharedData shared_data;
   std::thread thread_object([&shared_data]() { Optimize(shared_data); });
 
-  bb3d::ColorLines axes;
+  std::function<void(key_t)> handle_keypress = [&visualization](key_t key) {
+    visualization.HandleKeyPress(key);
+  };
 
-  bb3d::Freetype textbox(18);
-
-  const std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
-  std::chrono::time_point t_last = t_start;
-  while (!window.ShouldClose()) {
-    // Send keypress events to visualization to update state.
-    while (!window.GetWindowState()->KeypressQueueEmpty()) {
-      visualization.HandleKeyPress(window.GetWindowState()->PopKeypressQueue());
-    }
-
+  std::function<void()> update_visualization = [&visualization, &shared_data]() {
     // drain the queue
     std::optional<Eigen::Matrix<double, NX, NY>> dvs = std::nullopt;
     {
@@ -182,50 +155,14 @@ int run_it() {
       visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(
           Backboard<NX, NY>::ToControlPoints(*dvs));
     }
+  };
 
-    std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
-    float frame_time =
-        std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
-    t_last = t_now;
+  std::function<void(const glm::mat4 &, const glm::mat4 &)> draw_visualization =
+      [&visualization](const glm::mat4 &view, const glm::mat4 &proj) {
+        visualization.Draw(view, proj);
+      };
 
-    // Clear the screen to black
-    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
-    // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Calculate transformation
-    float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
-
-    // Model transformation
-    glm::mat4 model = glm::rotate(glm::mat4(1.0F), time * glm::radians(0.1F * 180.0F),
-                                  glm::vec3(0.0F, 0.0F, 1.0F));
-    (void)model;
-
-    // Camera transformation
-    glm::mat4 view = window.GetWindowState()->GetViewTransformation();
-
-    // projection transformation
-    glm::mat4 proj = window.GetProjectionTransformation();
-
-    visualization.Draw(view, proj);
-
-    // draw axes if we're dragging or rotating
-    if (window.GetWindowState()->IsDraggingOrRotating()) {
-      axes.Update(AxesLines(window.GetWindowState()->GetCamera()));
-      axes.Draw(view, proj, GL_LINE_STRIP);
-    }
-
-    // Draw some dummy text.
-    std::string fps_string(80, '\0');
-    sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
-    const bb3d::Window::Size window_size = window.GetSize();
-    textbox.RenderText(window, fps_string, 25.0F, static_cast<float>(window_size.height) - 25.0F,
-                       glm::vec3(1, 1, 1));
-
-    // Swap buffers and poll events
-    window.SwapBuffers();
-    bb3d::Window::PollEvents();
-  }
+  window.Run(handle_keypress, update_visualization, draw_visualization);
 
   return EXIT_SUCCESS;
 }

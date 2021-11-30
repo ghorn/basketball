@@ -3,11 +3,14 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <functional>
 #include <glm/glm.hpp>
 #include <memory>
 #include <queue>  // for queue
 
 #include "bb3d/camera.hpp"
+#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
+#include "bb3d/shader/freetype.hpp"    // for Freetype
 
 namespace bb3d {
 
@@ -56,6 +59,9 @@ class Window {
   void SwapBuffers();
   static void PollEvents();
   std::unique_ptr<WindowState> &GetWindowState() { return window_state_; };
+  void Run(std::function<void(key_t key)> &handle_keypress,
+           std::function<void()> &update_visualization,
+           std::function<void(const glm::mat4 &view, const glm::mat4 &proj)> &draw_visualization);
 
  private:
   GLFWwindow *glfw_window;

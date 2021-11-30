@@ -1,6 +1,26 @@
 build --compilation_mode=opt
 run --compilation_mode=opt
 
-## avoid downloading datasets twice
-#build --distinct_host_configuration=false
-#build --javabase=@bazel_tools//tools/jdk:remote_jdk11
+#build --strip=never
+#build --copt -fsanitize=undefined
+#build --copt -DUNDEFINED_SANITIZER
+#build --copt -O1
+#build --copt -g
+#build --copt -fno-omit-frame-pointer
+#build --linkopt -fsanitize=undefined
+
+#build --strip=never
+#build --copt -fsanitize=address
+#build --copt -DADDRESS_SANITIZER
+#build --copt -O1
+#build --copt -g
+#build --copt -fno-omit-frame-pointer
+#build --linkopt -fsanitize=address
+
+#build --strip=never
+#build --copt -fsanitize=thread
+#build --copt -DTHREAD_SANITIZER
+#build --copt -O1
+#build --copt -g
+#build --copt -fno-omit-frame-pointer
+#build --linkopt -fsanitize=thread

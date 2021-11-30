@@ -3,6 +3,7 @@
 #include <GL/glew.h>  // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
 
 #include <algorithm>  // for max
+#include <chrono>     // for duration, duration_cast, operator-, high_resolut...
 #include <cmath>
 #include <cstdio>   // for fprintf, stderr
 #include <cstdlib>  // for exit, EXIT_FAILURE
@@ -15,8 +16,10 @@
 #include <glm/gtc/matrix_transform.hpp>  // for lookAt, ortho, perspective
 
 #include "bb3d/assert.hpp"
-#include "bb3d/camera.hpp"    // for Camera
-#include "bb3d/gl_error.hpp"  // for GlDebugOutput
+#include "bb3d/camera.hpp"             // for Camera
+#include "bb3d/gl_error.hpp"           // for GlDebugOutput
+#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
+#include "bb3d/shader/freetype.hpp"    // for Freetype
 
 namespace bb3d {
 static GLFWwindow *OpenglSetup(WindowState *window_state);
@@ -265,6 +268,80 @@ int WindowState::PopKeypressQueue() {
   const int next = keypress_queue.front();
   keypress_queue.pop();
   return next;
+}
+
+static std::vector<std::vector<bb3d::ColoredVec3>> AxesLines(const bb3d::Camera &camera) {
+  constexpr glm::vec4 red = {1, 0, 0, 1};
+  constexpr glm::vec4 green = {0, 1, 0, 1};
+  constexpr glm::vec4 blue = {0, 0, 1, 1};
+  const glm::vec3 focus_pos = camera.Center();
+  const double distance = camera.Distance();
+  const double scale = distance * 0.1;
+
+  const glm::vec3 x = {scale, 0, 0};
+  const glm::vec3 y = {0, scale, 0};
+  const glm::vec3 z = {0, 0, scale};
+
+  std::vector<std::vector<bb3d::ColoredVec3>> segments;
+  segments.push_back({{focus_pos, red}, {focus_pos + x, red}});
+  segments.push_back({{focus_pos, green}, {focus_pos + y, green}});
+  segments.push_back({{focus_pos, blue}, {focus_pos + z, blue}});
+
+  return segments;
+}
+
+void Window::Run(
+    std::function<void(key_t key)> &handle_keypress, std::function<void()> &update_visualization,
+    std::function<void(const glm::mat4 &view, const glm::mat4 &proj)> &draw_visualization) {
+  bb3d::ColorLines axes;
+  bb3d::Freetype textbox(18);
+
+  std::chrono::time_point t_last = std::chrono::high_resolution_clock::now();
+
+  while (!ShouldClose()) {
+    // Send keypress events to visualization to update state.
+    while (!window_state_->KeypressQueueEmpty()) {
+      handle_keypress(window_state_->PopKeypressQueue());
+    }
+
+    update_visualization();
+
+    std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
+    float frame_time =
+        std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
+    t_last = t_now;
+
+    // Clear the screen to black
+    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Camera transformation
+    glm::mat4 view = window_state_->GetViewTransformation();
+
+    // projection transformation
+    glm::mat4 proj = GetProjectionTransformation();
+
+    draw_visualization(view, proj);
+
+    // draw axes if we're dragging or rotating
+    if (window_state_->IsDraggingOrRotating()) {
+      axes.Update(bb3d::AxesLines(window_state_->GetCamera()));
+      axes.Draw(view, proj, GL_LINE_STRIP);
+    }
+
+    // Draw some dummy text.
+    std::string fps_string(80, '\0');
+    sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
+    const bb3d::Window::Size window_size = GetSize();
+
+    textbox.RenderText(GetOrthographicProjection(), fps_string, 25.0F,
+                       static_cast<float>(window_size.height) - 25.0F, glm::vec3(1, 1, 1));
+
+    // Swap buffers and poll events
+    SwapBuffers();
+    bb3d::Window::PollEvents();
+  }
 }
 
 };  //  namespace bb3d

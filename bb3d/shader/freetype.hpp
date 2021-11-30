@@ -6,8 +6,7 @@
 #include <map>          // for map
 #include <string>       // for string
 
-#include "bb3d/opengl_context.hpp"  // Window
-#include "bb3d/shader/shader.hpp"   // for GLFWwindow, Shader
+#include "bb3d/shader/shader.hpp"  // for GLFWwindow, Shader
 
 namespace bb3d {
 
@@ -15,8 +14,8 @@ class Freetype {
  public:
   explicit Freetype(int font_size);
   ~Freetype() = default;
-  void RenderText(const bb3d::Window& window, const std::string& text, float x, float y,
-                  glm::vec3 color);
+  void RenderText(const glm::mat4& orthographic_projection, const std::string& text, float x,
+                  float y, glm::vec3 color);
 
  private:
   Shader shader_;
