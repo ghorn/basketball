@@ -120,8 +120,8 @@ void Freetype::RenderText(const bb3d::Window &window, std::string text, float x,
   glDisable(GL_POLYGON_SMOOTH);
 
   // iterate through all characters
-  for (std::string::const_iterator c = text.begin(); c != text.end(); c++) {
-    Character ch = characters_[*c];
+  for (char c : text) {
+    Character ch = characters_[c];
 
     float xpos = x + (float)ch.Bearing.x * scale;
     float ypos = y - (float)(ch.Size.y - ch.Bearing.y) * scale;

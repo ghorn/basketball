@@ -42,10 +42,10 @@ public:
     std::vector<std::vector<ColoredVec3> > shot_lines;
     std::vector<std::vector<ColoredVec3> > bounce_lines;
     // histogram range
-    float min_x = (float)samples[0].bounce_.landing_point_.x;
-    float max_x = (float)samples[0].bounce_.landing_point_.x;
-    float min_y = (float)samples[0].bounce_.landing_point_.y;
-    float max_y = (float)samples[0].bounce_.landing_point_.y;
+    auto min_x = (float)samples[0].bounce_.landing_point_.x;
+    auto max_x = (float)samples[0].bounce_.landing_point_.x;
+    auto min_y = (float)samples[0].bounce_.landing_point_.y;
+    auto max_y = (float)samples[0].bounce_.landing_point_.y;
     for (const Sample &sample : samples) {
       const Shot &shot = sample.shot_;
       const Bounce &bounce = sample.bounce_;
@@ -57,7 +57,7 @@ public:
 
       // Color shot by how close it is to going in.
       double dist = bounce.XYDistanceFromHoop();
-      float r = static_cast<float>(dist/Hoop::kRimDiameter);
+      auto r = static_cast<float>(dist/Hoop::kRimDiameter);
       if (r < 0) {
         r = 0;
       }
@@ -120,13 +120,13 @@ public:
         const glm::dvec3 &position = surface.position(ku, kv);
         const glm::dvec3 &tangent_u = surface.tangent_u(ku, kv);
         const glm::dvec3 &tangent_v = surface.tangent_v(ku, kv);
-        tangents.push_back(position);
-        tangents.push_back(position + 0.1*tangent_u);
-        tangents.push_back(position);
-        tangents.push_back(position + 0.1*tangent_v);
+        tangents.emplace_back(position);
+        tangents.emplace_back(position + 0.1*tangent_u);
+        tangents.emplace_back(position);
+        tangents.emplace_back(position + 0.1*tangent_v);
 
         if (ku > 0 && ku < NU_VIS - 1 && kv > 0 && kv < NV_VIS - 1) {
-          normals.push_back(position);
+          normals.emplace_back(position);
           normals.push_back(position + surface.normal(ku, kv));
         }
       }
@@ -139,7 +139,7 @@ public:
     for (int kx=0; kx<NX; kx++) {
       for (int ky=0; ky<NY; ky++) {
         const glm::dvec3 point = control_points(kx, ky);
-        control_point_vec.push_back(point);
+        control_point_vec.emplace_back(point);
       }
     }
     control_points_vis_.Update(SingletonVector(control_point_vec));

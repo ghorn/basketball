@@ -68,7 +68,7 @@ void ColorLines::Update(const std::vector<std::vector<ColoredVec3> > &segments) 
   std::vector<float> buffer_data;
   segment_sizes_.resize(0);
   for (const std::vector<ColoredVec3> &segment : segments) {
-    const GLint segment_size = static_cast<GLint>(segment.size());
+    const auto segment_size = static_cast<GLint>(segment.size());
     segment_sizes_.push_back(segment_size);
     for (const ColoredVec3 &vertex : segment) {
       buffer_data.push_back(vertex.position.x);
@@ -84,7 +84,7 @@ void ColorLines::Update(const std::vector<std::vector<ColoredVec3> > &segments) 
   //glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
-  const GLint buffer_size = static_cast<GLint>(sizeof(float) * buffer_data.size());
+  const auto buffer_size = static_cast<GLint>(sizeof(float) * buffer_data.size());
   if (buffer_size == current_buffer_size_) {
     // if the size of data is the same, just update the buffer
     glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, buffer_data.data());

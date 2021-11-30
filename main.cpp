@@ -87,7 +87,7 @@ struct SharedData {
 double Objective(const std::vector<double> &x,
                  std::vector<double> &grad __attribute__((unused)),
                  void *my_func_data) {
-  SharedData *shared_data = reinterpret_cast<SharedData*>(my_func_data);
+  auto *shared_data = reinterpret_cast<SharedData*>(my_func_data);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(0.01s);

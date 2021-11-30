@@ -145,9 +145,9 @@ void Cubemesh::Update(
     }
   }
 
-  const GLint num_indices = static_cast<GLint>(indices.size());
-  const GLint vertex_buffer_size = static_cast<GLint>(sizeof(vertices[0])*vertices.size());
-  const GLint index_buffer_size = static_cast<GLint>(sizeof(indices[0])*indices.size());
+  const auto num_indices = static_cast<GLint>(indices.size());
+  const auto vertex_buffer_size = static_cast<GLint>(sizeof(vertices[0])*vertices.size());
+  const auto index_buffer_size = static_cast<GLint>(sizeof(indices[0])*indices.size());
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);

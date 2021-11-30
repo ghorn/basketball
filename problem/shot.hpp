@@ -44,7 +44,7 @@ public:
   double vy_;
   double bounce_time_;
 
-  std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+  [[nodiscard]] std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
     std::vector<ColoredVec3> ret;
     ret.reserve(N);
@@ -60,7 +60,7 @@ public:
     return ret;
   }
 
-  glm::dvec3 BounceVel() const {
+  [[nodiscard]] glm::dvec3 BounceVel() const {
     return glm::dvec3(vx_, vy_, vz_bounce_);
   }
 };
@@ -102,7 +102,7 @@ public:
   double land_time_;
   glm::dvec3 landing_point_;
 
-  double XYDistanceFromHoop() const {
+  [[nodiscard]] double XYDistanceFromHoop() const {
     glm::dvec3 rim_center = Hoop::RimCenter();
     glm::dvec3 delta = rim_center - landing_point_;
 
@@ -111,7 +111,7 @@ public:
     return sqrt(delta.x*delta.x + delta.y*delta.y);
   }
 
-  std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+  [[nodiscard]] std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
     std::vector<ColoredVec3> ret;
     ret.reserve(N);

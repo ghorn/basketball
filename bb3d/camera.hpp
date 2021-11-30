@@ -4,9 +4,9 @@
 
 class Camera {
 public:
-  glm::vec3 Eye() const;
-  glm::vec3 Center() const;
-  double Distance() const;
+  [[nodiscard]] glm::vec3 Eye() const;
+  [[nodiscard]] glm::vec3 Center() const;
+  [[nodiscard]] double Distance() const;
   void Rotate(const float delta_x, const float delta_y);
   void TranslateXy(const float delta_x, const float delta_y);
   void TranslateZ(const float delta_x, const float delta_y);

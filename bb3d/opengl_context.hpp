@@ -25,15 +25,15 @@ namespace bb3d {
   // The state which is stored by glfwSetWindowUserPointer.
   class WindowState {
   public:
-    WindowState(){};
-    ~WindowState(){};
+    WindowState()= default;;
+    ~WindowState()= default;;
     bool KeypressQueueEmpty();
     int PopKeypressQueue();
     std::queue<int> keypress_queue; // to hand to user
     const Camera &GetCamera(); // TODO(greg): delete me
     Camera camera;
     bool IsDraggingOrRotating();
-    glm::mat4 GetViewTransformation() const;
+    [[nodiscard]] glm::mat4 GetViewTransformation() const;
     MouseHandler mouse_handler;
   };
 
@@ -47,9 +47,9 @@ namespace bb3d {
     };
 
     bool ShouldClose();
-    Size GetSize() const;
-    glm::mat4 GetProjectionTransformation() const;
-    glm::mat4 GetOrthographicProjection() const;
+    [[nodiscard]] Size GetSize() const;
+    [[nodiscard]] glm::mat4 GetProjectionTransformation() const;
+    [[nodiscard]] glm::mat4 GetOrthographicProjection() const;
     void SwapBuffers();
     void PollEvents();
     std::unique_ptr<WindowState> window_state_;

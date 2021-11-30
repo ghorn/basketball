@@ -22,7 +22,7 @@ public:
     ret.reserve(N);
     for (int k=0; k < N; k++) {
       const double theta = 2 * M_PI * k / (double)(N - 1);
-      ret.push_back({kRimRadius*sin(theta), kRimCenterY + kRimRadius*cos(theta), -kRimHeight});
+      ret.emplace_back(kRimRadius*sin(theta), kRimCenterY + kRimRadius*cos(theta), -kRimHeight);
     }
     return ret;
   }
