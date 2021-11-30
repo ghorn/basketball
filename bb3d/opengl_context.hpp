@@ -1,16 +1,15 @@
 #pragma once
 
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <GLFW/glfw3.h>  // for GLFWwindow
+#include <sys/types.h>   // for key_t
 
-#include <functional>
-#include <glm/glm.hpp>
-#include <memory>
-#include <queue>  // for queue
+#include <functional>   // for function
+#include <glm/glm.hpp>  // for mat4
+#include <memory>       // for unique_ptr
+#include <queue>        // for queue
 
-#include "bb3d/camera.hpp"
-#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
-#include "bb3d/shader/freetype.hpp"    // for Freetype
+#include "bb3d/camera.hpp"  // for Camera
 
 namespace bb3d {
 

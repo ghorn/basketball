@@ -1,34 +1,32 @@
-#include <GL/glew.h>         // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
 #include <bits/exception.h>  // for exception
-#include <sys/types.h>       // for uint
+#include <sys/types.h>       // for key_t, uint
 
-#include <chrono>  // for duration, duration_cast, operator-, high_resolut...
-#include <cmath>
-#include <cstdio>              // for fprintf, sprintf, stderr
+#include <algorithm>           // for copy
+#include <chrono>              // for operator""s, chrono_literals
+#include <cstdio>              // for fprintf, stderr
 #include <cstdlib>             // for EXIT_SUCCESS
+#include <deque>               // for _Deque_iterator
 #include <eigen3/Eigen/Dense>  // for Matrix, DenseCoeffsBase
-#include <iostream>            // for operator<<, basic_ostream, endl, cerr, ostream
+#include <functional>          // for function
+#include <iostream>            // for operator<<, basic_ostream, cerr, endl, ostream, cha...
+#include <memory>              // for make_unique
 #include <mutex>               // for mutex, lock_guard
 #include <optional>            // for optional, nullopt
 #include <queue>               // for queue
-#include <string>              // for allocator, char_traits, string
 #include <thread>              // for sleep_for, thread
 #include <vector>              // for vector
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>  // for glfwDestroyWindow, glfwGetWindowSize, glfwPollEv...
 
-#include <glm/glm.hpp>                   // for operator+, vec3, mat4, radians, vec4
-#include <glm/gtc/matrix_transform.hpp>  // for rotate
-#include <nlopt.hpp>                     // for opt, LN_NELDERMEAD
+#include <glm/glm.hpp>  // for mat4
+#include <nlopt.hpp>    // for opt, LN_NELDERMEAD
 
-#include "bb3d/assert.hpp"             // for ASSERT
-#include "bb3d/camera.hpp"             // for Camera
-#include "bb3d/opengl_context.hpp"     // for GetCamera, GetProjectionTransformation, GetViewT...
-#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
-#include "bb3d/shader/freetype.hpp"    // for Freetype
-#include "problem/backboard.hpp"       // for Backboard
-#include "problem/problem.hpp"         // for Problem
-#include "problem/visualization.hpp"   // for ProblemVisualization
+#include "bb3d/assert.hpp"            // for ASSERT
+#include "bb3d/opengl_context.hpp"    // for WindowState, Window
+#include "problem/backboard.hpp"      // for Backboard
+#include "problem/problem.hpp"        // for Problem
+#include "problem/visualization.hpp"  // for ProblemVisualization
 
 constexpr int NX = 6;
 constexpr int NY = 4;

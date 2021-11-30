@@ -2,8 +2,6 @@
 
 #include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
 
-#include <string>  // for string
-
 namespace bb3d {
 
 Lines::Lines() : shader_("bb3d/shader/lines.vs", "bb3d/shader/lines.fs") {

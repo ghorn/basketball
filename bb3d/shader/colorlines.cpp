@@ -2,8 +2,6 @@
 
 #include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
 
-#include <string>  // for string
-
 namespace bb3d {
 
 ColorLines::ColorLines() : shader_("bb3d/shader/colorlines.vs", "bb3d/shader/colorlines.fs") {

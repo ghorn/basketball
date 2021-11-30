@@ -1,21 +1,23 @@
 #include "bb3d/opengl_context.hpp"
 
-#include <GL/glew.h>  // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
+#include <GL/glew.h>  // for glEnable, GL_TRUE, GL_DONT_CARE, glClear, glClea...
 
 #include <algorithm>  // for max
 #include <chrono>     // for duration, duration_cast, operator-, high_resolut...
-#include <cmath>
-#include <cstdio>   // for fprintf, stderr
-#include <cstdlib>  // for exit, EXIT_FAILURE
-#include <iostream>
-#include <queue>  // for queue
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>  // for glfwWindowHint, GLFWwindow, glfwGetCursorPos
+#include <cstdio>     // for fprintf, stderr, sprintf
+#include <cstdlib>    // for EXIT_FAILURE
+#include <queue>      // for queue
+#include <string>     // for string
+#include <utility>    // for move
+#include <vector>     // for vector
 
-#include <glm/glm.hpp>                   // for vec3, mat4, radians, vec<>::(anonymous)
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>  // for glfwWindowHint, glfwGetWindowUserPointer, glfwGe...
+
+#include <glm/glm.hpp>                   // for operator+, vec3, mat4, radians, vec4, vec<>::(an...
 #include <glm/gtc/matrix_transform.hpp>  // for lookAt, ortho, perspective
 
-#include "bb3d/assert.hpp"
+#include "bb3d/assert.hpp"             // for exit_thread_safe
 #include "bb3d/camera.hpp"             // for Camera
 #include "bb3d/gl_error.hpp"           // for GlDebugOutput
 #include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines

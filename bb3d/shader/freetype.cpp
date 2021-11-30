@@ -1,20 +1,18 @@
 #include "freetype.hpp"
 
-#include <GL/glew.h>            // for GLchar, glBindTexture, glTexParameteri, GL_TEXTU...
-#include <freetype/freetype.h>  // for FT_FREETYPE_H
+#include <GL/glew.h>            // for GLchar, glBindTexture, glTexParameteri, GL_TEXTURE_2D
+#include <freetype/freetype.h>  // for FT_FaceRec_, FT_GlyphSlotRec_, FT_Done_Face, FT_Done_F...
 #include <freetype/ftimage.h>   // for FT_Bitmap, FT_Vector
 
-#include <algorithm>                     // for max
-#include <cstdlib>                       // for exit, EXIT_FAILURE, NULL
-#include <glm/glm.hpp>                   // for ivec2, vec<>::(anonymous), vec3, mat4
-#include <glm/gtc/matrix_transform.hpp>  // for ortho
-#include <iostream>                      // for operator<<, endl, basic_ostream, cerr, ostream
-#include <map>                           // for map
-#include <string>                        // for basic_string, string, allocator, operator<<, bas...
-#include <utility>                       // for pair
+#include <cstdlib>      // for EXIT_FAILURE
+#include <glm/glm.hpp>  // for ivec2, vec<>::(anonymous), vec3, mat4
+#include <iostream>     // for operator<<, endl, basic_ostream, cerr, ostream
+#include <map>          // for map
+#include <string>       // for basic_string, allocator, string, operator<<, char_traits
+#include <utility>      // for pair
 
-#include "bb3d/assert.hpp"
-#include "bb3d/shader/shader.hpp"  // for Shader, glfwGetWindowSize, GLFWwindow
+#include "bb3d/assert.hpp"         // for exit_thread_safe
+#include "bb3d/shader/shader.hpp"  // for Shader
 
 namespace bb3d {
 

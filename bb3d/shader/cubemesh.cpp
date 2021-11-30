@@ -1,9 +1,8 @@
 #include "cubemesh.hpp"
 
-#include <GL/glew.h>  // for GLuint, GL_ARRAY_BUFFER, GLint, glBindBuffer, glDisable
+#include <GL/glew.h>  // for GLuint, GL_ARRAY_BUFFER, glBindBuffer, glDisable, GL_ELEME...
 
 #include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
-#include <string>              // for string
 #include <vector>              // for vector, allocator
 
 #include "bb3d/assert.hpp"  // for ASSERT
