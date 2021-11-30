@@ -21,9 +21,9 @@ public:
     const int num_sp_x = 5;
     const int num_sp_y = 4;
     for (int k_sp_x=0; k_sp_x<num_sp_x; k_sp_x++) {
-      const double sp_x = k_sp_x / (double)(num_sp_x - 1);
+      const double sp_x = k_sp_x / static_cast<double>(num_sp_x - 1);
       for (int k_sp_y=0; k_sp_y<num_sp_y; k_sp_y++) {
-        const double sp_y = k_sp_y / (double)(num_sp_y - 1);
+        const double sp_y = k_sp_y / static_cast<double>(num_sp_y - 1);
 
         const glm::dvec3 shot_point(1.5*(2 * sp_x + -1), 3 + sp_y*2, 0);
 

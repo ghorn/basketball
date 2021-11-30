@@ -75,15 +75,15 @@ void Cubemesh::Update(
   ASSERT(nx >= 2);
   ASSERT(ny >= 2);
 
-  const float dx = 0.5f * (max_x - min_x) / ((float)nx - 1);
-  const float dy = 0.5f * (max_y - min_y) / ((float)ny - 1);
+  const float dx = 0.5f * (max_x - min_x) / (static_cast<float>(nx) - 1);
+  const float dy = 0.5f * (max_y - min_y) / (static_cast<float>(ny) - 1);
   
   // Massage the data.
   std::vector<float> vertices;
   for (int kx=0; kx<nx; kx++) {
-    const float x = min_x + (max_x - min_x)*(float)kx / (float)(nx - 1);
+    const float x = min_x + (max_x - min_x)*static_cast<float>(kx) / static_cast<float>(nx - 1);
     for (int ky=0; ky<ny; ky++) {
-      const float y = min_y + (max_y - min_y)*(float)ky / (float)(ny - 1);
+      const float y = min_y + (max_y - min_y)*static_cast<float>(ky) / static_cast<float>(ny - 1);
       const std::pair<float, glm::vec3> zcol = grid(kx, ky);
       const float z = zcol.first;
       const glm::vec3 color = zcol.second;

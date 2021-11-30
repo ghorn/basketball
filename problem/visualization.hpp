@@ -42,18 +42,18 @@ public:
     std::vector<std::vector<ColoredVec3> > shot_lines;
     std::vector<std::vector<ColoredVec3> > bounce_lines;
     // histogram range
-    auto min_x = (float)samples[0].bounce_.landing_point_.x;
-    auto max_x = (float)samples[0].bounce_.landing_point_.x;
-    auto min_y = (float)samples[0].bounce_.landing_point_.y;
-    auto max_y = (float)samples[0].bounce_.landing_point_.y;
+    auto min_x = static_cast<float>(samples[0].bounce_.landing_point_.x);
+    auto max_x = static_cast<float>(samples[0].bounce_.landing_point_.x);
+    auto min_y = static_cast<float>(samples[0].bounce_.landing_point_.y);
+    auto max_y = static_cast<float>(samples[0].bounce_.landing_point_.y);
     for (const Sample &sample : samples) {
       const Shot &shot = sample.shot_;
       const Bounce &bounce = sample.bounce_;
 
-      min_x = std::min(min_x, (float)bounce.landing_point_.x);
-      max_x = std::max(max_x, (float)bounce.landing_point_.x);
-      min_y = std::min(min_y, (float)bounce.landing_point_.y);
-      max_y = std::max(max_y, (float)bounce.landing_point_.y);
+      min_x = std::min(min_x, static_cast<float>(bounce.landing_point_.x));
+      max_x = std::max(max_x, static_cast<float>(bounce.landing_point_.x));
+      min_y = std::min(min_y, static_cast<float>(bounce.landing_point_.y));
+      max_y = std::max(max_y, static_cast<float>(bounce.landing_point_.y));
 
       // Color shot by how close it is to going in.
       double dist = bounce.XYDistanceFromHoop();
@@ -98,7 +98,7 @@ public:
     const glm::vec3 cold = {0, 0.4, 1};
     for (int kx=0; kx<nx_hist; kx++) {
       for (int ky=0; ky<ny_hist; ky++) {
-        const float z = (float)histogram(kx, ky) / (float)max_count;
+        const float z = static_cast<float>(histogram(kx, ky)) / static_cast<float>(max_count);
         const glm::vec3 col = z * warm + (1 - z) * cold;
         histogram_float(kx, ky) = std::make_pair(min_z + z*(max_z - min_z), col);
       }

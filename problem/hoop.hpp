@@ -21,7 +21,7 @@ public:
     std::vector<glm::vec3> ret;
     ret.reserve(N);
     for (int k=0; k < N; k++) {
-      const double theta = 2 * M_PI * k / (double)(N - 1);
+      const double theta = 2 * M_PI * k / static_cast<double>(N - 1);
       ret.emplace_back(kRimRadius*sin(theta), kRimCenterY + kRimRadius*cos(theta), -kRimHeight);
     }
     return ret;

@@ -219,7 +219,7 @@ int run_it() {
     std::string fps_string(80, '\0');
     sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
     const bb3d::Window::Size window_size = window.GetSize();
-    textbox.RenderText(window, fps_string, 25.0f, (float)window_size.height-25.0f, glm::vec3(1, 1, 1));
+    textbox.RenderText(window, fps_string, 25.0f, static_cast<float>(window_size.height)-25.0f, glm::vec3(1, 1, 1));
 
     // Swap buffers and poll events
     window.SwapBuffers();

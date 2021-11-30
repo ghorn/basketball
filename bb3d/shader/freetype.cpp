@@ -124,11 +124,11 @@ void Freetype::RenderText(const bb3d::Window &window, const std::string& text, f
   for (char c : text) {
     Character ch = characters_[c];
 
-    float xpos = x + (float)ch.Bearing.x * scale;
-    float ypos = y - (float)(ch.Size.y - ch.Bearing.y) * scale;
+    float xpos = x + static_cast<float>(ch.Bearing.x) * scale;
+    float ypos = y - static_cast<float>(ch.Size.y - ch.Bearing.y) * scale;
 
-    float w = (float)ch.Size.x * scale;
-    float h = (float)ch.Size.y * scale;
+    float w = static_cast<float>(ch.Size.x) * scale;
+    float h = static_cast<float>(ch.Size.y) * scale;
     // update VBO for each character
     float vertices[6][4] = { // NOLINT
         { xpos,     ypos + h,   0.0f, 0.0f },
@@ -150,7 +150,7 @@ void Freetype::RenderText(const bb3d::Window &window, const std::string& text, f
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
-    x += (float)(ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+    x += static_cast<float>(ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
   }
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
