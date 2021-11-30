@@ -31,11 +31,11 @@ Gridmesh::Gridmesh(const std::string &image_path) :
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
   shader_.VertexAttribPointer("position",
-                              3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(GLfloat)));
+                              3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(GLfloat))); //NOLINT
   glEnableVertexAttribArray(0);
 
   shader_.VertexAttribPointer("texture_coordinate",
-                              2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(GLfloat)));
+                              2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(GLfloat))); //NOLINT
   glEnableVertexAttribArray(1);
 
   // load and create a texture

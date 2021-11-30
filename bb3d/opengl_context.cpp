@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>                     // for glEnable, GL_TRUE, GL_DONT_CARE, glGetString
 #include <algorithm>                     // for max
+#include <cmath>
 #include <cstdio>                        // for fprintf, stderr
 #include <cstdlib>                       // for exit, EXIT_FAILURE
 #include <iostream>
@@ -29,7 +30,7 @@ Window::~Window() {
 };
 
 bool Window::ShouldClose() {
-  return glfwWindowShouldClose(glfw_window);
+  return glfwWindowShouldClose(glfw_window) != 0;
 }
 
 void Window::SwapBuffers() {
@@ -42,12 +43,12 @@ void Window::PollEvents() {
 
 
 Window::Size Window::GetSize() const {
-  Window::Size window_size;
+  Window::Size window_size{};
   glfwGetWindowSize(glfw_window, &window_size.width, &window_size.height);
   return window_size;
 }
 
-const Camera & WindowState::GetCamera() {
+const Camera & WindowState::GetCamera() const {
   return camera;
 }
 
@@ -116,7 +117,8 @@ static void MouseButtonCallback(GLFWwindow* glfw_window,
     window_state.mouse_handler.cursor_rotating = true;
 
     // set previous position
-    double xpos, ypos;
+    double xpos{};
+    double ypos{};
     glfwGetCursorPos(glfw_window, &xpos, &ypos);
     window_state.mouse_handler.cursor_rotating_previous_xpos = xpos;
     window_state.mouse_handler.cursor_rotating_previous_ypos = ypos;
@@ -127,7 +129,8 @@ static void MouseButtonCallback(GLFWwindow* glfw_window,
     window_state.mouse_handler.cursor_xy_translating = true;
 
     // set previous position
-    double xpos, ypos;
+    double xpos{};
+    double ypos{};
     glfwGetCursorPos(glfw_window, &xpos, &ypos);
     window_state.mouse_handler.cursor_xy_translating_previous_xpos = xpos;
     window_state.mouse_handler.cursor_xy_translating_previous_ypos = ypos;
@@ -138,7 +141,8 @@ static void MouseButtonCallback(GLFWwindow* glfw_window,
     window_state.mouse_handler.cursor_z_translating = true;
 
     // set previous position
-    double xpos, ypos;
+    double xpos{};
+    double ypos{};
     glfwGetCursorPos(glfw_window, &xpos, &ypos);
     window_state.mouse_handler.cursor_z_translating_previous_xpos = xpos;
     window_state.mouse_handler.cursor_z_translating_previous_ypos = ypos;
@@ -190,7 +194,7 @@ static GLFWwindow* OpenglSetup(WindowState *window_state) {
   glfwSetErrorCallback(ErrorCallback);
 
   // Load GLFW and Create a Window
-  if (!glfwInit()) {
+  if (glfwInit() == 0) {
     fprintf(stderr, "Failed to initialize glfw");
     exit_thread_safe(EXIT_FAILURE);
   }
@@ -270,11 +274,11 @@ glm::mat4 Window::GetOrthographicProjection() const {
                     0.0f, static_cast<float>(window_size.height));
 }
 
-bool WindowState::IsDraggingOrRotating() {
+bool WindowState::IsDraggingOrRotating() const {
   return mouse_handler.cursor_rotating || mouse_handler.cursor_xy_translating || mouse_handler.cursor_z_translating;
 }
 
-bool WindowState::KeypressQueueEmpty() {
+bool WindowState::KeypressQueueEmpty() const {
   return keypress_queue.empty();
 }
 int WindowState::PopKeypressQueue() {

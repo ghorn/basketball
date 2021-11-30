@@ -1,6 +1,7 @@
 #include <GL/glew.h>                     // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
 #include <bits/exception.h>              // for exception
 #include <chrono>                        // for duration, duration_cast, operator-, high_resolut...
+#include <cmath>
 #include <cstdio>                        // for fprintf, sprintf, stderr
 #include <cstdlib>                       // for EXIT_SUCCESS
 #include <eigen3/Eigen/Dense>            // for Matrix, DenseCoeffsBase
@@ -128,7 +129,7 @@ void Optimize(SharedData &shared_data) {
 //  std::vector<double> x(2);
 //  x[0] = 1.234; x[1] = 5.678;
 
-  double minf;
+  double minf{};
   try{
     fprintf(stderr, "starting optimization\n");
     optimizer.optimize(x, minf);
@@ -160,8 +161,8 @@ int run_it() {
   std::chrono::time_point t_last = t_start;
   while (!window.ShouldClose()) {
     // Send keypress events to visualization to update state.
-    while (!window.window_state_->KeypressQueueEmpty()) {
-      visualization.HandleKeyPress(window.window_state_->PopKeypressQueue());
+    while (!window.GetWindowState()->KeypressQueueEmpty()) {
+      visualization.HandleKeyPress(window.GetWindowState()->PopKeypressQueue());
     }
 
     // drain the queue
@@ -171,7 +172,7 @@ int run_it() {
       while (shared_data.dvs_queue.size() > 1) {
         shared_data.dvs_queue.pop();
       }
-      if (shared_data.dvs_queue.size() > 0) {
+      if (!shared_data.dvs_queue.empty()) {
         dvs = shared_data.dvs_queue.front();
         shared_data.dvs_queue.pop();
       }
@@ -186,6 +187,7 @@ int run_it() {
 
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate transformation
@@ -200,7 +202,7 @@ int run_it() {
     (void)model;
 
     // Camera transformation
-    glm::mat4 view = window.window_state_->GetViewTransformation();
+    glm::mat4 view = window.GetWindowState()->GetViewTransformation();
 
     // projection transformation
     glm::mat4 proj = window.GetProjectionTransformation();
@@ -208,20 +210,20 @@ int run_it() {
     visualization.Draw(view, proj);
 
     // draw axes if we're dragging or rotating
-    if (window.window_state_->IsDraggingOrRotating()) {
-      axes.Update(AxesLines(window.window_state_->GetCamera()));
+    if (window.GetWindowState()->IsDraggingOrRotating()) {
+      axes.Update(AxesLines(window.GetWindowState()->GetCamera()));
       axes.Draw(view, proj, GL_LINE_STRIP);
     }
 
     // Draw some dummy text.
-    char fps_string[80]; // NOLINT
-    sprintf(fps_string, "%.1f fps", 1 / frame_time);
+    std::string fps_string(80, '\0');
+    sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
     const bb3d::Window::Size window_size = window.GetSize();
-    textbox.RenderText(window, std::string(fps_string), 25.0f, (float)window_size.height-25.0f, glm::vec3(1, 1, 1));
+    textbox.RenderText(window, fps_string, 25.0f, (float)window_size.height-25.0f, glm::vec3(1, 1, 1));
 
     // Swap buffers and poll events
     window.SwapBuffers();
-    window.PollEvents();
+    bb3d::Window::PollEvents();
   }
 
   return EXIT_SUCCESS;

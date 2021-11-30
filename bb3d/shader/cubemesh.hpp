@@ -15,12 +15,12 @@ struct Cubemesh {
 
   void Draw(const glm::mat4 &view, const glm::mat4 &proj);
   void Update(const Eigen::Matrix<std::pair<float, glm::vec3>, Eigen::Dynamic, Eigen::Dynamic> &grid,
-              const float min_x, const float max_x,
-              const float min_y, const float max_y);
+              float min_x, float max_x,
+              float min_y, float max_y);
   template <int NU, int NV>
   void Update(const Eigen::Matrix<std::pair<float, glm::vec3>, NU, NV> &mat,
-              const float min_x, const float max_x,
-              const float min_y, const float max_y) {
+              float min_x, float max_x,
+              float min_y, float max_y) {
     Eigen::Matrix<std::pair<float, glm::vec3>, Eigen::Dynamic, Eigen::Dynamic> dynamic_mat(NU, NV);
     for (int ku=0; ku<NU; ku++) {
       for (int kv=0; kv<NV; kv++) {
@@ -32,9 +32,9 @@ struct Cubemesh {
 
 private:
   Shader shader_;
-  GLuint vao_;
-  GLuint vbo_;
-  GLuint ebo_;
+  GLuint vao_{};
+  GLuint vbo_{};
+  GLuint ebo_{};
   int num_indices_;
   GLint vertex_buffer_size_ = 0;
   GLint index_buffer_size_ = 0;

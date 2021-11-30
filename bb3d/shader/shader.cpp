@@ -23,13 +23,13 @@ static inline std::string ReadFile(const std::string &path) {
   return shader_stream.str();
 }
 
-static void CheckCompileErrors(GLuint shader, std::string type) {
-  GLint success;
-  GLchar infoLog[1024];  // NOLINT
+static void CheckCompileErrors(GLuint shader, const std::string& type) {
+  GLint success = 0;
+  std::string infoLog(1024, '\0');
   if(type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-      glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
+    if (success == 0) {
+      glGetShaderInfoLog(shader, static_cast<GLsizei>(infoLog.size()), nullptr, infoLog.data());
       std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
@@ -37,8 +37,8 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
-    if(!success) {
-      glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
+    if(success == 0) {
+      glGetProgramInfoLog(shader, static_cast<GLsizei>(infoLog.size()), nullptr, infoLog.data());
       std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
@@ -49,9 +49,9 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
 
 // constructor generates the shader on the fly
 // ------------------------------------------------------------------------
-Shader::Shader(const std::string vshader_path,
-               const std::string fshader_path,
-               const std::string gshader_path) {
+Shader::Shader(const std::string &vshader_path,
+               const std::string &fshader_path,
+               const std::string &gshader_path) {
   // vertex shader
   const GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
   std::string vshader_code = ReadFile(vshader_path);
@@ -104,7 +104,7 @@ Shader::~Shader() {
 
 // activate the shader
 // ------------------------------------------------------------------------
-void Shader::UseProgram() {
+void Shader::UseProgram() const {
   glUseProgram(program_id_);
 }
 
@@ -113,7 +113,7 @@ void Shader::VertexAttribPointer(const char *name,
                                  GLenum type,
                                  GLboolean normalized,
                                  GLsizei stride,
-                                 const void * pointer) {
+                                 const void * pointer) const {
   glVertexAttribPointer(glGetAttribLocation(program_id_, name),
                         size,
                         type,
@@ -149,7 +149,7 @@ void Shader::Uniform3f(const char *name, float x, float y, float z) const {
 void Shader::Uniform4fv(const char *name, const glm::vec4 &value) const {
   glUniform4fv(glGetUniformLocation(program_id_, name), 1, glm::value_ptr(value));
 }
-void Shader::Uniform4f(const char *name, float x, float y, float z, float w) {
+void Shader::Uniform4f(const char *name, float x, float y, float z, float w) const {
   glUniform4f(glGetUniformLocation(program_id_, name), x, y, z, w);
 }
 // ------------------------------------------------------------------------

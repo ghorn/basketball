@@ -27,19 +27,19 @@ namespace bb3d {
   public:
     WindowState()= default;;
     ~WindowState()= default;;
-    bool KeypressQueueEmpty();
+    [[nodiscard]] bool KeypressQueueEmpty() const;
     int PopKeypressQueue();
     std::queue<int> keypress_queue; // to hand to user
-    const Camera &GetCamera(); // TODO(greg): delete me
+    [[nodiscard]] const Camera &GetCamera() const; // TODO(greg): delete me
     Camera camera;
-    bool IsDraggingOrRotating();
+    [[nodiscard]] bool IsDraggingOrRotating() const;
     [[nodiscard]] glm::mat4 GetViewTransformation() const;
-    MouseHandler mouse_handler;
+    MouseHandler mouse_handler{};
   };
 
   class Window {
   public:
-    Window(std::unique_ptr<WindowState> vis);
+    explicit Window(std::unique_ptr<WindowState> window_state);
     ~Window();
     struct Size {
       int width;
@@ -51,10 +51,11 @@ namespace bb3d {
     [[nodiscard]] glm::mat4 GetProjectionTransformation() const;
     [[nodiscard]] glm::mat4 GetOrthographicProjection() const;
     void SwapBuffers();
-    void PollEvents();
-    std::unique_ptr<WindowState> window_state_;
+    static void PollEvents();
+    std::unique_ptr<WindowState> &GetWindowState() {return window_state_;};
   private:
     GLFWwindow* glfw_window;
+    std::unique_ptr<WindowState> window_state_;
   };
 
 }; // namespace bb3d

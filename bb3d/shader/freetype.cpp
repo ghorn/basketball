@@ -18,9 +18,9 @@
 Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/shader/freetype.fs") {
   // FreeType
   // --------
-  FT_Library ft;
+  FT_Library ft = nullptr;
   // All functions return a value different than 0 whenever an error occurred
-  if (FT_Init_FreeType(&ft)) {
+  if (FT_Init_FreeType(&ft) != 0) {
     std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
     exit_thread_safe(EXIT_FAILURE);
   }
@@ -30,8 +30,8 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
   //std::string font_path = "/usr/share/fonts/truetype/freefont/FreeMono.ttf";
   std::string font_path = "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf";
   //std::string font_path = "/usr/share/fonts/truetype/freefont/FreeSerif.ttf";
-  FT_Face face;
-  if (FT_New_Face(ft, font_path.c_str(), 0, &face)) {
+  FT_Face face = nullptr;
+  if (FT_New_Face(ft, font_path.c_str(), 0, &face) != 0) {
     std::cerr << "ERROR::FREETYPE: Failed to load '" << font_path << "'." << std::endl;
     exit_thread_safe(EXIT_FAILURE);
   }
@@ -44,12 +44,13 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
   // load first 128 characters of ASCII set
   for (unsigned char c = 0; c < 128; c++) {
     // Load character glyph
-    if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
+    if (FT_Load_Char(face, c, FT_LOAD_RENDER) != 0) {
       std::cerr << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
       continue;
     }
     // generate texture
-    unsigned int texture;
+    unsigned int texture = 0;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(
@@ -100,7 +101,7 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
 
 // render line of text
 // -------------------
-void Freetype::RenderText(const bb3d::Window &window, std::string text, float x, float y, glm::vec3 color) {
+void Freetype::RenderText(const bb3d::Window &window, const std::string& text, float x, float y, glm::vec3 color) {
   const float scale = 1.0f;
 
   // activate corresponding render state
@@ -142,12 +143,13 @@ void Freetype::RenderText(const bb3d::Window &window, std::string text, float x,
     glBindTexture(GL_TEXTURE_2D, ch.TextureID);
     // update content of VBO memory
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &(vertices[0][0])); // be sure to use glBufferSubData and not glBufferData
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // render quad
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
     x += (float)(ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
   }
   glBindVertexArray(0);

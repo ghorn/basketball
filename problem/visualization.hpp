@@ -19,7 +19,7 @@
 #include "problem/shot.hpp"       // for Bounce, Sample, Shot
 
 template <typename T>
-std::vector<std::vector<T> > SingletonVector(const std::vector<T> xs) {
+std::vector<std::vector<T> > SingletonVector(std::vector<T> xs) {
   std::vector<std::vector<T> > ret;
   ret.push_back(xs);
   return ret;
@@ -145,7 +145,7 @@ public:
     control_points_vis_.Update(SingletonVector(control_point_vec));
   }
 
-  void HandleKeyPress(const int key);
+  void HandleKeyPress(int key);
 private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 

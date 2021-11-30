@@ -133,9 +133,9 @@ CubicBSplineSurface(const Eigen::Matrix<glm::dvec3, NX, NY> &ps) {
       for (int kx=0; kx<4; kx++) {
         for (int ky=0; ky<4; ky++) {
           const glm::dvec3 &p = ps(interval_x - 3 + kx, interval_y - 3 + ky);
-          position  +=       cxs[kx]*      cys[ky]*p;
-          tangent_u += deriv_cxs[kx]*      cys[ky]*p;
-          tangent_v +=       cxs[kx]*deriv_cys[ky]*p;
+          position  +=       cxs[kx]*      cys[ky]*p; //NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+          tangent_u += deriv_cxs[kx]*      cys[ky]*p; //NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+          tangent_v +=       cxs[kx]*deriv_cys[ky]*p; //NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
       }
       position.x /= 36;

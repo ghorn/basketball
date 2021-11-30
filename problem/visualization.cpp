@@ -9,7 +9,7 @@
 #include "bb3d/shader/lines.hpp"     // for Lines
 
 ProblemVisualization::ProblemVisualization() : backboard_vis_("image/awesomeface.png"), court_vis_("image/warriors_court.png") {
-  control_points_vis_.point_size_ = 3;
+  control_points_vis_.SetPointSize(3);
 
   Eigen::Matrix<glm::vec3, 2, 2> court = CourtCorners();
   court_vis_.Update(court);
@@ -60,7 +60,7 @@ void ProblemVisualization::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   }
 }
 
-static void DescribeState(std::string name, bool state) {
+static void DescribeState(const std::string& name, bool state) {
   std::cerr << name << " drawing ";
   if (state) {
     std::cerr << "enabled";

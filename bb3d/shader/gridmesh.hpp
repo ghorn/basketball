@@ -10,7 +10,7 @@
 #include "bb3d/shader/shader.hpp"   // for Shader
 
 struct Gridmesh {
-  Gridmesh(const std::string &image_path);
+  explicit Gridmesh(const std::string &image_path);
   ~Gridmesh();
 
   void Update(const Eigen::Matrix<glm::vec3, Eigen::Dynamic, Eigen::Dynamic> &grid);
@@ -28,10 +28,10 @@ struct Gridmesh {
 
 private:
   Shader shader_;
-  GLuint vao_;
-  GLuint vbo_;
-  GLuint ebo_;
-  GLuint texture_;
+  GLuint vao_{};
+  GLuint vbo_{};
+  GLuint ebo_{};
+  GLuint texture_{};
   int num_indices_;
   GLint vertex_buffer_size_ = 0;
   GLint index_buffer_size_ = 0;

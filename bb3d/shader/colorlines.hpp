@@ -18,15 +18,15 @@ struct ColorLines {
 public:
   ColorLines();
   ~ColorLines() = default;
-  void Update(const std::vector<std::vector<ColoredVec3> > &vertices);
-  void Draw(const glm::mat4 &view, const glm::mat4 &proj, const GLenum mode);
-
+  void Update(const std::vector<std::vector<ColoredVec3> > &segments);
+  void Draw(const glm::mat4 &view, const glm::mat4 &proj, GLenum mode);
+  void SetPointSize(float point_size){point_size_ = point_size;};
+private:
   float point_size_ = 1;
 
-private:
   Shader shader_;
-  GLuint vao_;
-  GLuint vbo_;
+  GLuint vao_{};
+  GLuint vbo_{};
   GLint current_buffer_size_;
   std::vector<GLint> segment_sizes_;
 };

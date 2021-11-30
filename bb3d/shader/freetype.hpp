@@ -10,13 +10,13 @@
 
 class Freetype {
 public:
-  Freetype(int font_size);
+  explicit Freetype(int font_size);
   ~Freetype() = default;
-  void RenderText(const bb3d::Window &window, std::string text, float x, float y, glm::vec3 color);
+  void RenderText(const bb3d::Window &window, const std::string& text, float x, float y, glm::vec3 color);
 private:
   Shader shader_;
-  GLuint vao_;
-  GLuint vbo_;
+  GLuint vao_{};
+  GLuint vbo_{};
 
   // Holds all state information relevant to a character as loaded using FreeType
   struct Character {

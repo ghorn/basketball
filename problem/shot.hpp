@@ -36,8 +36,8 @@ public:
     vy_ = (bounce_point_.y - shot_point_.y) / bounce_time_;
   }
 
-  glm::dvec3 shot_point_;
-  glm::dvec3 bounce_point_;
+  glm::dvec3 shot_point_{};
+  glm::dvec3 bounce_point_{};
   double vz_bounce_;
   double vz_shot_;
   double vx_;
@@ -50,7 +50,7 @@ public:
     ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * bounce_time_ / (N - 1);
-      ColoredVec3 v;
+      ColoredVec3 v{};
       v.position.x = static_cast<float>(shot_point_.x + vx_ * t);
       v.position.y = static_cast<float>(shot_point_.y + vy_ * t);
       v.position.z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5*g_accel*t*t);
@@ -98,9 +98,9 @@ public:
   }
   bool lower_than_hoop_;
   glm::dvec3 bounce_point_;
-  glm::dvec3 outgoing_velocity_;
+  glm::dvec3 outgoing_velocity_{};
   double land_time_;
-  glm::dvec3 landing_point_;
+  glm::dvec3 landing_point_{};
 
   [[nodiscard]] double XYDistanceFromHoop() const {
     glm::dvec3 rim_center = Hoop::RimCenter();
@@ -117,7 +117,7 @@ public:
     ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * land_time_ / (N - 1);
-      ColoredVec3 v;
+      ColoredVec3 v{};
       v.position.x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
       v.position.y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
       v.position.z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);
@@ -137,5 +137,5 @@ public:
   }
   Shot shot_;
   Bounce bounce_;
-  double objective;
+  double objective{};
 };

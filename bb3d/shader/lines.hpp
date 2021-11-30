@@ -13,15 +13,15 @@ class Lines {
 public:
   Lines();
   ~Lines() = default;
-  void Update(const std::vector<std::vector<glm::vec3> > &vertices);
-  void Draw(const glm::mat4 &view, const glm::mat4 &proj, const glm::vec4 &color, const GLenum mode);
-
+  void Update(const std::vector<std::vector<glm::vec3> > &segments);
+  void Draw(const glm::mat4 &view, const glm::mat4 &proj, const glm::vec4 &color, GLenum mode);
+  void SetPointSize(float point_size){point_size_ = point_size;};
+private:
   float point_size_ = 1;
 
-private:
   Shader shader_;
-  GLuint vao_;
-  GLuint vbo_;
+  GLuint vao_{};
+  GLuint vbo_{};
   std::vector<GLint> segment_sizes_;
   GLint current_buffer_size_;
 };
