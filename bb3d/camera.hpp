@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+namespace bb3d {
+  
 class Camera {
 public:
   [[nodiscard]] glm::vec3 Eye() const;
@@ -17,3 +19,5 @@ private:
   float elevation_deg_ = 30;
   float distance_ = 10;
 };
+
+};  // namespace bb3d

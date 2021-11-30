@@ -9,6 +9,8 @@
 
 #include "bb3d/shader/shader.hpp"   // for Shader
 
+namespace bb3d {
+
 struct Cubemesh {
   Cubemesh();
   ~Cubemesh();
@@ -39,3 +41,5 @@ private:
   GLint vertex_buffer_size_ = 0;
   GLint index_buffer_size_ = 0;
 };
+
+};  // namespace bb3d

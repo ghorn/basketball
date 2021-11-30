@@ -9,6 +9,8 @@
 
 #include "bb3d/shader/shader.hpp"
 
+namespace bb3d {
+
 struct ColoredVec3 {
   glm::vec3 position;
   glm::vec4 color;
@@ -31,3 +33,4 @@ private:
   std::vector<GLint> segment_sizes_;
 };
 
+};  // namespace bb3d

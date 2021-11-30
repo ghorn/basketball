@@ -7,6 +7,8 @@
 
 #include "bb3d/assert.hpp"
 
+namespace bb3d {
+
 GLenum GlCheckError_(const char *file, int line) {
   GLenum errorCode = 0;
   while ((errorCode = glGetError()) != GL_NO_ERROR)
@@ -81,3 +83,5 @@ void GlDebugOutput(GLenum source,
   std::cerr << boost::stacktrace::stacktrace();
   exit_thread_safe(EXIT_FAILURE);
 }
+
+};  // namespace bb3d

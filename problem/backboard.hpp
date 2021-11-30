@@ -19,9 +19,9 @@ public:
     Eigen::Matrix<glm::dvec3, NX, NY> control_points;
 
     for (int ku=0; ku<NX; ku++) {
-      const double su = ku / (double)(NX - 1); // 0 to 1
+      const double su = ku / static_cast<double>(NX - 1); // 0 to 1
       for (int kv=0; kv<NY; kv++) {
-        const double sv = kv / (double)(NY - 1); // 0 to 1
+        const double sv = kv / static_cast<double>(NY - 1); // 0 to 1
 
         const double su_ = 2*su - 1; // -1 to 1
         const double sv_ = 2*sv - 1; // -1 to 1

@@ -11,6 +11,8 @@
 
 #include "bb3d/assert.hpp"
 
+namespace bb3d {
+
 static inline std::string ReadFile(const std::string &path) {
   std::ifstream file(path, std::ifstream::in);
   if (!file) {
@@ -164,3 +166,5 @@ void Shader::UniformMatrix3fv(const char *name, const glm::mat3 &value) const {
 void Shader::UniformMatrix4fv(const char *name, const glm::mat4 &value) const {
   glUniformMatrix4fv(glGetUniformLocation(program_id_, name), 1, GL_FALSE, glm::value_ptr(value));
 }
+
+};  // namespace bb3d

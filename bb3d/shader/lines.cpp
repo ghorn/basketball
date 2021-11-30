@@ -4,6 +4,8 @@
 #include <string>     // for string
 
 
+namespace bb3d {
+  
 Lines::Lines() : shader_("bb3d/shader/lines.vs", "bb3d/shader/lines.fs") {
   current_buffer_size_ = 0;
 
@@ -94,3 +96,5 @@ void Lines::Update(const std::vector<std::vector<glm::vec3> > &segments) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   //glBindVertexArray(0);
 }
+
+};  // namespace bb3d

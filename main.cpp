@@ -28,7 +28,7 @@
 #include "problem/problem.hpp"           // for Problem
 #include "problem/visualization.hpp"     // for ProblemVisualization
 
-static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
+static std::vector<std::vector<bb3d::ColoredVec3> > AxesLines(const bb3d::Camera &camera) {
   constexpr glm::vec4 red   = {1, 0, 0, 1};
   constexpr glm::vec4 green = {0, 1, 0, 1};
   constexpr glm::vec4 blue  = {0, 0, 1, 1};
@@ -40,7 +40,7 @@ static std::vector<std::vector<ColoredVec3> > AxesLines(const Camera &camera) {
   const glm::vec3 y = {    0, scale,     0};
   const glm::vec3 z = {    0,     0, scale};
 
-  std::vector<std::vector<ColoredVec3> > segments;
+  std::vector<std::vector<bb3d::ColoredVec3> > segments;
   segments.push_back({{focus_pos,   red}, {focus_pos + x,   red}});
   segments.push_back({{focus_pos, green}, {focus_pos + y, green}});
   segments.push_back({{focus_pos,  blue}, {focus_pos + z,  blue}});
@@ -153,9 +153,9 @@ int run_it() {
   SharedData shared_data;
   std::thread thread_object([&shared_data]() {Optimize(shared_data);});
 
-  ColorLines axes;
+  bb3d::ColorLines axes;
 
-  Freetype textbox(18);
+  bb3d::Freetype textbox(18);
 
   const std::chrono::time_point t_start = std::chrono::high_resolution_clock::now();
   std::chrono::time_point t_last = t_start;

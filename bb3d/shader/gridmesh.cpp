@@ -9,6 +9,8 @@
 
 #include "bb3d/assert.hpp"          // for ASSERT
 
+namespace bb3d {
+
 Gridmesh::Gridmesh(const std::string &image_path) :
   shader_("bb3d/shader/gridmesh.vs", "bb3d/shader/gridmesh.fs")
 {
@@ -173,3 +175,5 @@ Gridmesh::~Gridmesh() {
   glDeleteBuffers(1, &vbo_);
   glDeleteBuffers(1, &ebo_);
 }
+
+};  // namespace bb3d

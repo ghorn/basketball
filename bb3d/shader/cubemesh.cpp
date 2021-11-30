@@ -7,6 +7,8 @@
 
 #include "bb3d/assert.hpp"          // for ASSERT
 
+namespace bb3d {
+
 Cubemesh::Cubemesh() : shader_("bb3d/shader/cubemesh.vs", "bb3d/shader/cubemesh.fs") {
   num_indices_ = 0;
   vertex_buffer_size_ = 0;
@@ -180,3 +182,5 @@ Cubemesh::~Cubemesh() {
   glDeleteBuffers(1, &vbo_);
   glDeleteBuffers(1, &ebo_);
 }
+
+};  // namespace bb3d

@@ -3,6 +3,7 @@
 #include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
 #include <string>     // for string
 
+namespace bb3d {
 
 ColorLines::ColorLines() : shader_("bb3d/shader/colorlines.vs", "bb3d/shader/colorlines.fs") {
   point_size_ = 1;
@@ -96,3 +97,5 @@ void ColorLines::Update(const std::vector<std::vector<ColoredVec3> > &segments) 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   //glBindVertexArray(0);
 }
+
+};  // namespace bb3d

@@ -44,13 +44,13 @@ public:
   double vy_;
   double bounce_time_;
 
-  [[nodiscard]] std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+  [[nodiscard]] std::vector<bb3d::ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
-    std::vector<ColoredVec3> ret;
+    std::vector<bb3d::ColoredVec3> ret;
     ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * bounce_time_ / (N - 1);
-      ColoredVec3 v{};
+      bb3d::ColoredVec3 v{};
       v.position.x = static_cast<float>(shot_point_.x + vx_ * t);
       v.position.y = static_cast<float>(shot_point_.y + vy_ * t);
       v.position.z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5*g_accel*t*t);
@@ -111,13 +111,13 @@ public:
     return sqrt(delta.x*delta.x + delta.y*delta.y);
   }
 
-  [[nodiscard]] std::vector<ColoredVec3> DrawArc(const glm::vec4 &color) const {
+  [[nodiscard]] std::vector<bb3d::ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
-    std::vector<ColoredVec3> ret;
+    std::vector<bb3d::ColoredVec3> ret;
     ret.reserve(N);
     for (int k=0; k<N; k++) {
       const double t = k * land_time_ / (N - 1);
-      ColoredVec3 v{};
+      bb3d::ColoredVec3 v{};
       v.position.x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
       v.position.y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
       v.position.z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);

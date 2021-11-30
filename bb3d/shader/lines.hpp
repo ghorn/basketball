@@ -9,6 +9,8 @@
 
 #include "bb3d/shader/shader.hpp"
 
+namespace bb3d {
+
 class Lines {
 public:
   Lines();
@@ -25,3 +27,6 @@ private:
   std::vector<GLint> segment_sizes_;
   GLint current_buffer_size_;
 };
+
+};  // namespace bb3d
+  

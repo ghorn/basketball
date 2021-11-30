@@ -8,6 +8,8 @@
 #include "bb3d/opengl_context.hpp" // Window
 #include "bb3d/shader/shader.hpp"        // for GLFWwindow, Shader
 
+namespace bb3d {
+
 class Freetype {
 public:
   explicit Freetype(int font_size);
@@ -28,3 +30,5 @@ private:
 
   std::map<GLchar, Character> characters_;
 };
+
+};  // namespace bb3d

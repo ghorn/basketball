@@ -39,8 +39,8 @@ public:
 
     // shots
     // ------------------------------------------------------
-    std::vector<std::vector<ColoredVec3> > shot_lines;
-    std::vector<std::vector<ColoredVec3> > bounce_lines;
+    std::vector<std::vector<bb3d::ColoredVec3> > shot_lines;
+    std::vector<std::vector<bb3d::ColoredVec3> > bounce_lines;
     // histogram range
     auto min_x = static_cast<float>(samples[0].bounce_.landing_point_.x);
     auto max_x = static_cast<float>(samples[0].bounce_.landing_point_.x);
@@ -67,8 +67,8 @@ public:
       float g = 1 - r;
       glm::vec4 bounce_color = {r, g, 0, 0.6};
       glm::vec4 shot_color = {r, g, 0, 0.4};
-      const std::vector<ColoredVec3> shot_arc = shot.DrawArc(shot_color);
-      const std::vector<ColoredVec3> bounce_arc = bounce.DrawArc(bounce_color);
+      const std::vector<bb3d::ColoredVec3> shot_arc = shot.DrawArc(shot_color);
+      const std::vector<bb3d::ColoredVec3> bounce_arc = bounce.DrawArc(bounce_color);
       shot_lines.push_back(shot_arc);
       bounce_lines.push_back(bounce_arc);
     }
@@ -158,13 +158,13 @@ private:
   bool histogram_on_ = true;
   bool wireframe_on_ = false;
 
-  Gridmesh backboard_vis_;
-  Lines rim_vis_;
-  Gridmesh court_vis_;
-  Lines backboard_tangents_vis_;
-  Lines backboard_normals_vis_;
-  ColorLines shot_lines_vis_;
-  ColorLines bounce_lines_vis_;
-  Lines control_points_vis_;
-  Cubemesh histogram_vis_;
+  bb3d::Gridmesh backboard_vis_;
+  bb3d::Lines rim_vis_;
+  bb3d::Gridmesh court_vis_;
+  bb3d::Lines backboard_tangents_vis_;
+  bb3d::Lines backboard_normals_vis_;
+  bb3d::ColorLines shot_lines_vis_;
+  bb3d::ColorLines bounce_lines_vis_;
+  bb3d::Lines control_points_vis_;
+  bb3d::Cubemesh histogram_vis_;
 };

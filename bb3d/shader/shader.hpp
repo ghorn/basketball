@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>                  // for mat4, vec3, vec4
 #include <string>                       // for string
 
+namespace bb3d {
+
 class Shader {
 public:
   // constructor generates the shader on the fly
@@ -39,3 +41,5 @@ public:
 private:
   GLuint program_id_;
 };
+
+};  // namespace bb3d

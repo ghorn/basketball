@@ -15,6 +15,8 @@
 #include "bb3d/assert.hpp"
 #include "bb3d/shader/shader.hpp"             // for Shader, glfwGetWindowSize, GLFWwindow
 
+namespace bb3d {
+
 Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/shader/freetype.fs") {
   // FreeType
   // --------
@@ -155,3 +157,5 @@ void Freetype::RenderText(const bb3d::Window &window, const std::string& text, f
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+};  // namespace bb3d

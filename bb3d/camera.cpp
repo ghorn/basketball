@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstdio>
 
+namespace bb3d {
+
 glm::vec3 Camera::Eye() const {
   const float elevation = elevation_deg_ * static_cast<float>(M_PI) / 180.F;
   const float azimuth = azimuth_deg_ * static_cast<float>(M_PI) / 180.F;
@@ -62,3 +64,5 @@ void Camera::Scroll(const float scroll_amount) {
             static_cast<double>(scroll_amount));
   }
 }
+
+};  // namespace bb3d
