@@ -51,7 +51,8 @@ Gridmesh::Gridmesh(const std::string &image_path) :
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // Load from file
-  int image_width, image_height;
+  int image_width = 0;
+  int image_height = 0;
   unsigned char* image = SOIL_load_image(image_path.c_str(),
                                          &image_width, &image_height, 0, SOIL_LOAD_RGBA);
   if (image == nullptr) {

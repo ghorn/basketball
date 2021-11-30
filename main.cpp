@@ -140,8 +140,7 @@ void Optimize(SharedData &shared_data) {
   }
 }
 
-int main(int argc __attribute__((unused)),
-         char * argv[] __attribute__((unused))) {
+int run_it() {
   // Boilerplate
   bb3d::Window window(std::make_unique<bb3d::WindowState>(bb3d::WindowState()));
 
@@ -226,4 +225,13 @@ int main(int argc __attribute__((unused)),
   }
 
   return EXIT_SUCCESS;
+}
+
+int main(int argc __attribute__((unused)),
+         char * argv[] __attribute__((unused))) {
+  try {
+    run_it();
+  } catch (const std::exception &e) {
+    std::cerr << e.what();
+  }
 }
