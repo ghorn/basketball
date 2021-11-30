@@ -1,11 +1,12 @@
 #include "cubemesh.hpp"
 
-#include <GL/glew.h>           // for GLuint, GL_ARRAY_BUFFER, GLint, glBindBuffer, glDisable
+#include <GL/glew.h>  // for GLuint, GL_ARRAY_BUFFER, GLint, glBindBuffer, glDisable
+
 #include <ext/alloc_traits.h>  // for __alloc_traits<>::value_type
 #include <string>              // for string
 #include <vector>              // for vector, allocator
 
-#include "bb3d/assert.hpp"          // for ASSERT
+#include "bb3d/assert.hpp"  // for ASSERT
 
 namespace bb3d {
 
@@ -19,7 +20,8 @@ Cubemesh::Cubemesh() : shader_("bb3d/shader/cubemesh.vs", "bb3d/shader/cubemesh.
   glGenVertexArrays(1, &vao_);
   glGenBuffers(1, &vbo_);
   glGenBuffers(1, &ebo_);
-  // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+  // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure
+  // vertex attributes(s).
   glBindVertexArray(vao_);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
@@ -28,22 +30,25 @@ Cubemesh::Cubemesh() : shader_("bb3d/shader/cubemesh.vs", "bb3d/shader/cubemesh.
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
-  shader_.VertexAttribPointer("position",
-                              3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(0*sizeof(GLfloat))); // NOLINT
+  shader_.VertexAttribPointer("position", 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                              (void *)(0 * sizeof(GLfloat)));  // NOLINT
   glEnableVertexAttribArray(0);
 
-  shader_.VertexAttribPointer("color",
-                              3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(GLfloat))); // NOLINT
+  shader_.VertexAttribPointer("color", 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                              (void *)(3 * sizeof(GLfloat)));  // NOLINT
   glEnableVertexAttribArray(1);
 
-  // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-  glBindBuffer(GL_ARRAY_BUFFER, 0); // NOLINT
+  // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex
+  // attribute's bound vertex buffer object so afterwards we can safely unbind
+  glBindBuffer(GL_ARRAY_BUFFER, 0);  // NOLINT
 
-  // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS
+  // stored in the VAO; keep the EBO bound.
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-  // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+  // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but
+  // this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways so we
+  // generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
 }
 
@@ -69,36 +74,35 @@ void Cubemesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
 
 void Cubemesh::Update(
     const Eigen::Matrix<std::pair<float, glm::vec3>, Eigen::Dynamic, Eigen::Dynamic> &grid,
-    const float min_x, const float max_x, const float min_y, const float max_y)
-{
-  const int nx = static_cast<int>(grid.rows()); // readability below
-  const int ny = static_cast<int>(grid.cols()); // readability below
+    const float min_x, const float max_x, const float min_y, const float max_y) {
+  const int nx = static_cast<int>(grid.rows());  // readability below
+  const int ny = static_cast<int>(grid.cols());  // readability below
 
   ASSERT(nx >= 2);
   ASSERT(ny >= 2);
 
   const float dx = 0.5F * (max_x - min_x) / (static_cast<float>(nx) - 1);
   const float dy = 0.5F * (max_y - min_y) / (static_cast<float>(ny) - 1);
-  
+
   // Massage the data.
   std::vector<float> vertices;
-  for (int kx=0; kx<nx; kx++) {
-    const float x = min_x + (max_x - min_x)*static_cast<float>(kx) / static_cast<float>(nx - 1);
-    for (int ky=0; ky<ny; ky++) {
-      const float y = min_y + (max_y - min_y)*static_cast<float>(ky) / static_cast<float>(ny - 1);
+  for (int kx = 0; kx < nx; kx++) {
+    const float x = min_x + (max_x - min_x) * static_cast<float>(kx) / static_cast<float>(nx - 1);
+    for (int ky = 0; ky < ny; ky++) {
+      const float y = min_y + (max_y - min_y) * static_cast<float>(ky) / static_cast<float>(ny - 1);
       const std::pair<float, glm::vec3> zcol = grid(kx, ky);
       const float z = zcol.first;
       const glm::vec3 color = zcol.second;
-      vertices.insert(vertices.end(), {x+dx, y-dy, z, color.r, color.g, color.b});
-      vertices.insert(vertices.end(), {x+dx, y+dy, z, color.r, color.g, color.b});
-      vertices.insert(vertices.end(), {x-dx, y+dy, z, color.r, color.g, color.b});
-      vertices.insert(vertices.end(), {x-dx, y-dy, z, color.r, color.g, color.b});
+      vertices.insert(vertices.end(), {x + dx, y - dy, z, color.r, color.g, color.b});
+      vertices.insert(vertices.end(), {x + dx, y + dy, z, color.r, color.g, color.b});
+      vertices.insert(vertices.end(), {x - dx, y + dy, z, color.r, color.g, color.b});
+      vertices.insert(vertices.end(), {x - dx, y - dy, z, color.r, color.g, color.b});
     }
   }
 
   std::vector<GLuint> indices;
-  for (int kx=0; kx<nx - 1; kx++) {
-    for (int ky=0; ky<ny - 1; ky++) {
+  for (int kx = 0; kx < nx - 1; kx++) {
+    for (int ky = 0; ky < ny - 1; ky++) {
       //
       //     1u  2u
       //   ---------
@@ -112,13 +116,13 @@ void Cubemesh::Update(
       //  |   y
       //  ---->
       //
-      const int i1  = 4 * (kx*ny + ky);
-      const int i2  = i1 + 1;
-      const int i3  = i2 + 1;
-      const int i4  = i3 + 1;
+      const int i1 = 4 * (kx * ny + ky);
+      const int i2 = i1 + 1;
+      const int i3 = i2 + 1;
+      const int i4 = i3 + 1;
       const int i2r = i4 + 1;
       const int i3r = i4 + 4;
-      const int i2u = 4 * ((kx+1)*ny + ky) + 2;
+      const int i2u = 4 * ((kx + 1) * ny + ky) + 2;
       const int i1u = i2u + 1;
       // flat 1
       indices.push_back(i3);
@@ -148,8 +152,8 @@ void Cubemesh::Update(
   }
 
   const auto num_indices = static_cast<GLint>(indices.size());
-  const auto vertex_buffer_size = static_cast<GLint>(sizeof(vertices[0])*vertices.size());
-  const auto index_buffer_size = static_cast<GLint>(sizeof(indices[0])*indices.size());
+  const auto vertex_buffer_size = static_cast<GLint>(sizeof(vertices[0]) * vertices.size());
+  const auto index_buffer_size = static_cast<GLint>(sizeof(indices[0]) * indices.size());
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);

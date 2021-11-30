@@ -1,49 +1,51 @@
-#include <GL/glew.h>                     // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
-#include <bits/exception.h>              // for exception
-#include <chrono>                        // for duration, duration_cast, operator-, high_resolut...
+#include <GL/glew.h>         // for glClear, glClearColor, GL_COLOR_BUFFER_BIT, GL_D...
+#include <bits/exception.h>  // for exception
+#include <sys/types.h>       // for uint
+
+#include <chrono>  // for duration, duration_cast, operator-, high_resolut...
 #include <cmath>
-#include <cstdio>                        // for fprintf, sprintf, stderr
-#include <cstdlib>                       // for EXIT_SUCCESS
-#include <eigen3/Eigen/Dense>            // for Matrix, DenseCoeffsBase
-#include <iostream>                      // for operator<<, basic_ostream, endl, cerr, ostream
-#include <mutex>                         // for mutex, lock_guard
-#include <optional>                      // for optional, nullopt
-#include <queue>                         // for queue
-#include <string>                        // for allocator, char_traits, string
-#include <sys/types.h>                   // for uint
-#include <thread>                        // for sleep_for, thread
-#include <vector>                        // for vector
+#include <cstdio>              // for fprintf, sprintf, stderr
+#include <cstdlib>             // for EXIT_SUCCESS
+#include <eigen3/Eigen/Dense>  // for Matrix, DenseCoeffsBase
+#include <iostream>            // for operator<<, basic_ostream, endl, cerr, ostream
+#include <mutex>               // for mutex, lock_guard
+#include <optional>            // for optional, nullopt
+#include <queue>               // for queue
+#include <string>              // for allocator, char_traits, string
+#include <thread>              // for sleep_for, thread
+#include <vector>              // for vector
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>                  // for glfwDestroyWindow, glfwGetWindowSize, glfwPollEv...
+#include <GLFW/glfw3.h>  // for glfwDestroyWindow, glfwGetWindowSize, glfwPollEv...
+
 #include <glm/glm.hpp>                   // for operator+, vec3, mat4, radians, vec4
 #include <glm/gtc/matrix_transform.hpp>  // for rotate
 #include <nlopt.hpp>                     // for opt, LN_NELDERMEAD
 
-#include "bb3d/assert.hpp"                    // for ASSERT
-#include "bb3d/camera.hpp"                    // for Camera
-#include "bb3d/opengl_context.hpp"            // for GetCamera, GetProjectionTransformation, GetViewT...
-#include "bb3d/shader/colorlines.hpp"         // for ColoredVec3, ColorLines
-#include "bb3d/shader/freetype.hpp"           // for Freetype
-#include "problem/backboard.hpp"         // for Backboard
-#include "problem/problem.hpp"           // for Problem
-#include "problem/visualization.hpp"     // for ProblemVisualization
+#include "bb3d/assert.hpp"             // for ASSERT
+#include "bb3d/camera.hpp"             // for Camera
+#include "bb3d/opengl_context.hpp"     // for GetCamera, GetProjectionTransformation, GetViewT...
+#include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
+#include "bb3d/shader/freetype.hpp"    // for Freetype
+#include "problem/backboard.hpp"       // for Backboard
+#include "problem/problem.hpp"         // for Problem
+#include "problem/visualization.hpp"   // for ProblemVisualization
 
-static std::vector<std::vector<bb3d::ColoredVec3> > AxesLines(const bb3d::Camera &camera) {
-  constexpr glm::vec4 red   = {1, 0, 0, 1};
+static std::vector<std::vector<bb3d::ColoredVec3>> AxesLines(const bb3d::Camera &camera) {
+  constexpr glm::vec4 red = {1, 0, 0, 1};
   constexpr glm::vec4 green = {0, 1, 0, 1};
-  constexpr glm::vec4 blue  = {0, 0, 1, 1};
+  constexpr glm::vec4 blue = {0, 0, 1, 1};
   const glm::vec3 focus_pos = camera.Center();
   const double distance = camera.Distance();
   const double scale = distance * 0.1;
 
-  const glm::vec3 x = {scale,     0,     0};
-  const glm::vec3 y = {    0, scale,     0};
-  const glm::vec3 z = {    0,     0, scale};
+  const glm::vec3 x = {scale, 0, 0};
+  const glm::vec3 y = {0, scale, 0};
+  const glm::vec3 z = {0, 0, scale};
 
-  std::vector<std::vector<bb3d::ColoredVec3> > segments;
-  segments.push_back({{focus_pos,   red}, {focus_pos + x,   red}});
+  std::vector<std::vector<bb3d::ColoredVec3>> segments;
+  segments.push_back({{focus_pos, red}, {focus_pos + x, red}});
   segments.push_back({{focus_pos, green}, {focus_pos + y, green}});
-  segments.push_back({{focus_pos,  blue}, {focus_pos + z,  blue}});
+  segments.push_back({{focus_pos, blue}, {focus_pos + z, blue}});
 
   return segments;
 }
@@ -58,11 +60,11 @@ constexpr int NU_OBJ = 14;
 constexpr int NV_OBJ = 8;
 
 Eigen::Matrix<double, NX, NY> Vec2Dvs(const std::vector<double> &vec) {
-  ASSERT(NX*NY == vec.size());
+  ASSERT(NX * NY == vec.size());
   Eigen::Matrix<double, NX, NY> mat;
   int k = 0;
-  for (int kx=0; kx<NX; kx++) {
-    for (int ky=0; ky<NY; ky++) {
+  for (int kx = 0; kx < NX; kx++) {
+    for (int ky = 0; ky < NY; ky++) {
       mat(kx, ky) = vec[k];
       k++;
     }
@@ -71,9 +73,9 @@ Eigen::Matrix<double, NX, NY> Vec2Dvs(const std::vector<double> &vec) {
 }
 std::vector<double> Dvs2Vec(const Eigen::Matrix<double, NX, NY> &mat) {
   std::vector<double> vec;
-  vec.reserve(NX*NY);
-  for (int kx=0; kx<NX; kx++) {
-    for (int ky=0; ky<NY; ky++) {
+  vec.reserve(NX * NY);
+  for (int kx = 0; kx < NX; kx++) {
+    for (int ky = 0; ky < NY; ky++) {
       vec.push_back(mat(kx, ky));
     }
   }
@@ -81,14 +83,13 @@ std::vector<double> Dvs2Vec(const Eigen::Matrix<double, NX, NY> &mat) {
 }
 
 struct SharedData {
-  std::queue<Eigen::Matrix<double, NX, NY> > dvs_queue;
+  std::queue<Eigen::Matrix<double, NX, NY>> dvs_queue;
   std::mutex queue_mutex;
 };
 
-double Objective(const std::vector<double> &x,
-                 std::vector<double> &grad __attribute__((unused)),
+double Objective(const std::vector<double> &x, std::vector<double> &grad __attribute__((unused)),
                  void *my_func_data) {
-  auto *shared_data = reinterpret_cast<SharedData*>(my_func_data);
+  auto *shared_data = reinterpret_cast<SharedData *>(my_func_data);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(0.01s);
@@ -102,42 +103,42 @@ double Objective(const std::vector<double> &x,
   }
 
   // Now I suppose we could compute the objective.
-  return Problem<NX, NY>::ObjectiveFunction<NU_OBJ, NV_OBJ>(Backboard<NX, NY>::ToControlPoints(dvs));
+  return Problem<NX, NY>::ObjectiveFunction<NU_OBJ, NV_OBJ>(
+      Backboard<NX, NY>::ToControlPoints(dvs));
 }
 
 void Optimize(SharedData &shared_data) {
   std::vector<double> x =
-    Dvs2Vec(Backboard<NX, NY>::FromControlPoints(Backboard<NX, NY>::Initialize()));
+      Dvs2Vec(Backboard<NX, NY>::FromControlPoints(Backboard<NX, NY>::Initialize()));
 
   nlopt::opt optimizer(nlopt::LN_NELDERMEAD, static_cast<uint>(x.size()));
-  //nlopt::opt optimizer(nlopt::LN_SBPLX, static_cast<uint>(x.size()));
+  // nlopt::opt optimizer(nlopt::LN_SBPLX, static_cast<uint>(x.size()));
   optimizer.set_lower_bounds(-10);
   optimizer.set_upper_bounds(2);
 
   std::vector<double> dx0(x.size(), 0.1);
   optimizer.set_initial_step(dx0);
 
-
-  //nlopt_set_xtol_rel(optimizer, 1e-4);
+  // nlopt_set_xtol_rel(optimizer, 1e-4);
   optimizer.set_xtol_rel(1e-4);
 
-  //FunctionData data = {problem, visualization};
+  // FunctionData data = {problem, visualization};
   optimizer.set_min_objective(Objective, &shared_data);
 
-//  opt.add_inequality_constraint(myvconstraint, &data[0], 1e-8);
-//  opt.add_inequality_constraint(myvconstraint, &data[1], 1e-8);
-//  std::vector<double> x(2);
-//  x[0] = 1.234; x[1] = 5.678;
+  //  opt.add_inequality_constraint(myvconstraint, &data[0], 1e-8);
+  //  opt.add_inequality_constraint(myvconstraint, &data[1], 1e-8);
+  //  std::vector<double> x(2);
+  //  x[0] = 1.234; x[1] = 5.678;
 
   double minf{};
-  try{
+  try {
     fprintf(stderr, "starting optimization\n");
     optimizer.optimize(x, minf);
     fprintf(stderr, "found minimum %.12f\n", minf);
-    //return EXIT_SUCCESS;
+    // return EXIT_SUCCESS;
   } catch (std::exception &e) {
     std::cerr << "nlopt failed: " << e.what() << std::endl;
-    //return EXIT_FAILURE;
+    // return EXIT_FAILURE;
   }
 }
 
@@ -151,7 +152,7 @@ int run_it() {
 
   // it's theadn' time
   SharedData shared_data;
-  std::thread thread_object([&shared_data]() {Optimize(shared_data);});
+  std::thread thread_object([&shared_data]() { Optimize(shared_data); });
 
   bb3d::ColorLines axes;
 
@@ -166,7 +167,7 @@ int run_it() {
     }
 
     // drain the queue
-    std::optional<Eigen::Matrix<double, NX, NY> > dvs = std::nullopt;
+    std::optional<Eigen::Matrix<double, NX, NY>> dvs = std::nullopt;
     {
       const std::lock_guard<std::mutex> lock(shared_data.queue_mutex);
       while (shared_data.dvs_queue.size() > 1) {
@@ -178,11 +179,13 @@ int run_it() {
       }
     }
     if (dvs) {
-      visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(Backboard<NX, NY>::ToControlPoints(*dvs));
+      visualization.Update<NU_OBJ, NV_OBJ, NU_VIS, NU_VIS>(
+          Backboard<NX, NY>::ToControlPoints(*dvs));
     }
 
     std::chrono::time_point t_now = std::chrono::high_resolution_clock::now();
-    float frame_time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
+    float frame_time =
+        std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_last).count();
     t_last = t_now;
 
     // Clear the screen to black
@@ -194,11 +197,8 @@ int run_it() {
     float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
     // Model transformation
-    glm::mat4 model = glm::rotate(
-      glm::mat4(1.0F),
-      time * glm::radians(0.1F * 180.0F),
-      glm::vec3(0.0F, 0.0F, 1.0F)
-    );
+    glm::mat4 model = glm::rotate(glm::mat4(1.0F), time * glm::radians(0.1F * 180.0F),
+                                  glm::vec3(0.0F, 0.0F, 1.0F));
     (void)model;
 
     // Camera transformation
@@ -219,7 +219,8 @@ int run_it() {
     std::string fps_string(80, '\0');
     sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
     const bb3d::Window::Size window_size = window.GetSize();
-    textbox.RenderText(window, fps_string, 25.0F, static_cast<float>(window_size.height)-25.0F, glm::vec3(1, 1, 1));
+    textbox.RenderText(window, fps_string, 25.0F, static_cast<float>(window_size.height) - 25.0F,
+                       glm::vec3(1, 1, 1));
 
     // Swap buffers and poll events
     window.SwapBuffers();
@@ -229,8 +230,7 @@ int run_it() {
   return EXIT_SUCCESS;
 }
 
-int main(int argc __attribute__((unused)),
-         char * argv[] __attribute__((unused))) {
+int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused))) {
   try {
     run_it();
   } catch (const std::exception &e) {

@@ -1,20 +1,19 @@
 #pragma once
 
-#include <algorithm>              // for max
-#include <cmath>                  // for sqrt, fabs
-#include <glm/glm.hpp>            // for dvec3, vec<>::(anonymous), vec3, vec4, operator-, reflect
-#include <vector>                 // for vector
+#include <algorithm>    // for max
+#include <cmath>        // for sqrt, fabs
+#include <glm/glm.hpp>  // for dvec3, vec<>::(anonymous), vec3, vec4, operator-, reflect
+#include <vector>       // for vector
 
 #include "bb3d/assert.hpp"             // for ASSERT
 #include "bb3d/shader/colorlines.hpp"  // for ColoredVec3
-#include "problem/hoop.hpp"       // for Hoop, Hoop::kRimHeight
+#include "problem/hoop.hpp"            // for Hoop, Hoop::kRimHeight
 
 const double g_accel = 9.81;
 
 class Shot {
-public:
-  Shot(glm::dvec3 shot_point,
-       glm::dvec3 bounce_point) {
+ public:
+  Shot(glm::dvec3 shot_point, glm::dvec3 bounce_point) {
     shot_point_ = shot_point;
     bounce_point_ = bounce_point;
 
@@ -26,7 +25,7 @@ public:
     ASSERT(pz_shot > pz_bounce);
 
     // v^2 == v0^2 + 2*a*(p - p0)
-    vz_shot_ = - sqrt(vz_bounce_ * vz_bounce_ - 2 * g_accel * (pz_bounce - pz_shot));
+    vz_shot_ = -sqrt(vz_bounce_ * vz_bounce_ - 2 * g_accel * (pz_bounce - pz_shot));
     // v = v0 + a*t
     bounce_time_ = (vz_bounce_ - vz_shot_) / g_accel;
     ASSERT(bounce_time_ > 0);
@@ -48,33 +47,29 @@ public:
     constexpr int N = 128;
     std::vector<bb3d::ColoredVec3> ret;
     ret.reserve(N);
-    for (int k=0; k<N; k++) {
+    for (int k = 0; k < N; k++) {
       const double t = k * bounce_time_ / (N - 1);
       bb3d::ColoredVec3 v{};
       v.position.x = static_cast<float>(shot_point_.x + vx_ * t);
       v.position.y = static_cast<float>(shot_point_.y + vy_ * t);
-      v.position.z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5*g_accel*t*t);
+      v.position.z = static_cast<float>(shot_point_.z + vz_shot_ * t + 0.5 * g_accel * t * t);
       v.color = color;
       ret.push_back(v);
     }
     return ret;
   }
 
-  [[nodiscard]] glm::dvec3 BounceVel() const {
-    return glm::dvec3(vx_, vy_, vz_bounce_);
-  }
+  [[nodiscard]] glm::dvec3 BounceVel() const { return glm::dvec3(vx_, vy_, vz_bounce_); }
 };
 
-
 class Bounce {
-public:
-  Bounce(const glm::dvec3 &bounce_point,
-         const glm::dvec3 &incoming_velocity,
-         const glm::dvec3 &bounce_normal) : bounce_point_(bounce_point) {
-
-    //glm::dvec3 normal = glm::cross(bounce_tangent_v, bounce_tangent_u);
-    //ASSERT(glm::length(normal) > 1e-9);
-    //normal = glm::normalize(normal);
+ public:
+  Bounce(const glm::dvec3 &bounce_point, const glm::dvec3 &incoming_velocity,
+         const glm::dvec3 &bounce_normal)
+      : bounce_point_(bounce_point) {
+    // glm::dvec3 normal = glm::cross(bounce_tangent_v, bounce_tangent_u);
+    // ASSERT(glm::length(normal) > 1e-9);
+    // normal = glm::normalize(normal);
 
     // I - 2.0 * dot(N, I) * N
     outgoing_velocity_ = glm::reflect(incoming_velocity, bounce_normal);
@@ -87,14 +82,13 @@ public:
       pz0 = bounce_point_.z;
     }
     ASSERT(pz0 < 0);
-    land_time_ = (-vz0 + sqrt(vz0*vz0 - 2 * pz0 * g_accel))/ g_accel;
-
+    land_time_ = (-vz0 + sqrt(vz0 * vz0 - 2 * pz0 * g_accel)) / g_accel;
 
     // landing point
     const double &t = land_time_;
     landing_point_.x = bounce_point_.x + outgoing_velocity_.x * t;
     landing_point_.y = bounce_point_.y + outgoing_velocity_.y * t;
-    landing_point_.z = bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t;
+    landing_point_.z = bounce_point_.z + outgoing_velocity_.z * t + 0.5 * g_accel * t * t;
   }
   bool lower_than_hoop_;
   glm::dvec3 bounce_point_;
@@ -108,19 +102,20 @@ public:
 
     ASSERT(fabs(delta.z) < 1e-9);
 
-    return sqrt(delta.x*delta.x + delta.y*delta.y);
+    return sqrt(delta.x * delta.x + delta.y * delta.y);
   }
 
   [[nodiscard]] std::vector<bb3d::ColoredVec3> DrawArc(const glm::vec4 &color) const {
     constexpr int N = 128;
     std::vector<bb3d::ColoredVec3> ret;
     ret.reserve(N);
-    for (int k=0; k<N; k++) {
+    for (int k = 0; k < N; k++) {
       const double t = k * land_time_ / (N - 1);
       bb3d::ColoredVec3 v{};
       v.position.x = static_cast<float>(bounce_point_.x + outgoing_velocity_.x * t);
       v.position.y = static_cast<float>(bounce_point_.y + outgoing_velocity_.y * t);
-      v.position.z = static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5*g_accel*t*t);
+      v.position.z =
+          static_cast<float>(bounce_point_.z + outgoing_velocity_.z * t + 0.5 * g_accel * t * t);
       v.color = color;
       ret.push_back(v);
     }
@@ -129,12 +124,9 @@ public:
 };
 
 class Sample {
-public:
-  Sample(glm::dvec3 shot_point, glm::dvec3 bounce_point, glm::dvec3 normal) :
-    shot_(shot_point, bounce_point),
-    bounce_(shot_.bounce_point_, shot_.BounceVel(), normal)
-  {
-  }
+ public:
+  Sample(glm::dvec3 shot_point, glm::dvec3 bounce_point, glm::dvec3 normal)
+      : shot_(shot_point, bounce_point), bounce_(shot_.bounce_point_, shot_.BounceVel(), normal) {}
   Shot shot_;
   Bounce bounce_;
   double objective{};

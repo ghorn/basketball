@@ -1,13 +1,14 @@
 #include "shader.hpp"
 
-#include <GL/glew.h>             // for glGetUniformLocation, GLuint, GL_FALSE, glAttachShader
-#include <cstdlib>              // for exit, NULL, EXIT_FAILURE
+#include <GL/glew.h>  // for glGetUniformLocation, GLuint, GL_FALSE, glAttachShader
+
+#include <cstdlib>               // for exit, NULL, EXIT_FAILURE
 #include <fstream>               // for operator<<, endl, basic_ostream, ostream, ifstream, basi...
 #include <glm/glm.hpp>           // for mat2, mat3, mat4, vec2, vec3, vec4
 #include <glm/gtc/type_ptr.hpp>  // for value_ptr
 #include <iostream>              // for cerr
 #include <sstream>
-#include <string>                // for string, operator<<, allocator, operator!=, char_traits
+#include <string>  // for string, operator<<, allocator, operator!=, char_traits
 
 #include "bb3d/assert.hpp"
 
@@ -25,10 +26,10 @@ static inline std::string ReadFile(const std::string &path) {
   return shader_stream.str();
 }
 
-static void CheckCompileErrors(GLuint shader, const std::string& type) {
+static void CheckCompileErrors(GLuint shader, const std::string &type) {
   GLint success = 0;
   std::string infoLog(1024, '\0');
-  if(type != "PROGRAM") {
+  if (type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (success == 0) {
       glGetShaderInfoLog(shader, static_cast<GLsizei>(infoLog.size()), nullptr, infoLog.data());
@@ -39,7 +40,7 @@ static void CheckCompileErrors(GLuint shader, const std::string& type) {
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
-    if(success == 0) {
+    if (success == 0) {
       glGetProgramInfoLog(shader, static_cast<GLsizei>(infoLog.size()), nullptr, infoLog.data());
       std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
@@ -51,8 +52,7 @@ static void CheckCompileErrors(GLuint shader, const std::string& type) {
 
 // constructor generates the shader on the fly
 // ------------------------------------------------------------------------
-Shader::Shader(const std::string &vshader_path,
-               const std::string &fshader_path,
+Shader::Shader(const std::string &vshader_path, const std::string &fshader_path,
                const std::string &gshader_path) {
   // vertex shader
   const GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -64,7 +64,8 @@ Shader::Shader(const std::string &vshader_path,
 
   // fragment Shader
   GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-  std::string fshader_code = ReadFile(fshader_path);;
+  std::string fshader_code = ReadFile(fshader_path);
+  ;
   const char *fshader_code_str = fshader_code.c_str();
   glShaderSource(fragment, 1, &fshader_code_str, nullptr);
   glCompileShader(fragment);
@@ -74,7 +75,7 @@ Shader::Shader(const std::string &vshader_path,
   GLuint geometry = 0;
   if (!gshader_path.empty()) {
     const std::string gshader_code = ReadFile(gshader_path);
-    const char * gshader_code_str = gshader_code.c_str();
+    const char *gshader_code_str = gshader_code.c_str();
     geometry = glCreateShader(GL_GEOMETRY_SHADER);
     glShaderSource(geometry, 1, &gshader_code_str, nullptr);
     glCompileShader(geometry);
@@ -99,28 +100,15 @@ Shader::Shader(const std::string &vshader_path,
   }
 }
 
-Shader::~Shader() {
-  glDeleteProgram(program_id_);
-}
-
+Shader::~Shader() { glDeleteProgram(program_id_); }
 
 // activate the shader
 // ------------------------------------------------------------------------
-void Shader::UseProgram() const {
-  glUseProgram(program_id_);
-}
+void Shader::UseProgram() const { glUseProgram(program_id_); }
 
-void Shader::VertexAttribPointer(const char *name,
-                                 GLint size,
-                                 GLenum type,
-                                 GLboolean normalized,
-                                 GLsizei stride,
-                                 const void * pointer) const {
-  glVertexAttribPointer(glGetAttribLocation(program_id_, name),
-                        size,
-                        type,
-                        normalized,
-                        stride,
+void Shader::VertexAttribPointer(const char *name, GLint size, GLenum type, GLboolean normalized,
+                                 GLsizei stride, const void *pointer) const {
+  glVertexAttribPointer(glGetAttribLocation(program_id_, name), size, type, normalized, stride,
                         pointer);
 }
 

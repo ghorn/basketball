@@ -1,11 +1,11 @@
 #include "lines.hpp"
 
 #include <GL/glew.h>  // for GLint, GL_ARRAY_BUFFER, glEnable, glBindBuffer, glBindVertexArray
-#include <string>     // for string
 
+#include <string>  // for string
 
 namespace bb3d {
-  
+
 Lines::Lines() : shader_("bb3d/shader/lines.vs", "bb3d/shader/lines.fs") {
   current_buffer_size_ = 0;
 
@@ -14,33 +14,32 @@ Lines::Lines() : shader_("bb3d/shader/lines.vs", "bb3d/shader/lines.fs") {
   glGenVertexArrays(1, &vao_);
   glGenBuffers(1, &vbo_);
 
-  // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+  // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure
+  // vertex attributes(s).
   glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  glBufferData(GL_ARRAY_BUFFER,
-               current_buffer_size_,
-               nullptr,
-               GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, current_buffer_size_, nullptr, GL_DYNAMIC_DRAW);
 
-  GLint posAttrib = 0; // layout = 0 above
+  GLint posAttrib = 0;  // layout = 0 above
   glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(posAttrib);
 
-  // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+  // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex
+  // attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-  // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+  // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but
+  // this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways so we
+  // generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
 }
 
-void Lines::Draw(const glm::mat4 &view,
-                 const glm::mat4 &proj,
-                 const glm::vec4 &color,
+void Lines::Draw(const glm::mat4 &view, const glm::mat4 &proj, const glm::vec4 &color,
                  const GLenum mode) {
   // draw triangle
   shader_.UseProgram();
-  glBindVertexArray(vao_); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+  glBindVertexArray(vao_);  // seeing as we only have a single VAO there's no need to bind it every
+                            // time, but we'll do so to keep things a bit more organized
 
   // Set up transformations
   shader_.UniformMatrix4fv("view", view);
@@ -63,7 +62,6 @@ void Lines::Draw(const glm::mat4 &view,
   }
 }
 
-
 void Lines::Update(const std::vector<std::vector<glm::vec3> > &segments) {
   // Massage the data.
   // TODO(greg): static assert that std::vector<glm::vec3> is packed and just reinterpret cast
@@ -80,7 +78,7 @@ void Lines::Update(const std::vector<std::vector<glm::vec3> > &segments) {
   }
 
   // bind the buffer
-  //glBindVertexArray(vao_);
+  // glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
   const auto buffer_size = static_cast<GLint>(sizeof(float) * buffer_data.size());
@@ -94,7 +92,7 @@ void Lines::Update(const std::vector<std::vector<glm::vec3> > &segments) {
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  //glBindVertexArray(0);
+  // glBindVertexArray(0);
 }
 
 };  // namespace bb3d

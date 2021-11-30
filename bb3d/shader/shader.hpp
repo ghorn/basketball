@@ -1,30 +1,26 @@
 #pragma once
 
-#include <GL/glew.h>    // for GLboolean, GLenum, GLint, GLsizei, GLuint
+#include <GL/glew.h>  // for GLboolean, GLenum, GLint, GLsizei, GLuint
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>                  // for mat4, vec3, vec4
-#include <string>                       // for string
+
+#include <glm/glm.hpp>  // for mat4, vec3, vec4
+#include <string>       // for string
 
 namespace bb3d {
 
 class Shader {
-public:
+ public:
   // constructor generates the shader on the fly
   // ------------------------------------------------------------------------
-  Shader(const std::string &vshader_path,
-         const std::string &fshader_path,
+  Shader(const std::string &vshader_path, const std::string &fshader_path,
          const std::string &gshader_path = std::string());
   ~Shader();
   // activate the shader
   // ------------------------------------------------------------------------
   void UseProgram() const;
-  void VertexAttribPointer(const char *name,
-                           GLint size,
-                           GLenum type,
-                           GLboolean normalized,
-                           GLsizei stride,
-                           const void * pointer) const;
+  void VertexAttribPointer(const char *name, GLint size, GLenum type, GLboolean normalized,
+                           GLsizei stride, const void *pointer) const;
   // utility uniform functions
   void Uniform1i(const char *name, int value) const;
   void Uniform1f(const char *name, float value) const;
@@ -38,7 +34,7 @@ public:
   void UniformMatrix3fv(const char *name, const glm::mat3 &value) const;
   void UniformMatrix4fv(const char *name, const glm::mat4 &value) const;
 
-private:
+ private:
   GLuint program_id_;
 };
 

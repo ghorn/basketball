@@ -1,22 +1,22 @@
 #pragma once
 
-#include <algorithm>              // for max, min
-#include <eigen3/Eigen/Dense>     // for Matrix, DenseCoeffsBase, DenseBase<>::ConstantReturnType
-#include <glm/glm.hpp>            // for vec3, dvec3, operator*, vec, vec<>::(anonymous), operator+
-#include <memory>                 // for allocator_traits<>::value_type
-#include <utility>                // for pair, make_pair
-#include <vector>                 // for vector
+#include <algorithm>           // for max, min
+#include <eigen3/Eigen/Dense>  // for Matrix, DenseCoeffsBase, DenseBase<>::ConstantReturnType
+#include <glm/glm.hpp>         // for vec3, dvec3, operator*, vec, vec<>::(anonymous), operator+
+#include <memory>              // for allocator_traits<>::value_type
+#include <utility>             // for pair, make_pair
+#include <vector>              // for vector
 
 #include "bb3d/assert.hpp"             // for ASSERT
 #include "bb3d/shader/colorlines.hpp"  // for ColoredVec3, ColorLines
 #include "bb3d/shader/cubemesh.hpp"    // for Cubemesh
 #include "bb3d/shader/gridmesh.hpp"    // for Gridmesh
 #include "bb3d/shader/lines.hpp"       // for Lines
-#include "bspline.hpp"            // for Surface
-#include "problem/backboard.hpp"  // for Backboard
-#include "problem/hoop.hpp"       // for Hoop, Hoop::kRimDiameter
-#include "problem/problem.hpp"    // for Problem
-#include "problem/shot.hpp"       // for Bounce, Sample, Shot
+#include "bspline.hpp"                 // for Surface
+#include "problem/backboard.hpp"       // for Backboard
+#include "problem/hoop.hpp"            // for Hoop, Hoop::kRimDiameter
+#include "problem/problem.hpp"         // for Problem
+#include "problem/shot.hpp"            // for Bounce, Sample, Shot
 
 template <typename T>
 std::vector<std::vector<T> > SingletonVector(std::vector<T> xs) {
@@ -26,16 +26,16 @@ std::vector<std::vector<T> > SingletonVector(std::vector<T> xs) {
 }
 
 class ProblemVisualization {
-public:
+ public:
   ProblemVisualization();
   ~ProblemVisualization() = default;
   void Draw(const glm::mat4 &view, const glm::mat4 &proj);
 
-  template<int NU_OBJ, int NV_OBJ, int NU_VIS, int NV_VIS, int NX, int NY>
+  template <int NU_OBJ, int NV_OBJ, int NU_VIS, int NV_VIS, int NX, int NY>
   void Update(const Eigen::Matrix<glm::dvec3, NX, NY> &control_points) {
     // shot and bounce lines
     const std::vector<Sample> samples =
-      Problem<NX, NY>::template ComputeShots<NU_OBJ, NV_OBJ>(control_points);
+        Problem<NX, NY>::template ComputeShots<NU_OBJ, NV_OBJ>(control_points);
 
     // shots
     // ------------------------------------------------------
@@ -57,7 +57,7 @@ public:
 
       // Color shot by how close it is to going in.
       double dist = bounce.XYDistanceFromHoop();
-      auto r = static_cast<float>(dist/Hoop::kRimDiameter);
+      auto r = static_cast<float>(dist / Hoop::kRimDiameter);
       if (r < 0) {
         r = 0;
       }
@@ -82,8 +82,10 @@ public:
     int max_count = 0;
     for (const Sample &sample : samples) {
       const glm::vec3 &landing_point = sample.bounce_.landing_point_;
-      int kx = static_cast<int>(0.5 + float(nx_hist - 1) * (landing_point.x - min_x) / (max_x - min_x));
-      int ky = static_cast<int>(0.5 + float(ny_hist - 1) * (landing_point.y - min_y) / (max_y - min_y));
+      int kx =
+          static_cast<int>(0.5 + float(nx_hist - 1) * (landing_point.x - min_x) / (max_x - min_x));
+      int ky =
+          static_cast<int>(0.5 + float(ny_hist - 1) * (landing_point.y - min_y) / (max_y - min_y));
       ASSERT(kx >= 0);
       ASSERT(kx < nx_hist);
       ASSERT(ky >= 0);
@@ -96,11 +98,11 @@ public:
     const float min_z = -1.F;
     const glm::vec3 warm = {0.5, 0.7, 0};
     const glm::vec3 cold = {0, 0.4, 1};
-    for (int kx=0; kx<nx_hist; kx++) {
-      for (int ky=0; ky<ny_hist; ky++) {
+    for (int kx = 0; kx < nx_hist; kx++) {
+      for (int ky = 0; ky < ny_hist; ky++) {
         const float z = static_cast<float>(histogram(kx, ky)) / static_cast<float>(max_count);
         const glm::vec3 col = z * warm + (1 - z) * cold;
-        histogram_float(kx, ky) = std::make_pair(min_z + z*(max_z - min_z), col);
+        histogram_float(kx, ky) = std::make_pair(min_z + z * (max_z - min_z), col);
       }
     }
     histogram_vis_.Update(histogram_float, min_x, max_x, min_y, max_y);
@@ -109,21 +111,22 @@ public:
     rim_vis_.Update(SingletonVector(Hoop::DrawArc()));
 
     // backboard
-    Surface<NU_VIS, NV_VIS> surface = Backboard<NX, NY>::template Interpolate<NU_VIS, NV_VIS>(control_points);
+    Surface<NU_VIS, NV_VIS> surface =
+        Backboard<NX, NY>::template Interpolate<NU_VIS, NV_VIS>(control_points);
     backboard_vis_.Update(surface.position);
 
     // tangents
     std::vector<glm::vec3> tangents;
     std::vector<glm::vec3> normals;
-    for (int ku=0; ku<NU_VIS; ku++) {
-      for (int kv=0; kv<NV_VIS; kv++) {
+    for (int ku = 0; ku < NU_VIS; ku++) {
+      for (int kv = 0; kv < NV_VIS; kv++) {
         const glm::dvec3 &position = surface.position(ku, kv);
         const glm::dvec3 &tangent_u = surface.tangent_u(ku, kv);
         const glm::dvec3 &tangent_v = surface.tangent_v(ku, kv);
         tangents.emplace_back(position);
-        tangents.emplace_back(position + 0.1*tangent_u);
+        tangents.emplace_back(position + 0.1 * tangent_u);
         tangents.emplace_back(position);
-        tangents.emplace_back(position + 0.1*tangent_v);
+        tangents.emplace_back(position + 0.1 * tangent_v);
 
         if (ku > 0 && ku < NU_VIS - 1 && kv > 0 && kv < NV_VIS - 1) {
           normals.emplace_back(position);
@@ -136,8 +139,8 @@ public:
 
     // control points
     std::vector<glm::vec3> control_point_vec;
-    for (int kx=0; kx<NX; kx++) {
-      for (int ky=0; ky<NY; ky++) {
+    for (int kx = 0; kx < NX; kx++) {
+      for (int ky = 0; ky < NY; ky++) {
         const glm::dvec3 point = control_points(kx, ky);
         control_point_vec.emplace_back(point);
       }
@@ -146,7 +149,8 @@ public:
   }
 
   void HandleKeyPress(int key);
-private:
+
+ private:
   static Eigen::Matrix<glm::vec3, 2, 2> CourtCorners();
 
   bool shots_on_ = false;
