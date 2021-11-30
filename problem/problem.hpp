@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>           // for max
 #include <eigen3/Eigen/Dense>  // for Matrix
 #include <glm/glm.hpp>         // for dvec3
 #include <vector>              // for vector

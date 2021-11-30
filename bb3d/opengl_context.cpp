@@ -8,7 +8,6 @@
 #include <cstdlib>    // for EXIT_FAILURE
 #include <queue>      // for queue
 #include <string>     // for string
-#include <utility>    // for move
 #include <vector>     // for vector
 
 #define GLFW_INCLUDE_NONE
@@ -26,7 +25,7 @@
 namespace bb3d {
 static GLFWwindow *OpenglSetup(WindowState *window_state);
 
-Window::Window(std::unique_ptr<WindowState> window_state) : window_state_(std::move(window_state)) {
+Window::Window() : window_state_(std::make_unique<bb3d::WindowState>(bb3d::WindowState())) {
   glfw_window = OpenglSetup(window_state_.get());
 };
 

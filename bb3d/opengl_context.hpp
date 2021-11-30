@@ -29,7 +29,6 @@ struct MouseHandler {
 class WindowState {
  public:
   WindowState() = default;
-  ;
   ~WindowState() = default;
   ;
   [[nodiscard]] bool KeypressQueueEmpty() const;
@@ -44,7 +43,7 @@ class WindowState {
 
 class Window {
  public:
-  explicit Window(std::unique_ptr<WindowState> window_state);
+  explicit Window();
   ~Window();
   struct Size {
     int width;

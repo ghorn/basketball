@@ -1,15 +1,13 @@
 #include <bits/exception.h>  // for exception
 #include <sys/types.h>       // for key_t, uint
 
-#include <algorithm>           // for copy
+#include <algorithm>           // for copy, max
 #include <chrono>              // for operator""s, chrono_literals
 #include <cstdio>              // for fprintf, stderr
 #include <cstdlib>             // for EXIT_SUCCESS
-#include <deque>               // for _Deque_iterator
 #include <eigen3/Eigen/Dense>  // for Matrix, DenseCoeffsBase
 #include <functional>          // for function
 #include <iostream>            // for operator<<, basic_ostream, cerr, endl, ostream, cha...
-#include <memory>              // for make_unique
 #include <mutex>               // for mutex, lock_guard
 #include <optional>            // for optional, nullopt
 #include <queue>               // for queue
@@ -23,7 +21,7 @@
 #include <nlopt.hpp>    // for opt, LN_NELDERMEAD
 
 #include "bb3d/assert.hpp"            // for ASSERT
-#include "bb3d/opengl_context.hpp"    // for WindowState, Window
+#include "bb3d/opengl_context.hpp"    // for Window
 #include "problem/backboard.hpp"      // for Backboard
 #include "problem/problem.hpp"        // for Problem
 #include "problem/visualization.hpp"  // for ProblemVisualization
@@ -122,7 +120,7 @@ void Optimize(SharedData &shared_data) {
 
 int run_it() {
   // Boilerplate
-  bb3d::Window window(std::make_unique<bb3d::WindowState>(bb3d::WindowState()));
+  bb3d::Window window;
 
   // problem
   ProblemVisualization visualization;
