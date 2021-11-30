@@ -92,8 +92,8 @@ public:
       max_count = std::max(max_count, histogram(kx, ky));
     }
     Eigen::Matrix<std::pair<float, glm::vec3>, nx_hist, ny_hist> histogram_float;
-    const float max_z = -2.f;
-    const float min_z = -1.f;
+    const float max_z = -2.F;
+    const float min_z = -1.F;
     const glm::vec3 warm = {0.5, 0.7, 0};
     const glm::vec3 cold = {0, 0.4, 1};
     for (int kx=0; kx<nx_hist; kx++) {

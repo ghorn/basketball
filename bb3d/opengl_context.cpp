@@ -248,17 +248,17 @@ glm::mat4 WindowState::GetViewTransformation() const {
   return glm::lookAt(
     camera.Eye(),
     camera.Center(),
-    glm::vec3(0.0f, 0.0f, -1.0f));
+    glm::vec3(0.0F, 0.0F, -1.0F));
 }
 
 glm::mat4 Window::GetProjectionTransformation() const {
-  const float min_clip = 1e-3f;
-  const float max_clip = 1e4f;
+  const float min_clip = 1e-3F;
+  const float max_clip = 1e4F;
   Window::Size window_size = GetSize();
   window_size.width =  std::max(window_size.width, 1);
   window_size.height = std::max(window_size.height, 1);
   const float aspect_ratio = static_cast<float>(window_size.width)/static_cast<float>(window_size.height);
-  return glm::perspective(glm::radians(45.0f),
+  return glm::perspective(glm::radians(45.0F),
                           aspect_ratio,
                           min_clip,
                           max_clip);
@@ -270,8 +270,8 @@ glm::mat4 Window::GetOrthographicProjection() const {
   glfwGetWindowSize(glfw_window, &window_size.width, &window_size.height);
   window_size.width = std::max(window_size.width, 1);
   window_size.height = std::max(window_size.height, 1);
-  return glm::ortho(0.0f, static_cast<float>(window_size.width),
-                    0.0f, static_cast<float>(window_size.height));
+  return glm::ortho(0.0F, static_cast<float>(window_size.width),
+                    0.0F, static_cast<float>(window_size.height));
 }
 
 bool WindowState::IsDraggingOrRotating() const {

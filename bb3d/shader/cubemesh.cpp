@@ -75,8 +75,8 @@ void Cubemesh::Update(
   ASSERT(nx >= 2);
   ASSERT(ny >= 2);
 
-  const float dx = 0.5f * (max_x - min_x) / (static_cast<float>(nx) - 1);
-  const float dy = 0.5f * (max_y - min_y) / (static_cast<float>(ny) - 1);
+  const float dx = 0.5F * (max_x - min_x) / (static_cast<float>(nx) - 1);
+  const float dy = 0.5F * (max_y - min_y) / (static_cast<float>(ny) - 1);
   
   // Massage the data.
   std::vector<float> vertices;

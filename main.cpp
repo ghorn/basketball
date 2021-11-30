@@ -186,7 +186,7 @@ int run_it() {
     t_last = t_now;
 
     // Clear the screen to black
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     // NOLINTNEXTLINE(hicpp-signed-bitwise)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -195,9 +195,9 @@ int run_it() {
 
     // Model transformation
     glm::mat4 model = glm::rotate(
-      glm::mat4(1.0f),
-      time * glm::radians(0.1f * 180.0f),
-      glm::vec3(0.0f, 0.0f, 1.0f)
+      glm::mat4(1.0F),
+      time * glm::radians(0.1F * 180.0F),
+      glm::vec3(0.0F, 0.0F, 1.0F)
     );
     (void)model;
 
@@ -219,7 +219,7 @@ int run_it() {
     std::string fps_string(80, '\0');
     sprintf(fps_string.data(), "%.1f fps", 1 / frame_time);
     const bb3d::Window::Size window_size = window.GetSize();
-    textbox.RenderText(window, fps_string, 25.0f, static_cast<float>(window_size.height)-25.0f, glm::vec3(1, 1, 1));
+    textbox.RenderText(window, fps_string, 25.0F, static_cast<float>(window_size.height)-25.0F, glm::vec3(1, 1, 1));
 
     // Swap buffers and poll events
     window.SwapBuffers();

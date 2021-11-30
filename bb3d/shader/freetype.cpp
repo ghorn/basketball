@@ -102,7 +102,7 @@ Freetype::Freetype(int font_size) : shader_("bb3d/shader/freetype.vs", "bb3d/sha
 // render line of text
 // -------------------
 void Freetype::RenderText(const bb3d::Window &window, const std::string& text, float x, float y, glm::vec3 color) {
-  const float scale = 1.0f;
+  const float scale = 1.0F;
 
   // activate corresponding render state
   shader_.UseProgram();
@@ -131,13 +131,13 @@ void Freetype::RenderText(const bb3d::Window &window, const std::string& text, f
     float h = static_cast<float>(ch.Size.y) * scale;
     // update VBO for each character
     float vertices[6][4] = { // NOLINT
-        { xpos,     ypos + h,   0.0f, 0.0f },
-        { xpos,     ypos,       0.0f, 1.0f },
-        { xpos + w, ypos,       1.0f, 1.0f },
+        { xpos,     ypos + h,   0.0F, 0.0F },
+        { xpos,     ypos,       0.0F, 1.0F },
+        { xpos + w, ypos,       1.0F, 1.0F },
 
-        { xpos,     ypos + h,   0.0f, 0.0f },
-        { xpos + w, ypos,       1.0f, 1.0f },
-        { xpos + w, ypos + h,   1.0f, 0.0f }
+        { xpos,     ypos + h,   0.0F, 0.0F },
+        { xpos + w, ypos,       1.0F, 1.0F },
+        { xpos + w, ypos + h,   1.0F, 0.0F }
     };
     // render glyph texture over quad
     glBindTexture(GL_TEXTURE_2D, ch.TextureID);
