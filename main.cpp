@@ -214,7 +214,7 @@ int run_it() {
     }
 
     // Draw some dummy text.
-    char fps_string[80];
+    char fps_string[80]; // NOLINT
     sprintf(fps_string, "%.1f fps", 1 / frame_time);
     const bb3d::Window::Size window_size = window.GetSize();
     textbox.RenderText(window, std::string(fps_string), 25.0f, (float)window_size.height-25.0f, glm::vec3(1, 1, 1));

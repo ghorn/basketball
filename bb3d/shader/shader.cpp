@@ -25,7 +25,7 @@ static inline std::string ReadFile(const std::string &path) {
 
 static void CheckCompileErrors(GLuint shader, std::string type) {
   GLint success;
-  GLchar infoLog[1024];
+  GLchar infoLog[1024];  // NOLINT
   if(type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
