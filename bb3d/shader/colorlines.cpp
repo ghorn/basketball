@@ -23,7 +23,7 @@ ColorLines::ColorLines() : shader_("bb3d/shader/colorlines.vs", "bb3d/shader/col
                nullptr,
                GL_DYNAMIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (GLvoid*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (GLvoid*)nullptr);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (GLvoid*)(3*sizeof(float)));
   glEnableVertexAttribArray(1);

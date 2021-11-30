@@ -29,7 +29,7 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
   if(type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-      glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+      glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
       std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
@@ -38,7 +38,7 @@ static void CheckCompileErrors(GLuint shader, std::string type) {
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if(!success) {
-      glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+      glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
       std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << std::endl;
       std::cerr << infoLog << std::endl;
       std::cerr << " -- --------------------------------------------------- -- " << std::endl;
@@ -56,7 +56,7 @@ Shader::Shader(const std::string vshader_path,
   const GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
   std::string vshader_code = ReadFile(vshader_path);
   const char *vshader_code_str = vshader_code.c_str();
-  glShaderSource(vertex, 1, &vshader_code_str, NULL);
+  glShaderSource(vertex, 1, &vshader_code_str, nullptr);
   glCompileShader(vertex);
   CheckCompileErrors(vertex, "VERTEX");
 
@@ -64,7 +64,7 @@ Shader::Shader(const std::string vshader_path,
   GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
   std::string fshader_code = ReadFile(fshader_path);;
   const char *fshader_code_str = fshader_code.c_str();
-  glShaderSource(fragment, 1, &fshader_code_str, NULL);
+  glShaderSource(fragment, 1, &fshader_code_str, nullptr);
   glCompileShader(fragment);
   CheckCompileErrors(fragment, "FRAGMENT");
 
@@ -74,7 +74,7 @@ Shader::Shader(const std::string vshader_path,
     const std::string gshader_code = ReadFile(gshader_path);
     const char * gshader_code_str = gshader_code.c_str();
     geometry = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderSource(geometry, 1, &gshader_code_str, NULL);
+    glShaderSource(geometry, 1, &gshader_code_str, nullptr);
     glCompileShader(geometry);
     CheckCompileErrors(geometry, "GEOMETRY");
   }

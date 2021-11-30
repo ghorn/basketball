@@ -59,7 +59,7 @@ void Cubemesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   glDisable(GL_POLYGON_SMOOTH);
 
   // Draw triangles
-  glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, nullptr);
 
   // unbind vao
   glBindVertexArray(0);

@@ -54,7 +54,7 @@ Gridmesh::Gridmesh(const std::string &image_path) :
   int image_width = 0;
   int image_height = 0;
   unsigned char* image = SOIL_load_image(image_path.c_str(),
-                                         &image_width, &image_height, 0, SOIL_LOAD_RGBA);
+                                         &image_width, &image_height, nullptr, SOIL_LOAD_RGBA);
   if (image == nullptr) {
     fprintf(stderr, "Can't load image %s: %s\n", image_path.c_str(), SOIL_last_result());
     exit_thread_safe(EXIT_FAILURE);
@@ -96,7 +96,7 @@ void Gridmesh::Draw(const glm::mat4 &view, const glm::mat4 &proj) {
   glDisable(GL_POLYGON_SMOOTH);
 
   // Draw triangles
-  glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, nullptr);
 
   // unbind vao
   glBindVertexArray(0);

@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,llvm-include-order,concurrency-*,bugprone-*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,llvm-include-order,concurrency-*,bugprone-*,modernize-use-nullptr,-llvm-callee-namespace,-llvmlibc-restrict-system-libc-headers,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-google-readability-casting,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-cppcoreguidelines-pro-type-union-access'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
