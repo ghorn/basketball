@@ -28,6 +28,17 @@ git_repository(
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 boost_deps()
 
+#local_repository(
+#    name = "bb3d",
+#    path = "/home/greg/bb3d",
+#)
+git_repository(
+    name = "bb3d",
+    remote = "https://github.com/ghorn/bb3d.git",
+    commit = "799334d625dcd3a5b362a3f62c618fcd3ccb80d8",
+    shallow_since = "1638316800 -0800",
+)
+
 #[
 #    http_archive(
 #        name = "dem_{}".format(dem_name),

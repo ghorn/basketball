@@ -118,9 +118,9 @@ void Optimize(SharedData &shared_data) {
   }
 }
 
-int run_it() {
+int run_it(char *argv0) {
   // Boilerplate
-  bb3d::Window window;
+  bb3d::Window window(argv0);
 
   // problem
   ProblemVisualization visualization;
@@ -165,7 +165,7 @@ int run_it() {
 
 int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused))) {
   try {
-    run_it();
+    run_it(argv[0]);
   } catch (const std::exception &e) {
     std::cerr << e.what();
   }
